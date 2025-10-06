@@ -200,7 +200,7 @@ export default function AboutPage() {
                     highlight: "Fair Trade"
                   }
                 ].map((item, idx) => (
-                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 shadow-xl border border-[#4b2e19]/10 hover:shadow-2xl transition-all duration-300">
+                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-[#4b2e19]/10 hover:shadow-md transition-all duration-300">
                     <div className="flex items-start gap-6">
                       <div className="w-16 h-16 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
                         {item.icon}
@@ -267,7 +267,7 @@ export default function AboutPage() {
                     detail: "Packaged with Love"
                   }
                 ].map((item, idx) => (
-                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 shadow-xl border border-[#4b2e19]/10">
+                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#4b2e19]/10">
                     <div className="flex flex-col lg:flex-row items-center gap-8">
                       <div className="flex-shrink-0">
                         <div className="relative">
