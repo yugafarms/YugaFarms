@@ -1,10 +1,10 @@
 "use client";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const params = useSearchParams();
   const router = useRouter();
   const [password, setPassword] = useState("");
@@ -43,8 +43,8 @@ export default function ResetPasswordPage() {
       }
       setSuccess(true);
       setTimeout(() => router.replace("/login"), 1500);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to reset password");
     } finally {
       setLoading(false);
     }
@@ -114,6 +114,23 @@ export default function ResetPasswordPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[70vh] bg-[#fdf7f2] flex items-center justify-center px-4">
+        <div className="w-full max-w-md bg-white/80 backdrop-blur rounded-xl shadow border border-[#2D2D2D]/10 p-6">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#4b2e19] mx-auto mb-4"></div>
+            <p className="text-[#4b2e19] text-sm">Loading...</p>
+          </div>
+        </div>
+      </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
 

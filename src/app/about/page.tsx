@@ -1,9 +1,48 @@
 'use client'
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import Image from "next/image";
 
 export default function AboutPage() {
+  const [counters, setCounters] = useState({ years: 0, families: 0, natural: 0, generations: 0 });
+  const statsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          // Animate counters
+          const animateCounter = (target: number, key: keyof typeof counters, duration: number = 2000) => {
+            let start = 0;
+            const increment = target / (duration / 16);
+            const timer = setInterval(() => {
+              start += increment;
+              if (start >= target) {
+                setCounters(prev => ({ ...prev, [key]: target }));
+                clearInterval(timer);
+              } else {
+                setCounters(prev => ({ ...prev, [key]: Math.floor(start) }));
+              }
+            }, 16);
+          };
+
+          animateCounter(38, 'years');
+          animateCounter(50, 'families');
+          animateCounter(100, 'natural');
+          animateCounter(3, 'generations');
+        }
+      },
+      { threshold: 0.3 }
+    );
+
+    if (statsRef.current) {
+      observer.observe(statsRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <TopBar />
@@ -13,23 +52,23 @@ export default function AboutPage() {
            <div className="container mx-auto px-4">
              <div className="text-center mb-16">
                <div className="inline-block relative">
-                 <h1 className="text-5xl md:text-7xl font-[Pacifico] text-[#4b2e19] mb-4">
+                 <h1 className="text-5xl md:text-7xl font-[Pacifico] text-[#4b2e19] mb-4 transition-all duration-700 hover:scale-105">
                    Our <span className="text-[#f5d26a]">Story</span>
                  </h1>
                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-[#f5d26a] to-[#4b2e19] rounded-full"></div>
                </div>
-               <p className="text-xl text-[#2D2D2D]/70 mt-6 max-w-3xl mx-auto leading-relaxed">
+               <p className="text-xl text-[#2D2D2D]/70 mt-6 max-w-3xl mx-auto leading-relaxed transition-all duration-700 delay-300">
                  Reviving the ancient wisdom of Old Bharat, we bring you pure, traditional products crafted with the same love and dedication that our ancestors used for generations.
                </p>
              </div>
 
              {/* Video Section */}
              <div className="max-w-5xl mx-auto mb-20">
-               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#f5d26a]/20">
+               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#f5d26a]/20 transition-all duration-500 hover:shadow-3xl hover:scale-[1.02] group">
                  <div className="aspect-video bg-gradient-to-br from-[#4b2e19] to-[#2f4f2f] flex items-center justify-center">
                    {/* YouTube Video Placeholder - Replace with actual video ID */}
                    <iframe
-                     className="w-full h-full rounded-2xl"
+                     className="w-full h-full rounded-2xl transition-all duration-500 group-hover:scale-105"
                      src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=example"
                      title="Our Farm Story - YugaFarms"
                      frameBorder="0"
@@ -38,15 +77,15 @@ export default function AboutPage() {
                    ></iframe>
                  </div>
                  {/* Decorative Elements */}
-                 <div className="absolute -top-6 -left-6 w-20 h-20 border-3 border-[#f5d26a]/40 rounded-full"></div>
-                 <div className="absolute -bottom-6 -right-6 w-16 h-16 border-3 border-[#4b2e19]/30 rounded-full"></div>
-                 <div className="absolute top-1/2 -left-3 w-12 h-12 border-2 border-[#2f4f2f]/20 rounded-full"></div>
-                 <div className="absolute top-1/4 -right-3 w-8 h-8 border-2 border-[#f5d26a]/30 rounded-full"></div>
+                 <div className="absolute -top-6 -left-6 w-20 h-20 border-3 border-[#f5d26a]/40 rounded-full transition-all duration-500 group-hover:border-[#f5d26a]/60 group-hover:scale-110"></div>
+                 <div className="absolute -bottom-6 -right-6 w-16 h-16 border-3 border-[#4b2e19]/30 rounded-full transition-all duration-500 group-hover:border-[#4b2e19]/50 group-hover:scale-110"></div>
+                 <div className="absolute top-1/2 -left-3 w-12 h-12 border-2 border-[#2f4f2f]/20 rounded-full transition-all duration-500 group-hover:border-[#2f4f2f]/40 group-hover:scale-110"></div>
+                 <div className="absolute top-1/4 -right-3 w-8 h-8 border-2 border-[#f5d26a]/30 rounded-full transition-all duration-500 group-hover:border-[#f5d26a]/50 group-hover:scale-110"></div>
                </div>
                
                {/* Video Caption */}
                <div className="text-center mt-6">
-                 <p className="text-[#2D2D2D]/60 italic text-lg">
+                 <p className="text-[#2D2D2D]/60 italic text-lg transition-all duration-500">
                  &quot;Watch our journey from farm to your table, preserving traditions that have nourished families for centuries.&quot;
                  </p>
                </div>
@@ -65,8 +104,8 @@ export default function AboutPage() {
         <section className="py-20 md:py-24 bg-[#eef2e9]">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6">Reviving Ancient Wisdom</h2>
-              <p className="text-xl text-[#2D2D2D]/70 max-w-4xl mx-auto leading-relaxed">
+              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6 transition-all duration-700 hover:scale-105">Reviving Ancient Wisdom</h2>
+              <p className="text-xl text-[#2D2D2D]/70 max-w-4xl mx-auto leading-relaxed transition-all duration-700 delay-300">
                 In a world rushing towards modernity, we chose to slow down and embrace the timeless wisdom of our ancestors. 
                 Every product we create is a testament to the ancient art of pure, natural food preparation.
               </p>
@@ -74,17 +113,17 @@ export default function AboutPage() {
 
             <div className="max-w-6xl mx-auto">
               {/* Main Story Section */}
-              <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 mb-16 border border-[#4b2e19]/10">
+              <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 mb-16 border border-[#4b2e19]/10 transition-all duration-500">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                   {/* Left Side - Story */}
                   <div className="space-y-6">
-                    <div className="flex items-center gap-4 mb-6">
-                      <div className="w-16 h-16 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-2xl shadow-lg">
-                        🏺
+                    <div className="flex items-center gap-4 mb-6 group">
+                      <div className="w-16 h-16 bg-gradient-to-br from-[#ffe189] to-[#ffd93f] rounded-full flex items-center justify-center text-2xl shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
+                        <Image src="/images/journey.png" alt="Rooted in Tradition" width={64} height={64} className="w-full h-full object-contain" />
                       </div>
                       <div>
-                        <h3 className="text-3xl font-bold text-[#4b2e19]">The Journey Begins</h3>
-                        <p className="text-[#f5d26a] font-semibold">Since 1985</p>
+                        <h3 className="text-3xl font-bold text-[#4b2e19] transition-colors duration-300 group-hover:text-[#2f4f2f]">The Journey Begins</h3>
+                        <p className="text-[#bb8c00] font-semibold">Since 1985</p>
                       </div>
                     </div>
                     
@@ -105,55 +144,57 @@ export default function AboutPage() {
                   </div>
 
                   {/* Right Side - Visual */}
-                  <div className="relative">
-                    <div className="w-80 h-80 mx-auto bg-gradient-to-br from-[#f5d26a]/20 via-[#e6b800]/10 to-[#2f4f2f]/20 rounded-full relative overflow-hidden shadow-2xl">
+                  <div className="relative group">
+                    <div className="max-w-100 max-h-100 mx-auto bg-gradient-to-br relative overflow-hidden">
                       {/* Inner circles */}
-                      <div className="absolute inset-6 bg-white/40 rounded-full backdrop-blur-sm"></div>
-                      <div className="absolute inset-12 bg-gradient-to-br from-[#f5d26a]/50 to-[#4b2e19]/30 rounded-full backdrop-blur-sm"></div>
+                      {/* <div className="absolute inset-6 bg-white/40 rounded-full backdrop-blur-sm"></div>
+                      <div className="absolute inset-12 bg-gradient-to-br from-[#f5d26a]/50 to-[#4b2e19]/30 rounded-full backdrop-blur-sm"></div> */}
 
                       {/* Central content */}
-                      <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
+                      {/* <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
                         <div className="text-6xl">🏺</div>
                         <div className="text-center space-y-1">
                           <div className="text-xl font-bold text-[#4b2e19]">Traditional</div>
                           <div className="text-[#2D2D2D]/70 text-sm">Bilona Method</div>
                         </div>
-                      </div>
+                      </div> */}
 
                       {/* Floating elements */}
-                      <div className="absolute top-6 right-6 w-12 h-12 bg-white/50 rounded-full backdrop-blur-sm flex items-center justify-center text-lg shadow-lg">
+                      {/* <div className="absolute top-6 right-6 w-12 h-12 bg-white/50 rounded-full backdrop-blur-sm flex items-center justify-center text-lg shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-12">
                         🧈
                       </div>
-                      <div className="absolute bottom-6 left-6 w-12 h-12 bg-white/50 rounded-full backdrop-blur-sm flex items-center justify-center text-lg shadow-lg">
+                      <div className="absolute bottom-6 left-6 w-12 h-12 bg-white/50 rounded-full backdrop-blur-sm flex items-center justify-center text-lg shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:-rotate-12">
                         🍯
                       </div>
-                      <div className="absolute top-1/2 left-3 w-8 h-8 bg-white/40 rounded-full backdrop-blur-sm flex items-center justify-center text-sm shadow-lg">
+                      <div className="absolute top-1/2 left-3 w-8 h-8 bg-white/40 rounded-full backdrop-blur-sm flex items-center justify-center text-sm shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
                         🌾
                       </div>
-                      <div className="absolute top-1/2 right-3 w-8 h-8 bg-white/40 rounded-full backdrop-blur-sm flex items-center justify-center text-sm shadow-lg">
+                      <div className="absolute top-1/2 right-3 w-8 h-8 bg-white/40 rounded-full backdrop-blur-sm flex items-center justify-center text-sm shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6">
                         🌿
-                      </div>
+                      </div> */}
+
+                      <Image src="/logo final.png" alt="Heritage" width={500} height={500} className="w-full h-full object-cover" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Heritage Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div className="text-center p-6 bg-white/40 rounded-2xl border border-[#4b2e19]/10">
-                  <div className="text-4xl font-bold text-[#4b2e19] mb-2">38+</div>
+              <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div className="text-center p-6 bg-white/40 rounded-2xl border border-[#4b2e19]/10 transition-all duration-500 hover:shadow-lg hover:scale-105 group">
+                  <div className="text-4xl font-bold text-[#4b2e19] mb-2 transition-colors duration-300 group-hover:text-[#2f4f2f]">{counters.years}+</div>
                   <div className="text-sm text-[#2D2D2D]/70 font-medium">Years of Tradition</div>
                 </div>
-                <div className="text-center p-6 bg-white/40 rounded-2xl border border-[#4b2e19]/10">
-                  <div className="text-4xl font-bold text-[#4b2e19] mb-2">50K+</div>
+                <div className="text-center p-6 bg-white/40 rounded-2xl border border-[#4b2e19]/10 transition-all duration-500 hover:shadow-lg hover:scale-105 group">
+                  <div className="text-4xl font-bold text-[#4b2e19] mb-2 transition-colors duration-300 group-hover:text-[#2f4f2f]">{counters.families}K+</div>
                   <div className="text-sm text-[#2D2D2D]/70 font-medium">Happy Families</div>
                 </div>
-                <div className="text-center p-6 bg-white/40 rounded-2xl border border-[#4b2e19]/10">
-                  <div className="text-4xl font-bold text-[#4b2e19] mb-2">100%</div>
+                <div className="text-center p-6 bg-white/40 rounded-2xl border border-[#4b2e19]/10 transition-all duration-500 hover:shadow-lg hover:scale-105 group">
+                  <div className="text-4xl font-bold text-[#4b2e19] mb-2 transition-colors duration-300 group-hover:text-[#2f4f2f]">{counters.natural}%</div>
                   <div className="text-sm text-[#2D2D2D]/70 font-medium">Natural Products</div>
                 </div>
-                <div className="text-center p-6 bg-white/40 rounded-2xl border border-[#4b2e19]/10">
-                  <div className="text-4xl font-bold text-[#4b2e19] mb-2">3</div>
+                <div className="text-center p-6 bg-white/40 rounded-2xl border border-[#4b2e19]/10 transition-all duration-500 hover:shadow-lg hover:scale-105 group">
+                  <div className="text-4xl font-bold text-[#4b2e19] mb-2 transition-colors duration-300 group-hover:text-[#2f4f2f]">{counters.generations}</div>
                   <div className="text-sm text-[#2D2D2D]/70 font-medium">Generations</div>
                 </div>
               </div>
@@ -165,8 +206,8 @@ export default function AboutPage() {
         <section className="py-20 md:py-24 bg-gradient-to-br from-[#fdf7f2] to-[#f8f4e6]">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6">Our Sacred Promise</h2>
-              <p className="text-xl text-[#2D2D2D]/70 max-w-4xl mx-auto leading-relaxed">
+              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6 transition-all duration-700 hover:scale-105">Our Sacred Promise</h2>
+              <p className="text-xl text-[#2D2D2D]/70 max-w-4xl mx-auto leading-relaxed transition-all duration-700 delay-300">
                 To you, our extended family, we make these solemn commitments that guide every decision we make, 
                 every product we create, and every relationship we build.
               </p>
@@ -200,15 +241,15 @@ export default function AboutPage() {
                     highlight: "Fair Trade"
                   }
                 ].map((item, idx) => (
-                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-[#4b2e19]/10 hover:shadow-md transition-all duration-300">
+                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-[#4b2e19]/10 hover:shadow-xl transition-all duration-500 hover:scale-[1.02] group">
                     <div className="flex items-start gap-6">
-                      <div className="w-16 h-16 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-2xl shadow-lg flex-shrink-0">
+                      <div className="w-16 h-16 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-2xl shadow-lg flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
                         {item.icon}
                       </div>
                       <div className="space-y-4">
                         <div>
-                          <h3 className="text-2xl font-bold text-[#4b2e19] mb-2">{item.title}</h3>
-                          <span className="inline-block bg-[#f5d26a]/20 text-[#4b2e19] px-3 py-1 rounded-full text-sm font-semibold">
+                          <h3 className="text-2xl font-bold text-[#4b2e19] mb-2 transition-colors duration-300 group-hover:text-[#2f4f2f]">{item.title}</h3>
+                          <span className="inline-block bg-[#f5d26a]/20 text-[#4b2e19] px-3 py-1 rounded-full text-sm font-semibold transition-all duration-300 group-hover:bg-[#f5d26a]/30">
                             {item.highlight}
                           </span>
                         </div>
@@ -228,8 +269,8 @@ export default function AboutPage() {
         <section className="py-20 md:py-24 bg-[#eef2e9]">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6">The Art of Creation</h2>
-              <p className="text-xl text-[#2D2D2D]/70 max-w-4xl mx-auto leading-relaxed">
+              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6 transition-all duration-700 hover:scale-105">The Art of Creation</h2>
+              <p className="text-xl text-[#2D2D2D]/70 max-w-4xl mx-auto leading-relaxed transition-all duration-700 delay-300">
                 Every product we create follows a sacred ritual that has been passed down through generations. 
                 This is not just a process - it&apos;s a meditation, a prayer, a celebration of nature&apos;s gifts.
               </p>
@@ -242,47 +283,47 @@ export default function AboutPage() {
                     step: "01",
                     title: "Sacred Sourcing",
                     description: "We begin at dawn, visiting our trusted partner farms where cows graze freely on organic pastures. We select only the finest, freshest milk from grass-fed cows and pure honey from specific flower sources, ensuring each ingredient carries the essence of its natural environment.",
-                    icon: "🌾",
+                    icon: "/images/sacredsourcing.png",
                     detail: "Farm Visits at Dawn"
                   },
                   {
                     step: "02", 
                     title: "Traditional Preparation",
                     description: "In our traditional kitchen, we use the ancient bilona churning method for ghee - a slow, rhythmic process that takes hours but preserves every nutrient. For honey, we practice gentle extraction that maintains the natural enzymes and pollen that make it truly beneficial.",
-                    icon: "🏺",
+                    icon: "/images/traditionalpreparation.png",
                     detail: "Hand-Churned for Hours"
                   },
                   {
                     step: "03",
                     title: "Rigorous Testing",
                     description: "Every batch undergoes comprehensive testing in our laboratory to ensure purity, authenticity, and nutritional value. We test for adulteration, check nutritional content, and verify that our products meet the highest standards of quality and safety.",
-                    icon: "🔬",
+                    icon: "/images/rigoroustesting.png",
                     detail: "Lab Tested & Verified"
                   },
                   {
                     step: "04",
                     title: "Blessed Packaging",
                     description: "Each product is carefully packaged in food-grade containers that preserve freshness and purity. We treat this final step as a blessing, ensuring that when our products reach your home, they carry the same love and care with which they were created.",
-                    icon: "📦",
+                    icon: "/images/blessedpackaging.png",
                     detail: "Packaged with Love"
                   }
                 ].map((item, idx) => (
-                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#4b2e19]/10">
+                  <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#4b2e19]/10 transition-all duration-500 hover:shadow-xl hover:scale-[1.01] group">
                     <div className="flex flex-col lg:flex-row items-center gap-8">
                       <div className="flex-shrink-0">
                         <div className="relative">
-                          <div className="w-24 h-24 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-3xl shadow-2xl">
-                            {item.icon}
+                          <div className="w-24 h-24 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-3xl shadow-2xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-3xl">
+                            <Image src={item.icon} alt={item.title} width={96} height={96} />
                           </div>
-                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#4b2e19] text-white rounded-full flex items-center justify-center text-sm font-bold">
+                          <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#4b2e19] text-white rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 group-hover:scale-110">
                             {item.step}
                           </div>
                         </div>
                       </div>
                       <div className="flex-1 text-center lg:text-left">
                         <div className="mb-4">
-                          <h3 className="text-3xl font-bold text-[#4b2e19] mb-2">{item.title}</h3>
-                          <span className="inline-block bg-[#f5d26a]/20 text-[#4b2e19] px-4 py-2 rounded-full text-sm font-semibold">
+                          <h3 className="text-3xl font-bold text-[#4b2e19] mb-2 transition-colors duration-300 group-hover:text-[#2f4f2f]">{item.title}</h3>
+                          <span className="inline-block bg-[#f5d26a]/20 text-[#4b2e19] px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 group-hover:bg-[#f5d26a]/30">
                             {item.detail}
                           </span>
                         </div>

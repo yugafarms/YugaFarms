@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { useCart } from "@/app/context/CartContext";
@@ -46,8 +47,7 @@ export default function HoneyPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedVariants, setSelectedVariants] = useState<{[key: number]: number}>({});
-  const { addToCart, isLoading: cartLoading, items: cartItems } = useCart();
+  const { addToCart, isLoading: cartLoading } = useCart();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -115,21 +115,6 @@ export default function HoneyPage() {
     }
   };
 
-  const handleVariantChange = (productId: number, variantId: number) => {
-    setSelectedVariants(prev => ({
-      ...prev,
-      [productId]: variantId
-    }));
-  };
-
-  const isItemInCart = (productId: number, variantId: number) => {
-    return cartItems.some(item => item.productId === productId && item.variantId === variantId);
-  };
-
-  const getCartItemQuantity = (productId: number, variantId: number) => {
-    const cartItem = cartItems.find(item => item.productId === productId && item.variantId === variantId);
-    return cartItem ? cartItem.quantity : 0;
-  };
 
   if (loading) {
     return (
@@ -213,16 +198,10 @@ export default function HoneyPage() {
                   const emoji = getProductEmoji(product.Title);
                   const gradient = getProductGradient(idx);
                   const badge = getProductBadge(idx);
-                  const features = product.Tags.map(tag => tag.Value);
                   
                   // Calculate pricing from variants
                   const variants = product.Variants || [];
                   const hasVariants = variants.length > 0;
-                  const selectedVariantId = selectedVariants[product.id] || variants[0]?.id;
-                  const selectedVariant = variants.find(v => v.id === selectedVariantId) || variants[0];
-                  const currentPrice = selectedVariant ? (selectedVariant.Price - (selectedVariant.Discount || 0)) : 0;
-                  const originalPrice = selectedVariant ? selectedVariant.Price : 0;
-                  const savings = selectedVariant ? (selectedVariant.Discount || 0) : 0;
 
                   return (
                     <div key={product.id} className="rounded-3xl border border-[#4b2e19]/15 bg-white hover:shadow-md transition-all duration-300 group overflow-hidden">
@@ -230,9 +209,11 @@ export default function HoneyPage() {
                       <Link href={`/product/${product.id}`} className="block">
                         <div className={`relative h-64 bg-gradient-to-br ${gradient} rounded-t-3xl flex items-center justify-center overflow-hidden cursor-pointer`}>
                           {product.Image && product.Image.length > 0 ? (
-                            <img 
+                            <Image 
                               src={`${BACKEND}${product.Image[0].url}`} 
                               alt={product.Image[0].alternativeText || product.Title}
+                              width={400}
+                              height={256}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           ) : (

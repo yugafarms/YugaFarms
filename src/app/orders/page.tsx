@@ -1,10 +1,9 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
-import { useAuth } from "@/app/context/AuthContext";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -47,8 +46,6 @@ type Order = {
 };
 
 export default function OrdersPage() {
-  const router = useRouter();
-  const { user, jwt } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -200,7 +197,7 @@ export default function OrdersPage() {
               <div className="text-8xl mb-6">📦</div>
               <h2 className="text-3xl font-bold text-[#4b2e19] mb-4">No Orders Yet</h2>
               <p className="text-lg text-[#2D2D2D]/70 mb-8 max-w-md mx-auto">
-                You haven't placed any orders yet. Start shopping to see your orders here!
+                You haven&apos;t placed any orders yet. Start shopping to see your orders here!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
@@ -258,9 +255,11 @@ export default function OrdersPage() {
                         <div key={index} className="flex items-center gap-4 p-3 bg-[#f8f4e6]/50 rounded-xl">
                           <div className="w-12 h-12 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-lg flex items-center justify-center overflow-hidden">
                             {item.productImage ? (
-                              <img 
+                              <Image 
                                 src={item.productImage} 
                                 alt={item.productTitle}
+                                width={48}
+                                height={48}
                                 className="w-full h-full object-cover"
                               />
                             ) : (

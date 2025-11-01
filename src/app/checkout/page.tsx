@@ -1,7 +1,6 @@
 'use client'
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { useCart } from "@/app/context/CartContext";
@@ -22,9 +21,59 @@ type Address = {
 
 type PaymentMethod = 'COD' | 'RAZORPAY';
 
+type RazorpayPaymentResponse = {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+};
+
+type RazorpayPaymentFailedResponse = {
+  error: {
+    code: string;
+    description: string;
+    source: string;
+    step: string;
+    reason: string;
+    metadata: {
+      order_id: string;
+      payment_id: string;
+    };
+  };
+};
+
+interface RazorpayOptions {
+  key: string;
+  amount: number;
+  currency: string;
+  name: string;
+  description: string;
+  order_id: string;
+  handler: (response: RazorpayPaymentResponse) => void | Promise<void>;
+  prefill?: {
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
+  notes?: Record<string, string>;
+  theme?: {
+    color: string;
+  };
+}
+
+interface RazorpayInstance {
+  on: (event: string, handler: (response: RazorpayPaymentFailedResponse) => void) => void;
+  open: () => void;
+}
+
+declare global {
+  interface Window {
+    Razorpay: new (options: RazorpayOptions) => RazorpayInstance;
+  }
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, totalItems, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart } = useCart();
   const { user, jwt } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -61,26 +110,7 @@ export default function CheckoutPage() {
   const shipping = totalPrice >= 699 ? 0 : 50;
   const finalTotal = totalPrice + tax + shipping;
 
-  useEffect(() => {
-    // Redirect if cart is empty
-    if (items.length === 0) {
-      router.push('/cart');
-      return;
-    }
-    
-    // Redirect if user is not logged in
-    if (!user) {
-      router.push('/login?redirect=/checkout');
-      return;
-    }
-    
-    // Load user's saved address if available
-    if (user) {
-      loadUserAddress();
-    }
-  }, [items, user, router]);
-
-  const loadUserAddress = async () => {
+  const loadUserAddress = useCallback(async () => {
     if (!jwt) return;
     
     try {
@@ -106,7 +136,26 @@ export default function CheckoutPage() {
     } catch (error) {
       console.error('Error loading user address:', error);
     }
-  };
+  }, [jwt]);
+
+  useEffect(() => {
+    // Redirect if cart is empty
+    if (items.length === 0) {
+      router.push('/cart');
+      return;
+    }
+    
+    // Redirect if user is not logged in
+    if (!user) {
+      router.push('/login?redirect=/checkout');
+      return;
+    }
+    
+    // Load user's saved address if available
+    if (user) {
+      loadUserAddress();
+    }
+  }, [items, user, router, loadUserAddress]);
 
   const validateAddress = (address: Address): string[] => {
     const errors: string[] = [];
@@ -244,7 +293,7 @@ export default function CheckoutPage() {
       name: 'YugaFarms',
       description: `Order #${order.data.orderNumber}`,
       order_id: order.data.razorpayOrderId,
-      handler: async function (response: any) {
+      handler: async function (response: RazorpayPaymentResponse) {
         // Payment successful
         await handlePaymentSuccess(order.data.id, response);
       },
@@ -263,8 +312,9 @@ export default function CheckoutPage() {
     };
 
     try {
-      const razorpay = new (window as any).Razorpay(options);
-      razorpay.on('payment.failed', function (response: any) {
+      const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', function (response: RazorpayPaymentFailedResponse) {
+        console.error('Payment failed:', response.error);
         alert('Payment failed. Please try again.');
       });
       
@@ -275,7 +325,7 @@ export default function CheckoutPage() {
     }
   };
 
-  const handlePaymentSuccess = async (orderId: number, paymentResponse: any) => {
+  const handlePaymentSuccess = async (orderId: number, paymentResponse: RazorpayPaymentResponse) => {
     try {
       // Use test endpoint for now (no authentication required)
       const response = await fetch(`${BACKEND}/api/test-orders/${orderId}/confirm-payment`, {

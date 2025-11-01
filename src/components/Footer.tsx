@@ -9,8 +9,8 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div>
                         <Link href="/" className="flex items-center">
-                            <Image src="/file.svg" alt="YugaFarms Logo" width={40} height={40} className="object-contain" />
-                            <span className="ml-2 font-[Pacifico] text-xl text-[#4b2e19]">YugaFarms</span>
+                            <Image src="/logo.svg" alt="YugaFarms Logo" width={80} height={80} className="object-contain" />
+                            {/* <span className="ml-2 font-[Pacifico] text-xl text-[#4b2e19]">YugaFarms</span> */}
                         </Link>
                         <p className="mt-3 text-sm text-[#2D2D2D]/70 max-w-xs">Pure, traditionally crafted ghee and oils made the slow way — from farm to your plate.</p>
                     </div>

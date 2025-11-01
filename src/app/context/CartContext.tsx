@@ -38,39 +38,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { user, jwt } = useAuth();
 
   // Load cart from localStorage on mount
-  useEffect(() => {
-    try {
-      const storedCart = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.cart) : null;
-      if (storedCart) {
-        setItems(JSON.parse(storedCart));
-      }
-    } catch (e) {
-      console.error("Error loading cart from localStorage:", e);
-    }
-  }, []);
-
-  // Sync cart with backend when user logs in
-  useEffect(() => {
-    if (user && jwt) {
-      syncCart();
-    }
-  }, [user, jwt]);
-
-  // Persist cart to localStorage whenever items change
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(items));
-    }
-  }, [items]);
-
-  const totalItems = useMemo(() => {
-    return items.reduce((sum, item) => sum + item.quantity, 0);
-  }, [items]);
-
-  const totalPrice = useMemo(() => {
-    return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  }, [items]);
-
+  
   const syncCart = useCallback(async () => {
     if (!user || !jwt) return;
 
@@ -89,7 +57,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         // Merge with local cart (backend takes precedence for conflicts)
         const mergedCart = [...items];
         
-        backendCart.forEach((backendItem: any) => {
+        backendCart.forEach((backendItem: CartItem) => {
           const existingIndex = mergedCart.findIndex(
             item => item.productId === backendItem.productId && item.variantId === backendItem.variantId
           );
@@ -111,6 +79,39 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     }
   }, [user, jwt, items]);
+  useEffect(() => {
+    try {
+      const storedCart = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.cart) : null;
+      if (storedCart) {
+        setItems(JSON.parse(storedCart));
+      }
+    } catch (e) {
+      console.error("Error loading cart from localStorage:", e);
+    }
+  }, []);
+
+  // Sync cart with backend when user logs in
+  useEffect(() => {
+    if (user && jwt) {
+      syncCart();
+    }
+  }, [user, jwt, syncCart]);
+
+  // Persist cart to localStorage whenever items change
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEYS.cart, JSON.stringify(items));
+    }
+  }, [items]);
+
+  const totalItems = useMemo(() => {
+    return items.reduce((sum, item) => sum + item.quantity, 0);
+  }, [items]);
+
+  const totalPrice = useMemo(() => {
+    return items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [items]);
+
 
   const saveCartToBackend = useCallback(async (cartItems: CartItem[]) => {
     if (!user || !jwt) return;

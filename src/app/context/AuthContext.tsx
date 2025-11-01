@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const storedUser = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.user) : null;
       if (storedJwt) setJwt(storedJwt);
       if (storedUser) setUser(JSON.parse(storedUser));
-    } catch (e) {
+    } catch {
       // ignore
     } finally {
       setIsLoading(false);

@@ -16,7 +16,7 @@ export default function TopBar() {
         <>
             {/* Offers Strip */}
             <div className="fixed top-0 left-0 right-0 z-[60] bg-[#4b2e19] text-[#f5d26a] text-sm">
-                <div className="relative overflow-hidden h-9 flex items-center">
+                <div className="relative overflow-hidden h-12 flex items-center">
                     <div className="marquee-track will-change-transform font-semibold">
                         <div className="marquee-group">
                             <span className="mx-6">✨ Lower Prices with GST 2.0</span>
@@ -37,22 +37,22 @@ export default function TopBar() {
             </div>
 
             {/* Header */}
-            <header className="bg-[#fdf7f2]/70 backdrop-blur-md py-3 md:py-4 fixed w-full top-9 z-50 border-b border-[#2D2D2D]/10">
+            <header className="bg-[#fdf7f2]/70 backdrop-blur-md fixed w-full top-12 z-50 border-b border-[#2D2D2D]/10">
                 <div className="container mx-auto px-4">
                     <nav className="flex items-center justify-between">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center group">
+                        <Link href="/" className="flex items-center group h-full">
                             <Image
-                                src="/file.svg"
+                                src="/logomark.svg"
                                 alt="YugaFarms Logo"
-                                width={40}
-                                height={40}
-                                className="object-contain transition-transform duration-300 group-hover:scale-110"
+                                width={50}
+                                height={50}
+                                className="object-contain transition-transform duration-300 group-hover:scale-110 h-full w-[100px]"
                             />
                         </Link>
 
                         {/* Navigation Links */}
-                        <div className="hidden md:flex items-center space-x-8">
+                        <div className="hidden md:flex items-center space-x-8 py-3 md:py-4">
                             <Link href="/" className={`relative transition-colors duration-300 font-medium group ${
                                 isHome 
                                     ? 'text-[#4b2e19]' 
@@ -84,7 +84,7 @@ export default function TopBar() {
                         </div>
 
                         {/* Right Side Icons */}
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-4 py-3 md:py-4">
                             {/* Cart Icon */}
                             <Link href="/cart" className="relative text-[#2D2D2D] hover:text-[#4b2e19] transition-all duration-300 group p-2 rounded-full hover:bg-[#f5d26a]/10">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">

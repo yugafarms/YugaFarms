@@ -1,12 +1,13 @@
 'use client'
-import React, { useEffect, useState } from "react";
-import TopBar from "@/components/TopBar";
-import Footer from "@/components/Footer";
-import { useCart } from "@/app/context/CartContext";
 import { useAuth } from "@/app/context/AuthContext";
+import { useCart } from "@/app/context/CartContext";
+import Footer from "@/components/Footer";
+import TopBar from "@/components/TopBar";
+import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
+// const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
 export default function CartPage() {
   const { items, totalItems, totalPrice, isLoading, updateQuantity, removeFromCart, clearCart } = useCart();
@@ -77,7 +78,7 @@ export default function CartPage() {
               <div className="text-8xl mb-6">🛒</div>
               <h1 className="text-4xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-4">Your Cart is Empty</h1>
               <p className="text-lg text-[#2D2D2D]/70 mb-8 max-w-md mx-auto">
-                Looks like you haven't added any items to your cart yet. Start shopping to fill it up!
+                Looks like you haven&apos;t added any items to your cart yet. Start shopping to fill it up!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link 
@@ -124,9 +125,11 @@ export default function CartPage() {
                       {/* Product Image */}
                       <div className="md:w-32 md:h-32 w-full h-48 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-xl flex items-center justify-center overflow-hidden">
                         {item.productImage ? (
-                          <img 
+                          <Image 
                             src={item.productImage} 
                             alt={item.productTitle}
+                            width={128}
+                            height={128}
                             className="w-full h-full object-cover"
                           />
                         ) : (

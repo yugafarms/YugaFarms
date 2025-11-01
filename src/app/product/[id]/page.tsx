@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
@@ -234,9 +235,11 @@ export default function ProductDetailPage() {
                 {/* Main Image */}
                 <div className={`relative h-96 lg:h-[500px] bg-gradient-to-br ${gradient} rounded-3xl flex items-center justify-center overflow-hidden`}>
                   {product.Image && product.Image.length > 0 ? (
-                    <img 
+                    <Image 
                       src={`${BACKEND}${product.Image[selectedImageIndex].url}`} 
                       alt={product.Image[selectedImageIndex].alternativeText || product.Title}
+                      width={800}
+                      height={500}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -270,9 +273,11 @@ export default function ProductDetailPage() {
                             : 'border-transparent hover:border-[#4b2e19]/50'
                         }`}
                       >
-                        <img 
+                        <Image 
                           src={`${BACKEND}${image.url}`} 
                           alt={image.alternativeText || `${product.Title} ${index + 1}`}
+                          width={80}
+                          height={80}
                           className="w-full h-full object-cover"
                         />
                       </button>

@@ -24,8 +24,8 @@ export default function ForgotPasswordPage() {
         throw new Error(err?.error?.message || "Failed to send reset email");
       }
       setSent(true);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to send reset email");
     } finally {
       setLoading(false);
     }

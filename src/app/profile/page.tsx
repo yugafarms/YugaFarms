@@ -17,7 +17,6 @@ const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
 export default function ProfilePage() {
   const { user, jwt, refreshUser } = useAuth();
-  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -39,7 +38,6 @@ export default function ProfilePage() {
         console.log("No JWT token available");
         return;
       }
-      setLoading(true);
       setError(null);
       try {
         console.log("Loading profile with JWT:", jwt.substring(0, 20) + "...");
@@ -64,11 +62,9 @@ export default function ProfilePage() {
           State: me.State || "Maharashtra",
           Pin: me.Pin || "",
         });
-      } catch (e: any) {
+      } catch (e) {
         console.error("Profile loading error:", e);
-        setError(e.message || "Failed to load");
-      } finally {
-        setLoading(false);
+        setError(e instanceof Error ? e.message : "Failed to load");
       }
     };
     load();
@@ -81,7 +77,7 @@ export default function ProfilePage() {
     []
   );
 
-  const updateAddress = (field: keyof Address, value: any) => {
+  const updateAddress = (field: keyof Address, value: string | number) => {
     setAddress((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -93,7 +89,7 @@ export default function ProfilePage() {
     setSuccess(null);
     try {
       // Prepare the complete payload with all fields
-      const payload: any = {};
+      const payload: Record<string, string | number> = {};
       if (username?.trim()) payload.username = username.trim();
       if (phone && /\d{6,}/.test(phone)) payload.Phone = Number(phone);
       
@@ -138,8 +134,8 @@ export default function ProfilePage() {
           Pin: updatedUser.Pin || "",
         });
       }
-    } catch (e: any) {
-      setError(e.message || "Save failed");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Save failed");
     } finally {
       setSaving(false);
     }

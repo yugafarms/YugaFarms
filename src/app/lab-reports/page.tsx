@@ -1,5 +1,6 @@
 'use client'
 import React from "react";
+import Image from "next/image";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 
@@ -78,9 +79,11 @@ export default function LabReportsPage() {
                   className="rounded-2xl border border-none flex flex-col items-center p-0 pb-6"
                 >
                   <div className="w-full flex-1 flex items-center justify-center p-4">
-                    <img
+                    <Image
                       src={item.image}
                       alt={item.name}
+                      width={400}
+                      height={256}
                       className="rounded-xl object-contain w-full h-64"
                       style={{
                         background: "#fff",
@@ -195,7 +198,7 @@ export default function LabReportsPage() {
         </section>
 
         {/* Download Section */}
-        <section className="py-16 md:py-20 bg-[#eef2e9]">
+        {/* <section className="py-16 md:py-20 bg-[#eef2e9]">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-4xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-6">Download All Reports</h2>
@@ -242,7 +245,7 @@ export default function LabReportsPage() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
          {/* Wave back to cream before Footer */}
          <div aria-hidden className="relative z-20 -mt-2 bg-[#fdf7f2]">

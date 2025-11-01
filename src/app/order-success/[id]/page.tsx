@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
@@ -48,7 +49,7 @@ type Order = {
 
 export default function OrderSuccessPage() {
   const params = useParams();
-  const { user, jwt } = useAuth();
+  const { jwt } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -150,7 +151,7 @@ export default function OrderSuccessPage() {
               Order Placed Successfully!
             </h1>
             <p className="text-lg text-[#2D2D2D]/70 mb-2">
-              Thank you for your order. We'll send you a confirmation email shortly.
+              Thank you for your order. We&apos;ll send you a confirmation email shortly.
             </p>
             <p className="text-sm text-[#2D2D2D]/60">
               Order Number: <span className="font-semibold text-[#4b2e19]">{order.orderNumber}</span>
@@ -193,9 +194,11 @@ export default function OrderSuccessPage() {
                     <div key={index} className="flex items-center gap-4 p-4 bg-[#f8f4e6]/50 rounded-xl">
                       <div className="w-16 h-16 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-lg flex items-center justify-center overflow-hidden">
                         {item.productImage ? (
-                          <img 
+                          <Image 
                             src={item.productImage} 
                             alt={item.productTitle}
+                            width={64}
+                            height={64}
                             className="w-full h-full object-cover"
                           />
                         ) : (
