@@ -15,12 +15,12 @@ export default function Footer() {
                         <p className="mt-3 text-sm text-[#2D2D2D]/70 max-w-xs">Pure, traditionally crafted ghee and oils made the slow way — from farm to your plate.</p>
                     </div>
                     <div>
-                        <h4 className="font-semibold text-[#4b2e19] mb-3">Shop</h4>
+                        <h4 className="font-semibold text-[#4b2e19] mb-3">Policies</h4>
                         <ul className="space-y-2 text-sm text-[#2D2D2D]/80">
-                            <li><Link href="/shop">All Products</Link></li>
-                            <li><Link href="/shop">Ghee</Link></li>
-                            <li><Link href="/shop">Cold-Pressed Oils</Link></li>
-                            <li><Link href="/shop">Combos</Link></li>
+                            <li><Link href="/privacy-policy">Privacy Policy</Link></li>
+                            <li><Link href="/terms-of-service">Terms of Service</Link></li>
+                            <li><Link href="/shipping-policy">Shipping Policy</Link></li>
+                            <li><Link href="/refund-policy">Refund & Returns</Link></li>
                         </ul>
                     </div>
                     <div>
