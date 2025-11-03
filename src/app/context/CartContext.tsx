@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "./AuthContext";
 
 export type CartItem = {
@@ -36,13 +36,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { user, jwt } = useAuth();
+  const isSyncingRef = useRef<boolean>(false);
 
   // Load cart from localStorage on mount
   
   const syncCart = useCallback(async () => {
-    if (!user || !jwt) return;
+    if (!user || !jwt || isSyncingRef.current) return;
 
     try {
+      isSyncingRef.current = true;
       setIsLoading(true);
       
       // Get current cart from backend
@@ -55,30 +57,34 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         const backendCart = userData.cart || [];
         
         // Merge with local cart (backend takes precedence for conflicts)
-        const mergedCart = [...items];
-        
-        backendCart.forEach((backendItem: CartItem) => {
-          const existingIndex = mergedCart.findIndex(
-            item => item.productId === backendItem.productId && item.variantId === backendItem.variantId
-          );
+        // Use functional update to avoid stale closure and infinite loop
+        setItems(prevItems => {
+          const mergedCart = [...prevItems];
           
-          if (existingIndex >= 0) {
-            // Update existing item with backend data
-            mergedCart[existingIndex] = backendItem;
-          } else {
-            // Add new item from backend
-            mergedCart.push(backendItem);
-          }
-        });
+          backendCart.forEach((backendItem: CartItem) => {
+            const existingIndex = mergedCart.findIndex(
+              item => item.productId === backendItem.productId && item.variantId === backendItem.variantId
+            );
+            
+            if (existingIndex >= 0) {
+              // Update existing item with backend data
+              mergedCart[existingIndex] = backendItem;
+            } else {
+              // Add new item from backend
+              mergedCart.push(backendItem);
+            }
+          });
 
-        setItems(mergedCart);
+          return mergedCart;
+        });
       }
     } catch (error) {
       console.error("Error syncing cart:", error);
     } finally {
       setIsLoading(false);
+      isSyncingRef.current = false;
     }
-  }, [user, jwt, items]);
+  }, [user, jwt]);
   useEffect(() => {
     try {
       const storedCart = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEYS.cart) : null;
