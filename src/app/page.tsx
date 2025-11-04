@@ -60,8 +60,12 @@ const BannerImage = () => {
         const img = data?.data?.Image;
         const largeUrl = img?.formats?.large?.url || img?.url;
         setImageUrl(largeUrl ? `${BACKEND}${largeUrl}` : null);
-      } catch (e: any) {
-        setError(e.message || "Unknown error");
+      } catch (e: unknown) {
+        if (e instanceof Error) {
+          setError(e.message);
+        } else {
+          setError("Unknown error");
+        }
       } finally {
         setLoading(false);
       }
