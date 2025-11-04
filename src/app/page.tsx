@@ -44,6 +44,63 @@ type Product = {
   updatedAt: string;
 };
 
+const BannerImage = () => {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchBanner = async () => {
+      try {
+        const res = await fetch(`${BACKEND}/api/banner?populate=*`);
+        if (!res.ok) {
+          throw new Error("Failed to fetch banner");
+        }
+        const data = await res.json();
+        const img = data?.data?.Image;
+        const largeUrl = img?.formats?.large?.url || img?.url;
+        setImageUrl(largeUrl ? `${BACKEND}${largeUrl}` : null);
+      } catch (e: any) {
+        setError(e.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBanner();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full h-[400px] flex items-center justify-center bg-[#fdf7f2]">
+        Loading banner...
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="w-full h-[400px] flex items-center justify-center bg-red-100 text-red-800">
+        Failed to load banner: {error}
+      </div>
+    );
+  }
+  if (!imageUrl) {
+    return null;
+  }
+  return (
+    <div className="w-full relative h-[400px]">
+      <Image
+        src={imageUrl}
+        alt="Banner"
+        layout="fill"
+        objectFit="cover"
+        className="w-full h-full object-cover"
+        priority
+      />
+      {/* Optionally, you can add styling overlays here if needed */}
+    </div>
+  );
+};
+
 export default function Home() {
   const [topProducts, setTopProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,23 +178,8 @@ export default function Home() {
       <main
         className="min-h-[90vh] max-h-screen relative overflow-hidden pt-20"
       >
-        {/* Background Video */}
-        <video
-          className="absolute inset-0 w-full h-full object-cover z-0"
-          src="/bg.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-        {/* Overlay for slight dimming if needed */}
-        <div className="absolute inset-0 bg-[#fdf7f2]/20 z-10 -mt-20"></div>
-
-        {/* Brand Name on top left */}
-        <div className="space-x-2 z-40 w-1/3 mt-[7%] ml-[12%] relative">
-          <div className="text-[#2D2D2D] tracking-wide text-[80px] font-[Pacifico] transition-colors duration-300 hover:text-[#4b2e19]">YugaFarms</div>
-          <div className="text-[#2D2D2D] text-xl font-semibold mt-2 pl-2">Pure Goodness, Straight from <br /> Our Farm to Your Table</div>
-        </div>
+        {/* Banner Image */}
+        <BannerImage />
 
         <Link
           href="/ghee"
