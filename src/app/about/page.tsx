@@ -217,25 +217,25 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 {[
                   {
-                    icon: "🌿",
+                    icon: "/about/natural.png",
                     title: "100% Natural Ingredients",
                     description: "We use only the finest, whole ingredients in all our products. No artificial additives, no preservatives, no shortcuts. Every ingredient is carefully selected for its purity and nutritional value, just as nature intended.",
                     highlight: "Pure & Natural"
                   },
                   {
-                    icon: "🏺",
+                    icon: "/about/ghee.png",
                     title: "Traditional Methods",
                     description: "We adhere to time-honored processes, even when they require more effort and time. Our bilona churning method for ghee and gentle extraction for honey preserve the authentic taste and health benefits that modern methods cannot replicate.",
                     highlight: "Time-Tested"
                   },
                   {
-                    icon: "🐄",
+                    icon: "/about/cow.png",
                     title: "Animal Welfare",
                     description: "Our cows graze freely on open pastures, eat natural grass and feed, and are never given synthetic hormones or antibiotics. We believe that happy, healthy animals produce the finest, most nutritious products.",
                     highlight: "Ethical Sourcing"
                   },
                   {
-                    icon: "🤝",
+                    icon: "/about/harvest.png",
                     title: "Community First",
                     description: "We work directly with small family farms and local communities, ensuring fair trade practices and supporting the livelihoods of those who have preserved these traditional methods for generations.",
                     highlight: "Fair Trade"
@@ -243,8 +243,8 @@ export default function AboutPage() {
                 ].map((item, idx) => (
                   <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-[#4b2e19]/10 hover:shadow-xl transition-all duration-500 hover:scale-[1.02] group">
                     <div className="flex items-start gap-6">
-                      <div className="w-16 h-16 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-2xl shadow-lg flex-shrink-0 transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
-                        {item.icon}
+                      <div className="w-24 h-24 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110">
+                        <Image src={item.icon} alt={item.title} width={64} height={64} className="w-full h-full object-contain" />
                       </div>
                       <div className="space-y-4">
                         <div>
@@ -312,7 +312,7 @@ export default function AboutPage() {
                     <div className="flex flex-col lg:flex-row items-center gap-8">
                       <div className="flex-shrink-0">
                         <div className="relative">
-                          <div className="w-24 h-24 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-3xl shadow-2xl transition-all duration-300 group-hover:scale-110 group-hover:shadow-3xl">
+                          <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
                             <Image src={item.icon} alt={item.title} width={96} height={96} />
                           </div>
                           <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#4b2e19] text-white rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 group-hover:scale-110">

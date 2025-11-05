@@ -425,7 +425,7 @@ export default function Home() {
                   <div className="w-40 h-40 border-2 border-transparent flex items-center justify-center mb-4 text-white transition-all duration-300 group-hover:scale-105 bg-red"
                     style={{
                       backgroundImage: `url(${item.icon})`,
-                      backgroundSize: '130% 130%',
+                      backgroundSize: '100% 100%',
                       backgroundPosition: 'center',
                       backgroundRepeat: 'no-repeat',
                     }}
@@ -481,13 +481,8 @@ export default function Home() {
                 {/* Background Circle */}
                 <div className="w-96 h-96 bg-white rounded-full shadow-lg mx-auto relative overflow-hidden">
                   {/* Overlay Circle */}
-                  <div className="absolute top-8 left-8 w-80 h-80 bg-gradient-to-br from-[#eef2e9] to-[#f0f4e8] rounded-full"></div>
-
-                  {/* Product Regions */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="grid grid-cols-3 gap-2 p-8">
-
-                    </div>
+                  <div className="absolute top-8 left-8 w-80 h-80 bg-gradient-to-br from-[#eef2e9] to-[#f0f4e8] rounded-full overflow-hidden flex bg-red-100">
+                    <Image src="/images/client.png" alt="Map" width={620} height={620} className="w-auto h-full object-cover" />
                   </div>
                 </div>
 

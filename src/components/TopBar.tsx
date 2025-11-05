@@ -19,18 +19,18 @@ export default function TopBar() {
                 <div className="relative overflow-hidden h-12 flex items-center">
                     <div className="marquee-track will-change-transform font-semibold">
                         <div className="marquee-group">
-                            <span className="mx-6">✨ Lower Prices with GST 2.0</span>
-                            <span className="mx-6">🍫 Navratri Special ✨ Flat 15% OFF</span>
-                            <span className="mx-6">🎁 Free Hamper on Orders ₹1999+</span>
-                            <span className="mx-6">🚚 Free Shipping on ₹699+ orders</span>
-                            <span className="mx-6">🧈 Pure Ghee • Lab Tested</span>
+                            <span className="mx-6">Lower Prices with GST 2.0</span>
+                            <span className="mx-6">Navratri Special ✨ Flat 15% OFF</span>
+                            <span className="mx-6">Free Hamper on Orders ₹1999+</span>
+                            <span className="mx-6">Free Shipping on ₹699+ orders</span>
+                            <span className="mx-6">Pure Ghee • Lab Tested</span>
                         </div>
                         <div className="marquee-group" aria-hidden="true">
-                            <span className="mx-6">✨ Lower Prices with GST 2.0</span>
-                            <span className="mx-6">🍫 Navratri Special ✨ Flat 15% OFF</span>
-                            <span className="mx-6">🎁 Free Hamper on Orders ₹1999+</span>
-                            <span className="mx-6">🚚 Free Shipping on ₹699+ orders</span>
-                            <span className="mx-6">🧈 Pure Ghee • Lab Tested</span>
+                            <span className="mx-6">Lower Prices with GST 2.0</span>
+                            <span className="mx-6">Navratri Special ✨ Flat 15% OFF</span>
+                            <span className="mx-6">Free Hamper on Orders ₹1999+</span>
+                            <span className="mx-6">Free Shipping on ₹699+ orders</span>
+                            <span className="mx-6">Pure Ghee • Lab Tested</span>
                         </div>
                     </div>
                 </div>
