@@ -210,6 +210,10 @@ export default function CheckoutPage() {
   };
 
   const createOrder = async () => {
+    if (!jwt) {
+      throw new Error('You must be logged in to create an order');
+    }
+
     const orderData = {
       items: items,
       shippingAddress: shippingAddress,
@@ -219,20 +223,22 @@ export default function CheckoutPage() {
       shipping: shipping,
       total: finalTotal,
       paymentMethod: paymentMethod,
-      notes: orderNotes
+      notes: orderNotes,
+      user: user?.id
     };
 
-    // Use test endpoint for now (no authentication required)
-    const response = await fetch(`${BACKEND}/api/test-orders`, {
+    const response = await fetch(`${BACKEND}/api/orders`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
       },
       body: JSON.stringify({ data: orderData })
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create order');
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error?.error?.message || 'Failed to create order');
     }
 
     const order = await response.json();
@@ -243,6 +249,10 @@ export default function CheckoutPage() {
   };
 
   const initiateRazorpayPayment = async () => {
+    if (!jwt) {
+      throw new Error('You must be logged in to create an order');
+    }
+
     // Create order first
     const orderData = {
       items: items,
@@ -253,35 +263,41 @@ export default function CheckoutPage() {
       shipping: shipping,
       total: finalTotal,
       paymentMethod: paymentMethod,
-      notes: orderNotes
+      notes: orderNotes,
+      user: user?.id
     };
 
-    // Use test endpoint for now (no authentication required)
-    const response = await fetch(`${BACKEND}/api/test-orders`, {
+    const response = await fetch(`${BACKEND}/api/orders`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwt}`
       },
       body: JSON.stringify({ data: orderData })
     });
 
     if (!response.ok) {
-      throw new Error('Failed to create order');
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error?.error?.message || 'Failed to create order');
     }
 
     const order = await response.json();
     
-    // Check if Razorpay is properly configured
+    // Check if Razorpay is properly configured on frontend
     if (!process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID === 'your_razorpay_key_id_here') {
-      alert('Razorpay is not configured. Order created successfully for testing!');
-      await clearCart();
-      router.push(`/order-success/${order.data.id}`);
+      alert('Razorpay is not configured on the frontend. Please contact support.');
       return;
     }
 
-    // Check if we have a valid Razorpay order ID
-    if (!order.data.razorpayOrderId || order.data.razorpayOrderId.startsWith('order_test_')) {
+    // Check if we have a valid Razorpay order ID from backend
+    if (!order.data.razorpayOrderId) {
       alert('Razorpay order creation failed. Please try again or use COD.');
+      return;
+    }
+
+    // Check if Razorpay script is loaded
+    if (typeof window === 'undefined' || !window.Razorpay) {
+      alert('Razorpay payment gateway is not loaded. Please refresh the page and try again.');
       return;
     }
 
@@ -313,35 +329,44 @@ export default function CheckoutPage() {
 
     try {
       const razorpay = new window.Razorpay(options);
+      
       razorpay.on('payment.failed', function (response: RazorpayPaymentFailedResponse) {
         console.error('Payment failed:', response.error);
-        alert('Payment failed. Please try again.');
+        alert(`Payment failed: ${response.error.description || 'Please try again.'}`);
       });
       
       razorpay.open();
     } catch (error) {
       console.error('Razorpay initialization error:', error);
-      alert('Payment gateway initialization failed. Please try again.');
+      alert('Payment gateway initialization failed. Please refresh the page and try again.');
     }
   };
 
   const handlePaymentSuccess = async (orderId: number, paymentResponse: RazorpayPaymentResponse) => {
     try {
-      // Use test endpoint for now (no authentication required)
-      const response = await fetch(`${BACKEND}/api/test-orders/${orderId}/confirm-payment`, {
-        method: 'POST',
+      if (!jwt) {
+        throw new Error('You must be logged in to confirm payment');
+      }
+
+      const response = await fetch(`${BACKEND}/api/orders/${orderId}`, {
+        method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwt}`
         },
         body: JSON.stringify({
-          razorpay_payment_id: paymentResponse.razorpay_payment_id,
-          razorpay_order_id: paymentResponse.razorpay_order_id,
-          razorpay_signature: paymentResponse.razorpay_signature
+          data: {
+            paymentStatus: 'PAID',
+            razorpayPaymentId: paymentResponse.razorpay_payment_id,
+            razorpayOrderId: paymentResponse.razorpay_order_id,
+            razorpaySignature: paymentResponse.razorpay_signature
+          }
         })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to confirm payment');
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error?.error?.message || 'Failed to confirm payment');
       }
 
       // Clear cart and redirect to success page
@@ -349,7 +374,7 @@ export default function CheckoutPage() {
       router.push(`/order-success/${orderId}`);
     } catch (error) {
       console.error('Payment confirmation error:', error);
-      alert('Payment confirmation failed. Please contact support.');
+      alert(error instanceof Error ? error.message : 'Payment confirmation failed. Please contact support.');
     }
   };
 

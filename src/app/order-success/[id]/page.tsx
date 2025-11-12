@@ -56,13 +56,23 @@ export default function OrderSuccessPage() {
 
   useEffect(() => {
     const fetchOrder = async () => {
+      if (!jwt) {
+        setError('You must be logged in to view order details');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        // Use test endpoint for now (no authentication required)
-        const response = await fetch(`${BACKEND}/api/test-orders/${params.id}`);
+        const response = await fetch(`${BACKEND}/api/orders/${params.id}`, {
+          headers: {
+            'Authorization': `Bearer ${jwt}`
+          }
+        });
         
         if (!response.ok) {
-          throw new Error('Failed to fetch order');
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error?.error?.message || 'Failed to fetch order');
         }
         
         const data = await response.json();

@@ -14,6 +14,8 @@ type AuthContextType = {
   isLoading: boolean;
   login: (identifier: string, password: string) => Promise<void>;
   signup: (username: string, email: string, password: string) => Promise<void>;
+  loginWithOTP: (phone: string, code: string) => Promise<void>;
+  sendOTP: (phone: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 };
@@ -113,11 +115,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== "undefined") localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(nextUser));
   }, [jwt]);
 
+  const sendOTP = useCallback(async (phone: string) => {
+    const res = await fetch(`${BACKEND}/api/otp/send`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || "Failed to send OTP");
+    }
+  }, []);
+
+  const loginWithOTP = useCallback(async (phone: string, code: string) => {
+    const res = await fetch(`${BACKEND}/api/otp/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone, code }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error?.message || "OTP verification failed");
+    }
+    const data = await res.json();
+    persist(data.jwt, {
+      id: data.user.id,
+      username: data.user.username,
+      email: data.user.email || "",
+      provider: data.user.provider,
+    });
+  }, [persist]);
+
   const logout = useCallback(() => {
     clear();
   }, [clear]);
 
-  const value = useMemo<AuthContextType>(() => ({ user, jwt, isLoading, login, signup, logout, refreshUser }), [user, jwt, isLoading, login, signup, logout, refreshUser]);
+  const value = useMemo<AuthContextType>(() => ({ 
+    user, jwt, isLoading, login, signup, loginWithOTP, sendOTP, logout, refreshUser 
+  }), [user, jwt, isLoading, login, signup, loginWithOTP, sendOTP, logout, refreshUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

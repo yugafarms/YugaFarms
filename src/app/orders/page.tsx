@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/app/context/AuthContext";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -46,23 +47,38 @@ type Order = {
 };
 
 export default function OrdersPage() {
+  const { jwt } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // For testing, allow access without authentication
-    fetchOrders();
-  }, []);
+    if (jwt) {
+      fetchOrders();
+    } else {
+      setError('You must be logged in to view your orders');
+      setLoading(false);
+    }
+  }, [jwt]);
 
   const fetchOrders = async () => {
+    if (!jwt) {
+      setError('You must be logged in to view your orders');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
-      // Use test endpoint for now (no authentication required)
-      const response = await fetch(`${BACKEND}/api/test-orders`);
+      const response = await fetch(`${BACKEND}/api/orders`, {
+        headers: {
+          'Authorization': `Bearer ${jwt}`
+        }
+      });
       
       if (!response.ok) {
-        throw new Error('Failed to fetch orders');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error?.message || 'Failed to fetch orders');
       }
       
       const data = await response.json();
@@ -116,21 +132,32 @@ export default function OrdersPage() {
       return;
     }
 
+    if (!jwt) {
+      alert('You must be logged in to cancel orders');
+      return;
+    }
+
     try {
-      const response = await fetch(`${BACKEND}/api/test-orders/${orderId}/cancel`, {
+      const response = await fetch(`${BACKEND}/api/orders/${orderId}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
-        }
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${jwt}`
+        },
+        body: JSON.stringify({
+          data: {
+            orderStatus: 'CANCELLED'
+          }
+        })
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error?.message || 'Failed to cancel order');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData?.error?.message || 'Failed to cancel order');
       }
 
       const result = await response.json();
-      alert(result.message || 'Order cancelled successfully');
+      alert('Order cancelled successfully');
       
       // Refresh orders list
       fetchOrders();

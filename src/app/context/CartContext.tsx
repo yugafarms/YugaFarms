@@ -1,6 +1,8 @@
 "use client";
 import React, { createContext, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "./AuthContext";
+import PhoneOTPModal from "@/components/PhoneOTPModal";
+import AddressModal from "@/components/AddressModal";
 
 export type CartItem = {
   productId: number;
@@ -35,8 +37,14 @@ const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { user, jwt } = useAuth();
+  const { user, jwt, refreshUser } = useAuth();
   const isSyncingRef = useRef<boolean>(false);
+  
+  // Modal states
+  const [showOTPModal, setShowOTPModal] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [pendingCartItem, setPendingCartItem] = useState<Omit<CartItem, 'quantity'> | null>(null);
+  const [userPhone, setUserPhone] = useState<string>("");
 
   // Load cart from localStorage on mount
   
@@ -143,7 +151,68 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, jwt]);
 
-  const addToCart = useCallback(async (newItem: Omit<CartItem, 'quantity'>) => {
+  const checkUserAddress = useCallback(async (): Promise<boolean> => {
+    if (!jwt) return false;
+    
+    try {
+      const response = await fetch(`${BACKEND}/api/users/me`, {
+        headers: { Authorization: `Bearer ${jwt}` },
+      });
+      
+      if (response.ok) {
+        const userData = await response.json();
+        return !!(userData.AddressLine1 && userData.City && userData.State && userData.Pin);
+      }
+    } catch (error) {
+      console.error("Error checking user address:", error);
+    }
+    return false;
+  }, [jwt]);
+
+  const saveAddressToBackend = useCallback(async (address: {
+    fullName: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    state: string;
+    pincode: string;
+    landmark?: string;
+  }) => {
+    if (!user || !jwt) return;
+
+    try {
+      const payload: Record<string, string | number> = {
+        username: address.fullName,
+        Phone: address.phone.replace(/\D/g, ''),
+        AddressLine1: address.addressLine1,
+        AddressLine2: address.addressLine2 || "",
+        City: address.city,
+        State: address.state,
+        Pin: parseInt(address.pincode),
+      };
+
+      const response = await fetch(`${BACKEND}/api/users/${user.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwt}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save address");
+      }
+
+      await refreshUser();
+    } catch (error) {
+      console.error("Error saving address:", error);
+      throw error;
+    }
+  }, [user, jwt, refreshUser]);
+
+  const addToCartDirectly = useCallback(async (newItem: Omit<CartItem, 'quantity'>) => {
     try {
       setIsLoading(true);
       
@@ -178,6 +247,35 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     }
   }, [items, user, jwt, saveCartToBackend]);
+
+  const handleOTPSuccess = useCallback(async (phone: string) => {
+    setUserPhone(phone);
+    // After OTP login, check if user has address
+    const hasAddress = await checkUserAddress();
+    
+    if (!hasAddress) {
+      // Show address modal
+      setShowAddressModal(true);
+    } else {
+      // User has address, proceed with adding to cart
+      if (pendingCartItem) {
+        await addToCartDirectly(pendingCartItem);
+        setPendingCartItem(null);
+      }
+    }
+  }, [checkUserAddress, pendingCartItem, addToCartDirectly]);
+
+  const addToCart = useCallback(async (newItem: Omit<CartItem, 'quantity'>) => {
+    // If user is not logged in, show OTP modal
+    if (!user || !jwt) {
+      setPendingCartItem(newItem);
+      setShowOTPModal(true);
+      return;
+    }
+
+    // User is logged in, add directly
+    await addToCartDirectly(newItem);
+  }, [user, jwt, addToCartDirectly]);
 
   const removeFromCart = useCallback(async (productId: number, variantId: number) => {
     try {
@@ -248,6 +346,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, jwt, saveCartToBackend]);
 
+  const handleAddressSave = useCallback(async (address: {
+    fullName: string;
+    phone: string;
+    addressLine1: string;
+    addressLine2: string;
+    city: string;
+    state: string;
+    pincode: string;
+    landmark?: string;
+  }) => {
+    await saveAddressToBackend(address);
+    
+    // After saving address, add the pending cart item
+    if (pendingCartItem) {
+      await addToCartDirectly(pendingCartItem);
+      setPendingCartItem(null);
+    }
+  }, [saveAddressToBackend, pendingCartItem, addToCartDirectly]);
+
   const value = useMemo<CartContextType>(() => ({
     items,
     totalItems,
@@ -260,7 +377,28 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     syncCart,
   }), [items, totalItems, totalPrice, isLoading, addToCart, removeFromCart, updateQuantity, clearCart, syncCart]);
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+      <PhoneOTPModal
+        isOpen={showOTPModal}
+        onClose={() => {
+          setShowOTPModal(false);
+          setPendingCartItem(null);
+        }}
+        onSuccess={handleOTPSuccess}
+      />
+      <AddressModal
+        isOpen={showAddressModal}
+        onClose={() => {
+          setShowAddressModal(false);
+          setPendingCartItem(null);
+        }}
+        onSave={handleAddressSave}
+        initialPhone={userPhone}
+      />
+    </CartContext.Provider>
+  );
 }
 
 export function useCart() {
