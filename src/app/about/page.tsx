@@ -223,19 +223,19 @@ export default function AboutPage() {
                     highlight: "Pure & Natural"
                   },
                   {
-                    icon: "/about/ghee.png",
+                    icon: "/about/traditional.png",
                     title: "Traditional Methods",
                     description: "We adhere to time-honored processes, even when they require more effort and time. Our bilona churning method for ghee and gentle extraction for honey preserve the authentic taste and health benefits that modern methods cannot replicate.",
                     highlight: "Time-Tested"
                   },
                   {
-                    icon: "/about/cow.png",
+                    icon: "/about/animal.png",
                     title: "Animal Welfare",
                     description: "Our cows graze freely on open pastures, eat natural grass and feed, and are never given synthetic hormones or antibiotics. We believe that happy, healthy animals produce the finest, most nutritious products.",
                     highlight: "Ethical Sourcing"
                   },
                   {
-                    icon: "/about/harvest.png",
+                    icon: "/about/community.png",
                     title: "Community First",
                     description: "We work directly with small family farms and local communities, ensuring fair trade practices and supporting the livelihoods of those who have preserved these traditional methods for generations.",
                     highlight: "Fair Trade"

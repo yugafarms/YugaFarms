@@ -44,10 +44,49 @@ type Product = {
   updatedAt: string;
 };
 
-const BannerImage = () => {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+type BannerMedia = {
+  id: number;
+  name: string;
+  mime: string;
+  url: string;
+  alternativeText?: string | null;
+  formats?: {
+    thumbnail?: { url: string };
+    small?: { url: string };
+    large?: { url: string };
+  };
+};
+
+type ClientImage = {
+  id: number;
+  url: string;
+  alternativeText?: string | null;
+  formats?: {
+    thumbnail?: { url: string };
+    small?: { url: string };
+  };
+};
+
+type Client = {
+  id: number;
+  Name: string;
+  Review: string;
+  Rating: number;
+  Designation: string | null;
+  Image: ClientImage | null;
+};
+
+const BannerCarousel = () => {
+  const [bannerItems, setBannerItems] = useState<BannerMedia[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const [mouseStart, setMouseStart] = useState<number | null>(null);
+  const [mouseEnd, setMouseEnd] = useState<number | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     const fetchBanner = async () => {
@@ -57,9 +96,11 @@ const BannerImage = () => {
           throw new Error("Failed to fetch banner");
         }
         const data = await res.json();
-        const img = data?.data?.Image;
-        const largeUrl = img?.formats?.large?.url || img?.url;
-        setImageUrl(largeUrl ? `${BACKEND}${largeUrl}` : null);
+        const bannerArray = data?.data?.Banner || [];
+        
+        if (bannerArray.length > 0) {
+          setBannerItems(bannerArray);
+        }
       } catch (e: unknown) {
         if (e instanceof Error) {
           setError(e.message);
@@ -73,34 +114,223 @@ const BannerImage = () => {
     fetchBanner();
   }, []);
 
+  // Auto-play carousel
+  useEffect(() => {
+    if (!isAutoPlaying || bannerItems.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % bannerItems.length);
+    }, 5000); // Change slide every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying, bannerItems.length]);
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+    setIsAutoPlaying(false); // Pause auto-play when user manually navigates
+    setTimeout(() => setIsAutoPlaying(true), 10000); // Resume after 10 seconds
+  };
+
+  // Minimum swipe distance (in pixels) to trigger slide change
+  const minSwipeDistance = 50;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    const currentTouch = e.targetTouches[0].clientX;
+    setTouchEnd(currentTouch);
+    // Prevent scrolling while swiping horizontally
+    if (touchStart !== null) {
+      const distance = Math.abs(touchStart - currentTouch);
+      // Only prevent default if swiping horizontally (more horizontal than vertical)
+      if (distance > 10) {
+        e.preventDefault();
+      }
+    }
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe && bannerItems.length > 1) {
+      // Swipe left - go to next slide
+      setCurrentIndex((prev) => (prev + 1) % bannerItems.length);
+      setIsAutoPlaying(false);
+      setTimeout(() => setIsAutoPlaying(true), 10000);
+    }
+    
+    if (isRightSwipe && bannerItems.length > 1) {
+      // Swipe right - go to previous slide
+      setCurrentIndex((prev) => (prev - 1 + bannerItems.length) % bannerItems.length);
+      setIsAutoPlaying(false);
+      setTimeout(() => setIsAutoPlaying(true), 10000);
+    }
+    
+    // Reset touch positions
+    setTouchStart(null);
+    setTouchEnd(null);
+  };
+
+  // Mouse drag handlers for desktop - global listeners for smooth dragging
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+      setMouseEnd(e.clientX);
+    };
+
+    const handleMouseUp = () => {
+      if (!isDragging) return;
+      
+      if (mouseStart !== null && mouseEnd !== null) {
+        const distance = mouseStart - mouseEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        if (isLeftSwipe && bannerItems.length > 1) {
+          // Swipe left - go to next slide
+          setCurrentIndex((prev) => (prev + 1) % bannerItems.length);
+          setIsAutoPlaying(false);
+          setTimeout(() => setIsAutoPlaying(true), 10000);
+        }
+        
+        if (isRightSwipe && bannerItems.length > 1) {
+          // Swipe right - go to previous slide
+          setCurrentIndex((prev) => (prev - 1 + bannerItems.length) % bannerItems.length);
+          setIsAutoPlaying(false);
+          setTimeout(() => setIsAutoPlaying(true), 10000);
+        }
+      }
+      
+      // Reset mouse positions
+      setIsDragging(false);
+      setMouseStart(null);
+      setMouseEnd(null);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      // Prevent text selection while dragging
+      document.body.style.userSelect = 'none';
+    } else {
+      document.body.style.userSelect = '';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging, mouseStart, mouseEnd, bannerItems.length]);
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setMouseEnd(null);
+    setMouseStart(e.clientX);
+  };
+
   if (loading) {
     return (
-      <div className="w-full h-[400px] flex items-center justify-center bg-[#fdf7f2]">
-        Loading banner...
+      <div className="w-full aspect-[720/300] flex items-center justify-center bg-[#fdf7f2]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4b2e19]"></div>
       </div>
     );
   }
+
   if (error) {
     return (
-      <div className="w-full h-[400px] flex items-center justify-center bg-red-100 text-red-800">
+      <div className="w-full aspect-[720/300] flex items-center justify-center bg-red-100 text-red-800">
         Failed to load banner: {error}
       </div>
     );
   }
-  if (!imageUrl) {
+
+  if (bannerItems.length === 0) {
     return null;
   }
+
+  const currentItem = bannerItems[currentIndex];
+  const isVideo = currentItem.mime?.startsWith('video/');
+
   return (
-    <div className="w-full relative h-[400px]">
-      <Image
-        src={imageUrl}
-        alt="Banner"
-        layout="fill"
-        objectFit="cover"
-        className="w-full h-full object-cover"
-        priority
-      />
-      {/* Optionally, you can add styling overlays here if needed */}
+    <div 
+      className="relative w-full aspect-[720/300] overflow-hidden touch-pan-y select-none cursor-grab active:cursor-grabbing"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onMouseDown={onMouseDown}
+    >
+      {/* Media Display */}
+      <div className="relative w-full h-full">
+        {isVideo ? (
+          <video
+            key={currentItem.id}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+            onMouseEnter={(e) => {
+              e.currentTarget.pause();
+              setIsAutoPlaying(false);
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.play();
+              setIsAutoPlaying(true);
+            }}
+          >
+            <source src={`${BACKEND}${currentItem.url}`} type={currentItem.mime} />
+            Your browser does not support the video tag.
+          </video>
+        ) : (
+          <Image
+            src={`${BACKEND}${currentItem.url}`}
+            alt={currentItem.alternativeText || currentItem.name || "Banner"}
+            fill
+            className="object-cover"
+            priority={currentIndex === 0}
+            sizes="100vw"
+          />
+        )}
+      </div>
+
+      {/* Dots Indicator */}
+      {bannerItems.length > 1 && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+          {bannerItems.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                index === currentIndex
+                  ? 'bg-white w-8'
+                  : 'bg-white/50 hover:bg-white/75 w-2'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* Progress Bar (for auto-play) */}
+      {bannerItems.length > 1 && isAutoPlaying && (
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20 z-10">
+          <div
+            className="h-full bg-white/60 transition-all duration-100"
+            style={{
+              width: `${((currentIndex + 1) / bannerItems.length) * 100}%`,
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -110,6 +340,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addToCart, isLoading: cartLoading } = useCart();
+  const [selectedVariants, setSelectedVariants] = useState<Record<number, number>>({});
+  
+  // Client reviews state
+  const [clients, setClients] = useState<Client[]>([]);
+  const [currentClientIndex, setCurrentClientIndex] = useState(0);
+  const [clientsLoading, setClientsLoading] = useState(true);
+  const [clientsError, setClientsError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTopProducts = async () => {
@@ -123,7 +360,17 @@ export default function Home() {
         }
 
         const data = await response.json();
-        setTopProducts(data.data || []);
+        const products = data.data || [];
+        setTopProducts(products);
+        
+        // Set default selected variant (first variant) for each product
+        const defaultVariants: Record<number, number> = {};
+        products.forEach((product: Product) => {
+          if (product.Variants && product.Variants.length > 0) {
+            defaultVariants[product.id] = product.Variants[0].id;
+          }
+        });
+        setSelectedVariants(defaultVariants);
       } catch (err) {
         console.error('Error fetching top products:', err);
         setError(err instanceof Error ? err.message : 'Failed to load products');
@@ -134,6 +381,44 @@ export default function Home() {
 
     fetchTopProducts();
   }, []);
+
+  // Fetch clients
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        setClientsLoading(true);
+        const response = await fetch(`${BACKEND}/api/clients?populate=*`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch clients');
+        }
+        
+        const data = await response.json();
+        const clientsData = data.data || [];
+        setClients(clientsData);
+      } catch (err) {
+        console.error('Error fetching clients:', err);
+        setClientsError(err instanceof Error ? err.message : 'Failed to load client reviews');
+      } finally {
+        setClientsLoading(false);
+      }
+    };
+    
+    fetchClients();
+  }, []);
+
+  // Navigation handlers for client reviews
+  const handlePreviousClient = () => {
+    if (clients.length > 0) {
+      setCurrentClientIndex((prev) => (prev - 1 + clients.length) % clients.length);
+    }
+  };
+
+  const handleNextClient = () => {
+    if (clients.length > 0) {
+      setCurrentClientIndex((prev) => (prev + 1) % clients.length);
+    }
+  };
 
   const getProductEmoji = (title: string, type: string) => {
     const titleLower = title.toLowerCase();
@@ -179,18 +464,9 @@ export default function Home() {
   return (
     <>
       <TopBar />
-      <main
-        className="min-h-[90vh] max-h-screen relative overflow-hidden pt-20"
-      >
-        {/* Banner Image */}
-        <BannerImage />
-
-        <Link
-          href="/ghee"
-          className="absolute bottom-10 bg-[#4b2e19] text-white px-6 py-3 rounded-full left-[50%] transform translate-x-[-50%] z-40 transition-all duration-300 hover:bg-[#2f4f2f] hover:scale-105"
-        >
-          SHOP NOW
-        </Link>
+      <main className="relative">
+        {/* Banner Carousel - Full Screen */}
+        <BannerCarousel />
       </main>
 
       {/* Wave into Our Top Picks */}
@@ -249,31 +525,39 @@ export default function Home() {
                 topProducts.map((product, idx) => {
                   const emoji = getProductEmoji(product.Title, product.Type);
                   const badge = getProductBadge(idx);
-                  const features = product.Tags.map(tag => tag.Value);
 
                   // Calculate pricing from variants
                   const variants = product.Variants || [];
                   const hasVariants = variants.length > 0;
-                  const minPrice = hasVariants ? Math.min(...variants.map(v => v.Price - (v.Discount || 0))) : 0;
-                  const maxPrice = hasVariants ? Math.max(...variants.map(v => v.Price - (v.Discount || 0))) : 0;
-                  const minOriginalPrice = hasVariants ? Math.min(...variants.map(v => v.Price)) : 0;
-                  const savings = minOriginalPrice - minPrice;
+                  const selectedVariantId = selectedVariants[product.id];
+                  const selectedVariant = variants.find(v => v.id === selectedVariantId) || variants[0];
+                  
+                  const handleVariantChange = (variantId: number) => {
+                    setSelectedVariants(prev => ({
+                      ...prev,
+                      [product.id]: variantId
+                    }));
+                  };
+
+                  const finalPrice = selectedVariant ? selectedVariant.Price - (selectedVariant.Discount || 0) : 0;
+                  const originalPrice = selectedVariant ? selectedVariant.Price : 0;
+                  const savings = originalPrice - finalPrice;
 
                   return (
                     <div key={product.id} className="rounded-2xl border border-[#4b2e19]/15 bg-white hover:shadow-lg transition-all duration-300 group">
                       {/* Product Image */}
                       <Link href={`/product/${product.id}`} className="block">
-                        <div className="relative h-48 bg-gradient-to-br from-[#f5d26a]/20 to-[#f5d26a]/10 rounded-t-2xl border-b border-[#4b2e19]/10 flex items-center justify-center overflow-hidden cursor-pointer">
+                        <div className="relative h-40 bg-gradient-to-br from-[#f5d26a]/20 to-[#f5d26a]/10 rounded-t-2xl border-b border-[#4b2e19]/10 flex items-center justify-center overflow-hidden cursor-pointer">
                           {product.Image && product.Image.length > 0 ? (
                             <Image
                               src={`${BACKEND}${product.Image[0].url}`}
                               alt={product.Image[0].alternativeText || product.Title}
                               width={400}
-                              height={192}
+                              height={160}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             />
                           ) : (
-                            <span className="text-6xl">{emoji}</span>
+                            <span className="text-5xl">{emoji}</span>
                           )}
                           <div className="absolute top-3 left-3">
                             <div className="text-xs bg-[#f5d26a] text-[#4b2e19] px-2 py-1 rounded-full font-semibold">{badge}</div>
@@ -290,78 +574,71 @@ export default function Home() {
                       </Link>
 
                       {/* Product Details */}
-                      <div className="p-5 space-y-4">
-                        {/* Title and Rating */}
+                      <div className="p-4 space-y-3">
+                        {/* Title */}
                         <div>
                           <Link href={`/product/${product.id}`} className="block group">
-                            <h3 className="text-lg font-semibold text-[#2D2D2D] mb-2 group-hover:text-[#4b2e19] transition-colors">{product.Title}</h3>
+                            <h3 className="text-base font-semibold text-[#2D2D2D] mb-1 group-hover:text-[#4b2e19] transition-colors line-clamp-2">{product.Title}</h3>
                           </Link>
-                          <p className="text-[#2D2D2D]/60 text-sm font-medium mb-2">{product.PunchLine}</p>
-                          <div className="flex items-center justify-between text-sm text-[#2D2D2D]/70">
-                            <div className="flex items-center gap-1">
-                              <div className="flex items-center gap-1">
-                                {Array.from({ length: 5 }).map((_, i) => (
-                                  <svg key={i} className="w-3 h-3 text-[#f5d26a]" fill={i < Math.floor(product.Rating) ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
-                                  </svg>
-                                ))}
-                              </div>
-                              <span className="text-xs">({product.NumberOfPurchase} bought)</span>
-                            </div>
-                          </div>
+                          <p className="text-[#2D2D2D]/60 text-xs font-medium line-clamp-1">{product.PunchLine}</p>
                         </div>
 
-                        {/* Features */}
-                        {features.length > 0 && (
-                          <div className="flex flex-wrap gap-1">
-                            {features.slice(0, 3).map((feature, featureIdx) => (
-                              <span key={featureIdx} className="text-xs bg-[#eef2e9] text-[#4b2e19] px-2 py-1 rounded-full">
-                                {feature}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Weight Selection */}
+                        {/* Size Dropdown with Pricing */}
                         {hasVariants && (
                           <div className="space-y-2">
-                            <label className="text-sm font-medium text-[#2D2D2D]">Available Sizes:</label>
-                            <div className="text-xs text-[#2D2D2D]/70">
-                              {variants.length > 1 ? `${variants.length} sizes available` : `${variants[0]?.Weight}g`}
+                            <label className="text-xs font-medium text-[#2D2D2D]">Select Size:</label>
+                            <select
+                              value={selectedVariantId || variants[0]?.id}
+                              onChange={(e) => handleVariantChange(Number(e.target.value))}
+                              className="w-full border border-[#4b2e19]/20 rounded-lg px-3 py-2 text-sm text-[#2D2D2D] bg-white focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a] cursor-pointer"
+                            >
+                              {variants.map((variant) => {
+                                const variantPrice = variant.Price - (variant.Discount || 0);
+                                const variantOriginalPrice = variant.Price;
+                                const variantSavings = variantOriginalPrice - variantPrice;
+                                return (
+                                  <option key={variant.id} value={variant.id}>
+                                    {variant.Weight}g - ₹{variantPrice}
+                                    {variantSavings > 0 && ` (Save ₹${variantSavings})`}
+                                    {variant.Stock <= 0 && ' - Out of Stock'}
+                                  </option>
+                                );
+                              })}
+                            </select>
+                            <div className="flex items-center justify-between text-xs">
+                              <span className="text-[#2D2D2D]/70">
+                                {selectedVariant?.Weight}g
+                              </span>
+                              {savings > 0 && (
+                                <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+                                  Save ₹{savings}
+                                </span>
+                              )}
                             </div>
                           </div>
                         )}
 
                         {/* Price and Add to Cart */}
-                        <div className="flex items-center justify-between">
-                          <div className="space-y-1">
+                        <div className="flex items-center justify-between pt-1">
+                          <div>
                             <div className="flex items-center gap-2">
-                              {hasVariants && (
-                                <>
-                                  <span className="text-xl font-bold text-[#4b2e19]">₹{minPrice}</span>
-                                  {variants.length > 1 && (
-                                    <span className="text-sm text-[#2D2D2D]/60">- ₹{maxPrice}</span>
-                                  )}
-                                  {savings > 0 && (
-                                    <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-full">
-                                      Save ₹{savings}
-                                    </span>
-                                  )}
-                                </>
+                              <span className="text-xl font-bold text-[#4b2e19]">₹{finalPrice}</span>
+                              {savings > 0 && (
+                                <span className="text-sm text-[#2D2D2D]/60 line-through">₹{originalPrice}</span>
                               )}
                             </div>
-                            <div className="text-xs text-[#2D2D2D]/70">
-                              {product.NumberOfPurchase}+ happy customers
+                            <div className="text-xs text-[#2D2D2D]/70 mt-0.5">
+                              {product.NumberOfPurchase}+ bought
                             </div>
                           </div>
                           <button
-                            className="bg-[#2f4f2f] text-white text-sm px-4 py-2 rounded-full hover:bg-[#3d6d3d] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="bg-[#2f4f2f] text-white text-xs px-4 py-2 rounded-full hover:bg-[#3d6d3d] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                             onClick={() => {
-                              if (variants[0]) {
-                                handleAddToCart(product, variants[0]);
+                              if (selectedVariant) {
+                                handleAddToCart(product, selectedVariant);
                               }
                             }}
-                            disabled={cartLoading || !hasVariants}
+                            disabled={cartLoading || !hasVariants || !selectedVariant || (selectedVariant.Stock <= 0)}
                           >
                             {cartLoading ? 'Adding...' : 'Add to Cart'}
                           </button>
@@ -377,52 +654,32 @@ export default function Home() {
       </div>
 
       {/* Why Choose YugaFarms */}
-      <section className="relative z-30 py-20 bg-[#4b2e19]">
+      <section className="relative z-30 py-12 md:py-16 bg-[#4b2e19]">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">WHY YUGAFARMS?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">WHY YUGAFARMS?</h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-12">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mb-8">
               {[
                 {
                   title: "100% Pure",
-                  // icon: (
-                  //   <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  //     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                  //   </svg>
-                  // )
                   icon: "/images/pure.png"
                 },
                 {
                   title: "Farm Fresh",
-                  // icon: (
-                  //   <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  //     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  //   </svg>
-                  // )
                   icon: "/images/farmfresh.png"
                 },
                 {
                   title: "Made in Small Batches",
-                  // icon: (
-                  //   <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  //     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  //   </svg>
-                  // )
                   icon: "/images/madeinsmallbatches.png"
                 },
                 {
                   title: "Rooted in Tradition",
-                  // icon: (
-                  //   <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  //     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  //   </svg>
-                  // )
                   icon: "/images/rootedintradition.png"
                 },
               ].map((item, idx) => (
                 <div key={idx} className="flex flex-col items-center text-center group">
-                  <div className="w-40 h-40 border-2 border-transparent flex items-center justify-center mb-4 text-white transition-all duration-300 group-hover:scale-105 bg-red"
+                  <div className="w-28 h-28 md:w-32 md:h-32 border-2 border-transparent flex items-center justify-center mb-3 text-white transition-all duration-300 group-hover:scale-105 bg-red"
                     style={{
                       backgroundImage: `url(${item.icon})`,
                       backgroundSize: '100% 100%',
@@ -431,12 +688,12 @@ export default function Home() {
                     }}
                   >
                   </div>
-                  <span className="text-white text-sm font-medium transition-colors duration-300 group-hover:text-[#f5d26a]">{item.title}</span>
+                  <span className="text-white text-xs md:text-sm font-medium transition-colors duration-300 group-hover:text-[#f5d26a]">{item.title}</span>
                 </div>
               ))}
             </div>
 
-            <button className="bg-white text-[#4b2e19] px-8 py-3 rounded-full font-semibold text-lg hover:bg-gray-100 transition-all duration-300 hover:scale-105">
+            <button className="bg-white text-[#4b2e19] px-6 py-2.5 rounded-full font-semibold text-base hover:bg-gray-100 transition-all duration-300 hover:scale-105">
               OUR STORY
             </button>
           </div>
@@ -444,130 +701,176 @@ export default function Home() {
       </section>
 
       {/* Client Reviews */}
-      <section className="py-16 md:py-20 bg-[#eef2e9]">
+      <section className="py-12 md:py-16 bg-[#eef2e9]">
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="flex items-end justify-between mb-12">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-4xl md:text-5xl font-bold text-[#2D2D2D] mb-2">
+              <h2 className="text-3xl md:text-4xl font-bold text-[#2D2D2D] mb-2">
                 Client <span className="text-[#4b2e19] relative">
                   Reviews
                   <div className="absolute -bottom-1 left-0 right-0 h-1 bg-[#f5d26a] rounded-full"></div>
                 </span>
               </h2>
-              <p className="text-[#2D2D2D]/70 text-lg">Hear what our satisfied customers have to say about their experiences.</p>
+              <p className="text-[#2D2D2D]/70 text-base">Hear what our satisfied customers have to say about their experiences.</p>
             </div>
 
             {/* Navigation Controls */}
-            <div className="flex items-center gap-3">
-              <button className="w-10 h-10 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5 text-[#2D2D2D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button className="w-10 h-10 bg-[#4b2e19] hover:bg-[#2f4f2f] rounded-full flex items-center justify-center transition-colors">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
+            {clients.length > 1 && (
+              <div className="flex items-center gap-3">
+                <button 
+                  onClick={handlePreviousClient}
+                  className="w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
+                  aria-label="Previous review"
+                >
+                  <svg className="w-4 h-4 text-[#2D2D2D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button 
+                  onClick={handleNextClient}
+                  className="w-9 h-9 bg-[#4b2e19] hover:bg-[#2f4f2f] rounded-full flex items-center justify-center transition-colors"
+                  aria-label="Next review"
+                >
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left Side - Map-like Visual */}
-            <div className="relative">
-              <div className="relative">
-                {/* Background Circle */}
-                <div className="w-96 h-96 bg-white rounded-full shadow-lg mx-auto relative overflow-hidden">
-                  {/* Overlay Circle */}
-                  <div className="absolute top-8 left-8 w-80 h-80 bg-gradient-to-br from-[#eef2e9] to-[#f0f4e8] rounded-full overflow-hidden flex bg-red-100">
-                    <Image src="/images/client.png" alt="Map" width={620} height={620} className="w-auto h-full object-cover" />
-                  </div>
+          {clientsLoading ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div className="w-72 h-72 md:w-80 md:h-80 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
+              <div className="bg-white rounded-2xl p-6 md:p-8 animate-pulse">
+                <div className="space-y-3">
+                  <div className="h-4 bg-gray-200 rounded w-full"></div>
+                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                  <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+                  <div className="h-6 bg-gray-200 rounded w-1/3 mt-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
                 </div>
-
-                {/* Decorative Elements */}
-                <div className="absolute -top-4 -right-4 w-24 h-24 border-2 border-[#f5d26a]/30 rounded-full"></div>
-                <div className="absolute -bottom-4 -left-4 w-16 h-16 border-2 border-[#4b2e19]/20 rounded-full"></div>
               </div>
             </div>
-
-            {/* Right Side - Testimonial Card */}
-            <div className="relative">
-              {/* Chat Icon */}
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-[#4b2e19] rounded-full flex items-center justify-center z-10">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </div>
-
-              {/* Testimonial Card */}
-              <div className="bg-white rounded-2xl p-8 ml-4">
-                <div className="space-y-4">
-                  {/* Quote */}
-                  <p className="text-[#2D2D2D] text-lg leading-relaxed">
-                    &quot;The quality of YugaFarms&apos; A2 ghee is absolutely exceptional! Every time I cook with it, the aroma fills my entire kitchen just like my grandmother&apos;s recipes. The rotis puff up perfectly and the taste is divine.&quot;
-                  </p>
-
-                  {/* Reviewer Info */}
-                  <div className="space-y-1">
-                    <div className="font-bold text-[#2D2D2D] text-lg">Meera Sharma</div>
-                    <div className="text-[#2D2D2D]/70">Home Chef & Food Blogger</div>
-                  </div>
-
-                  {/* Rating */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-[#4b2e19] font-bold">5.0</span>
-                    <div className="flex items-center gap-1">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <svg key={i} className="w-5 h-5 text-[#f5d26a]" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
+          ) : clientsError ? (
+            <div className="text-center py-12">
+              <p className="text-red-600 text-lg mb-4">Error: {clientsError}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-[#4b2e19] text-white px-6 py-2 rounded-lg hover:bg-[#2f4f2f] transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : clients.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-[#4b2e19] text-lg">No client reviews available at the moment.</p>
+              <p className="text-[#2D2D2D]/70 mt-2">Please check back later.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              {/* Left Side - Client Image */}
+              <div className="relative">
+                <div className="relative">
+                  {/* Background Circle */}
+                  <div className="w-72 h-72 md:w-80 md:h-80 bg-white rounded-full shadow-lg mx-auto relative overflow-hidden">
+                    {/* Overlay Circle with Client Image */}
+                    <div className="absolute top-6 left-6 md:top-8 md:left-8 w-60 h-60 md:w-64 md:h-64 bg-gradient-to-br from-[#eef2e9] to-[#f0f4e8] rounded-full overflow-hidden flex items-center justify-center">
+                      {clients[currentClientIndex]?.Image ? (
+                        <Image 
+                          src={`${BACKEND}${clients[currentClientIndex].Image.url}`} 
+                          alt={clients[currentClientIndex].Image.alternativeText || clients[currentClientIndex].Name || "Client"} 
+                          width={256} 
+                          height={256} 
+                          className="w-full h-full object-cover" 
+                        />
+                      ) : (
+                        <Image src="/images/client.png" alt="Client" width={256} height={256} className="w-auto h-full object-cover" />
+                      )}
                     </div>
                   </div>
+
+                  {/* Decorative Elements */}
+                  <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-16 h-16 md:w-20 md:h-20 border-2 border-[#f5d26a]/30 rounded-full"></div>
+                  <div className="absolute -bottom-3 -left-3 md:-bottom-4 md:-left-4 w-12 h-12 md:w-14 md:h-14 border-2 border-[#4b2e19]/20 rounded-full"></div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Additional Testimonials (Hidden by default, can be shown with navigation) */}
-          <div className="hidden">
-            {/* Second Testimonial */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Right Side - Testimonial Card */}
               <div className="relative">
-                {/* Same map visual */}
-              </div>
-              <div className="relative">
-                <div className="absolute -top-4 -left-4 w-12 h-12 bg-[#4b2e19] rounded-full flex items-center justify-center z-10">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {/* Chat Icon */}
+                <div className="absolute -top-3 -left-3 md:-top-4 md:-left-4 w-10 h-10 md:w-12 md:h-12 bg-[#4b2e19] rounded-full flex items-center justify-center z-10">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
-                <div className="bg-white rounded-2xl p-8 ml-4">
-                  <div className="space-y-4">
-                    <p className="text-[#2D2D2D] text-lg leading-relaxed">
-                      &quot;After trying countless oils, I finally found one that doesn&apos;t feel heavy on the stomach. My pakoras are crisp and light, just like my mother used to make. The difference in quality is remarkable.&quot;
+
+                {/* Testimonial Card */}
+                <div className="bg-white rounded-2xl p-6 md:p-8 ml-3 md:ml-4">
+                  <div className="space-y-3">
+                    {/* Quote */}
+                    <p className="text-[#2D2D2D] text-base md:text-lg leading-relaxed">
+                      &quot;{clients[currentClientIndex]?.Review || 'No review available.'}&quot;
                     </p>
+
+                    {/* Reviewer Info */}
                     <div className="space-y-1">
-                      <div className="font-bold text-[#2D2D2D] text-lg">Karthik Reddy</div>
-                      <div className="text-[#2D2D2D]/70">Restaurant Owner</div>
+                      <div className="font-bold text-[#2D2D2D] text-base md:text-lg">
+                        {clients[currentClientIndex]?.Name || 'Anonymous'}
+                      </div>
+                      {clients[currentClientIndex]?.Designation && (
+                        <div className="text-[#2D2D2D]/70 text-sm">
+                          {clients[currentClientIndex].Designation}
+                        </div>
+                      )}
                     </div>
+
+                    {/* Rating */}
                     <div className="flex items-center gap-2">
-                      <span className="text-[#4b2e19] font-bold">4.8</span>
+                      <span className="text-[#4b2e19] font-bold text-sm md:text-base">
+                        {clients[currentClientIndex]?.Rating?.toFixed(1) || '0.0'}
+                      </span>
                       <div className="flex items-center gap-1">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <svg key={i} className="w-5 h-5 text-[#f5d26a]" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
-                          </svg>
-                        ))}
+                        {Array.from({ length: 5 }).map((_, i) => {
+                          const rating = clients[currentClientIndex]?.Rating || 0;
+                          return (
+                            <svg 
+                              key={i} 
+                              className={`w-4 h-4 md:w-5 md:h-5 ${i < Math.round(rating) ? 'text-[#f5d26a]' : 'text-gray-300'}`} 
+                              fill="currentColor" 
+                              viewBox="0 0 20 20"
+                            >
+                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
+                            </svg>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
+
+          {/* Dots Indicator for Multiple Reviews */}
+          {clients.length > 1 && (
+            <div className="flex justify-center gap-2 mt-8">
+              {clients.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentClientIndex(index)}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === currentClientIndex
+                      ? 'bg-[#4b2e19] w-8'
+                      : 'bg-[#4b2e19]/30 hover:bg-[#4b2e19]/50 w-2'
+                  }`}
+                  aria-label={`Go to review ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
