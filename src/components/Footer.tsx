@@ -29,27 +29,25 @@ export default function Footer() {
                             <li><Link href="/about">About Us</Link></li>
                             <li><Link href="/recipes">Recipes</Link></li>
                             <li><Link href="/contact">Contact</Link></li>
-                            <li><Link href="/labs">Lab Reports</Link></li>
+                            <li><Link href="/lab-reports">Lab Reports</Link></li>
                         </ul>
                     </div>
                     <div>
                         <h4 className="font-semibold text-[#4b2e19] mb-3">Get in touch</h4>
                         <ul className="space-y-2 text-sm text-[#2D2D2D]/80">
-                            <li>Email: support@YugaFarms.com</li>
-                            <li>Phone: +91 9XX-XXX-XXXX</li>
-                            <li>Address: Pune, Maharashtra</li>
+                            <li>Email: support@yugafarms.com</li>
+                            <li>Phone: +91 96710 12177</li>
+                            <li>Address: Janouli, Palwal, Haryana, 121102</li>
                         </ul>
                     </div>
                 </div>
                 <div className="mt-8 pt-6 border-t border-[#4b2e19]/10 text-xs text-[#2D2D2D]/60 flex flex-col md:flex-row items-center justify-between">
                     <span>© {new Date().getFullYear()} YugaFarms. All rights reserved.</span>
                     <div className="mt-2 md:mt-0 space-x-4">
-                        <Link href="#">Privacy</Link>
-                        <Link href="#">Terms</Link>
-                        <Link href="#">Shipping</Link>
+                        Designed and Developed by <Link href="https://www.digicraft.one" className="text-[#2f4f2f] font-medium underline underline-offset-4 hover:text-[#4b2e19]">DigiCraft</Link>
                     </div>
                 </div>
             </div>
         </footer>
-    )
+    );
 }
