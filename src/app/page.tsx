@@ -36,6 +36,7 @@ type Product = {
   PunchLine: string;
   NumberOfPurchase: number;
   Type: "Ghee" | "Honey";
+  TopPicks: boolean;
   Variants: ProductVariant[];
   Tags: ProductTag[];
   Image: ProductImage[];
@@ -352,8 +353,8 @@ export default function Home() {
     const fetchTopProducts = async () => {
       try {
         setLoading(true);
-        // Fetch products and sort by NumberOfPurchase to get top products
-        const response = await fetch(`${BACKEND}/api/products?populate=*&sort=NumberOfPurchase:desc&pagination[limit]=3`);
+        // Fetch products where TopPicks is true
+        const response = await fetch(`${BACKEND}/api/products?filters[TopPicks][$eq]=true&populate=*&sort=NumberOfPurchase:desc`);
 
         if (!response.ok) {
           throw new Error('Failed to fetch products');

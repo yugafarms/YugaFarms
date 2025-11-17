@@ -35,6 +35,7 @@ type Product = {
   PunchLine: string;
   NumberOfPurchase: number;
   Type: "Ghee" | "Honey";
+  TopPicks: boolean;
   Variants: ProductVariant[];
   Tags: ProductTag[];
   Image: ProductImage[];
@@ -54,7 +55,8 @@ export default function HoneyPage() {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${BACKEND}/api/products?filters[Type][$eq]=Honey&populate=*`);
+        // Fetch Honey products where TopPicks is false (exclude top picks)
+        const response = await fetch(`${BACKEND}/api/products?filters[Type][$eq]=Honey&filters[TopPicks][$eq]=false&populate=*`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch products');

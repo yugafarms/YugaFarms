@@ -36,6 +36,7 @@ type Product = {
   PunchLine: string;
   NumberOfPurchase: number;
   Type: "Ghee" | "Honey";
+  TopPicks: boolean;
   Variants: ProductVariant[];
   Tags: ProductTag[];
   Image: ProductImage[];
