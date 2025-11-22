@@ -939,8 +939,8 @@ export default function Home() {
             <div className="space-y-8">
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-full flex items-center justify-center text-xl">
-                    🏺
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                    <Image src="/images/bilona.png" alt="Bilona" width={48} height={48} className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-[#4b2e19] mb-2">Bilona-Churned Excellence</h3>
@@ -949,8 +949,8 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#2f4f2f] to-[#4b2e19] rounded-full flex items-center justify-center text-xl">
-                    🌿
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                    <Image src="/images/leaf.png" alt="Cold Pressed" width={48} height={48} className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-[#4b2e19] mb-2">Cold-Pressed Purity</h3>
@@ -959,8 +959,8 @@ export default function Home() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-[#8B4513] to-[#D2691E] rounded-full flex items-center justify-center text-xl">
-                    🌾
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl">
+                    <Image src="/images/farm.png" alt="Farm" width={48} height={48} className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-[#4b2e19] mb-2">Farm-to-Table Freshness</h3>
@@ -971,14 +971,14 @@ export default function Home() {
 
               {/* Tradition badges */}
               <div className="flex flex-wrap gap-4 pt-6">
-                <div className="bg-[#f5d26a] text-[#4b2e19] px-6 py-3 rounded-full font-semibold">
-                  🏺 Bilona-churned
+                <div className="bg-[#f5d26a] text-[#4b2e19] px-6 py-3 rounded-full font-semibold flex items-center gap-2">
+                  <Image src="/images/bilona.png" alt="Bilona" width={24} height={24} className="h-[20px] object-contain" /> Bilona-churned
                 </div>
-                <div className="bg-[#4b2e19] text-white px-6 py-3 rounded-full font-semibold">
-                  🌿 Cold-pressed
+                <div className="bg-[#4b2e19] text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2">
+                  <Image src="/images/leaf.png" alt="Cold Pressed" width={24} height={24} className="h-[20px] object-contain" /> Cold-pressed
                 </div>
-                <div className="bg-white border-2 border-[#4b2e19] text-[#4b2e19] px-6 py-3 rounded-full font-semibold">
-                  🌾 No preservatives
+                <div className="bg-white border-2 border-[#4b2e19] text-[#4b2e19] px-6 py-3 rounded-full font-semibold flex items-center">
+                  <Image src="/images/farm.png" alt="Farm" width={24} height={24} className="h-[20px] object-contain" /> No preservatives
                 </div>
               </div>
             </div>

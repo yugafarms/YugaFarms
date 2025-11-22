@@ -15,6 +15,42 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
 
+  // Helper functions for unit conversion
+  const formatVolume = (ml: number): string => {
+    if (ml >= 1000) {
+      const liters = ml / 1000;
+      return liters % 1 === 0 ? `${liters} L` : `${liters.toFixed(1)} L`;
+    }
+    return `${ml} ml`;
+  };
+
+  const formatWeight = (grams: number): string => {
+    if (grams >= 1000) {
+      const kg = grams / 1000;
+      return kg % 1 === 0 ? `${kg} kg` : `${kg.toFixed(1)} kg`;
+    }
+    return `${grams} gram`;
+  };
+
+  // Determine product type from title
+  const getProductType = (title: string): "Ghee" | "Honey" => {
+    const titleLower = title.toLowerCase();
+    if (titleLower.includes('ghee')) return 'Ghee';
+    if (titleLower.includes('honey')) return 'Honey';
+    // Default to Honey if unclear (most products are Honey)
+    return 'Honey';
+  };
+
+  // Format weight based on product type
+  const formatProductWeight = (weight: number, title: string): string => {
+    const productType = getProductType(title);
+    if (productType === 'Ghee') {
+      return formatVolume(weight);
+    } else {
+      return formatWeight(weight);
+    }
+  };
+
   const handleQuantityChange = async (productId: number, variantId: number, newQuantity: number) => {
     if (newQuantity < 0) return;
     
@@ -140,7 +176,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                       <h3 className="text-sm md:text-base font-bold text-[#4b2e19] mb-1 line-clamp-2">
                         {item.productTitle}
                       </h3>
-                      <p className="text-xs text-[#2D2D2D]/70 mb-2">Size: {item.weight}g</p>
+                      <p className="text-xs text-[#2D2D2D]/70 mb-2">Size: {formatProductWeight(item.weight, item.productTitle)}</p>
                       
                       {/* Quantity Controls */}
                       <div className="flex items-center justify-between">
