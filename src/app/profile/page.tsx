@@ -91,7 +91,8 @@ export default function ProfilePage() {
       // Prepare the complete payload with all fields
       const payload: Record<string, string | number> = {};
       if (username?.trim()) payload.username = username.trim();
-      if (phone && /\d{6,}/.test(phone)) payload.Phone = Number(phone);
+      if (email?.trim()) payload.email = email.trim();
+      // Phone number cannot be changed - don't include it in payload
       
       // Add address fields directly to the payload
       if (address.AddressLine1?.trim()) payload.AddressLine1 = address.AddressLine1.trim();
@@ -120,12 +121,13 @@ export default function ProfilePage() {
       setSuccess("Profile updated");
       await refreshUser();
 
-      // Reload the profile data to get updated address
+      // Reload the profile data to get updated address and email
       const reloadRes = await fetch(`${BACKEND}/api/users/me`, {
         headers: { Authorization: `Bearer ${jwt}` },
       });
       if (reloadRes.ok) {
         const updatedUser = await reloadRes.json();
+        setEmail(updatedUser.email || "");
         setAddress({
           AddressLine1: updatedUser.AddressLine1 || "",
           AddressLine2: updatedUser.AddressLine2 || "",
@@ -181,8 +183,9 @@ export default function ProfilePage() {
                 <input
                   type="email"
                   value={email}
-                  disabled
-                  className="w-full rounded-lg border border-[#2D2D2D]/20 px-3 py-2 bg-[#fdf7f2] text-[#2D2D2D]/70"
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full rounded-lg border border-[#2D2D2D]/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#f5d26a] bg-white"
+                  placeholder="your@email.com"
                 />
               </div>
               <div>
@@ -190,10 +193,11 @@ export default function ProfilePage() {
                 <input
                   type="tel"
                   value={phone}
-                  onChange={(e) => setPhone(e.target.value.replace(/[^0-9]/g, ""))}
-                  className="w-full rounded-lg border border-[#2D2D2D]/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#f5d26a] bg-white"
-                  placeholder="10-digit phone"
+                  disabled
+                  className="w-full rounded-lg border border-[#2D2D2D]/20 px-3 py-2 bg-[#fdf7f2] text-[#2D2D2D]/70 cursor-not-allowed"
+                  placeholder="Phone number cannot be changed"
                 />
+                <p className="text-xs text-[#2D2D2D]/60 mt-1">Phone number cannot be changed for security reasons</p>
               </div>
             </div>
 

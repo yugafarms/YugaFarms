@@ -49,7 +49,6 @@ export default function HoneyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { addToCart, isLoading: cartLoading } = useCart();
-  const [selectedVariants, setSelectedVariants] = useState<Record<number, number>>({});
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -65,15 +64,6 @@ export default function HoneyPage() {
         const data = await response.json();
         const productsData = data.data || [];
         setProducts(productsData);
-        
-        // Set default selected variant (first variant) for each product
-        const defaultVariants: Record<number, number> = {};
-        productsData.forEach((product: Product) => {
-          if (product.Variants && product.Variants.length > 0) {
-            defaultVariants[product.id] = product.Variants[0].id;
-          }
-        });
-        setSelectedVariants(defaultVariants);
       } catch (err) {
         console.error('Error fetching products:', err);
         setError(err instanceof Error ? err.message : 'Failed to load products');
@@ -111,6 +101,15 @@ export default function HoneyPage() {
   const getProductBadge = (index: number) => {
     const badges = ["Best Seller", "Popular", "Health", "Classic", "Premium", "Value"];
     return badges[index % badges.length];
+  };
+
+  const formatWeight = (grams: number): string => {
+    if (grams >= 1000) {
+      const kg = grams / 1000;
+      // Show 1 decimal place if needed, otherwise show as integer
+      return kg % 1 === 0 ? `${kg} kg` : `${kg.toFixed(1)} kg`;
+    }
+    return `${grams} gram`;
   };
 
   const handleAddToCart = async (product: Product, variant: ProductVariant) => {
@@ -200,7 +199,7 @@ export default function HoneyPage() {
         <section className="py-16 md:py-20 bg-[#eef2e9]">
           <div className="container mx-auto px-4">
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {products.length === 0 ? (
                 <div className="col-span-full text-center py-12">
                   <p className="text-[#4b2e19] text-lg">No honey products available at the moment.</p>
@@ -211,121 +210,94 @@ export default function HoneyPage() {
                   const emoji = getProductEmoji(product.Title);
                   const badge = getProductBadge(idx);
                   
-                  // Calculate pricing from variants
+                  // Use first variant as default (no variant selection)
                   const variants = product.Variants || [];
-                  const hasVariants = variants.length > 0;
-                  const selectedVariantId = selectedVariants[product.id];
-                  const selectedVariant = variants.find(v => v.id === selectedVariantId) || variants[0];
+                  const defaultVariant = variants[0];
                   
-                  const handleVariantChange = (variantId: number) => {
-                    setSelectedVariants(prev => ({
-                      ...prev,
-                      [product.id]: variantId
-                    }));
-                  };
-
-                  const finalPrice = selectedVariant ? selectedVariant.Price - (selectedVariant.Discount || 0) : 0;
-                  const originalPrice = selectedVariant ? selectedVariant.Price : 0;
+                  const finalPrice = defaultVariant ? defaultVariant.Price - (defaultVariant.Discount || 0) : 0;
+                  const originalPrice = defaultVariant ? defaultVariant.Price : 0;
                   const savings = originalPrice - finalPrice;
 
                   return (
-                    <div key={product.id} className="rounded-2xl border border-[#4b2e19]/15 bg-white hover:shadow-lg transition-all duration-300 group">
+                    <div key={product.id} className="rounded-xl md:rounded-2xl transition-all duration-300 group">
                       {/* Product Image */}
                       <Link href={`/product/${product.id}`} className="block">
-                        <div className="relative h-40 bg-gradient-to-br from-[#f5d26a]/20 to-[#f5d26a]/10 rounded-t-2xl border-b border-[#4b2e19]/10 flex items-center justify-center overflow-hidden cursor-pointer">
+                        <div className="relative bg-gradient-to-br from-[#f5d26a]/20 to-[#f5d26a]/10 rounded-t-xl md:rounded-t-2xl border-b border-[#4b2e19]/10 flex items-center justify-center overflow-hidden cursor-pointer aspect-square w-full">
                           {product.Image && product.Image.length > 0 ? (
-                            <Image
-                              src={`${BACKEND}${product.Image[0].url}`}
+                            <Image 
+                              src={`${BACKEND}${product.Image[0].url}`} 
                               alt={product.Image[0].alternativeText || product.Title}
                               width={400}
                               height={160}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 aspect-square"
                             />
                           ) : (
-                            <span className="text-5xl">{emoji}</span>
+                            <span className="text-3xl md:text-5xl">{emoji}</span>
                           )}
-                          <div className="absolute top-3 left-3">
-                            <div className="text-xs bg-[#f5d26a] text-[#4b2e19] px-2 py-1 rounded-full font-semibold">{badge}</div>
+                          <div className="absolute top-1.5 left-1.5 md:top-3 md:left-3">
+                            <div className="text-[10px] md:text-xs bg-[#f5d26a] text-[#4b2e19] px-1.5 md:px-2 py-0.5 md:py-1 rounded-full font-semibold">{badge}</div>
                           </div>
-                          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-                            <div className="flex items-center gap-1">
-                              <svg className="w-3 h-3 text-[#f5d26a]" fill="currentColor" viewBox="0 0 20 20">
+                          <div className="absolute top-1.5 right-1.5 md:top-3 md:right-3 bg-white/90 backdrop-blur-sm rounded-full px-1.5 md:px-2 py-0.5 md:py-1">
+                            <div className="flex items-center gap-0.5 md:gap-1">
+                              <svg className="w-2.5 h-2.5 md:w-3 md:h-3 text-[#f5d26a]" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
                               </svg>
-                              <span className="text-xs font-semibold text-[#2D2D2D]">{product.Rating}</span>
+                              <span className="text-[10px] md:text-xs font-semibold text-[#2D2D2D]">{product.Rating}</span>
                             </div>
                           </div>
                         </div>
                       </Link>
 
                       {/* Product Details */}
-                      <div className="p-4 space-y-3">
+                      <div className="p-2 md:p-4 space-y-2 md:space-y-3">
                         {/* Title */}
                         <div>
                           <Link href={`/product/${product.id}`} className="block group">
-                            <h3 className="text-base font-semibold text-[#2D2D2D] mb-1 group-hover:text-[#4b2e19] transition-colors line-clamp-2">{product.Title}</h3>
+                            <h3 className="text-xs md:text-base font-bold text-[#2D2D2D] mb-0.5 md:mb-1 group-hover:text-[#4b2e19] transition-colors line-clamp-2 leading-tight">{product.Title}</h3>
                           </Link>
-                          <p className="text-[#2D2D2D]/60 text-xs font-medium line-clamp-1">{product.PunchLine}</p>
+                          <p className="text-[10px] md:text-xs text-[#2D2D2D]/70 font-semibold line-clamp-1 mt-0.5">{product.PunchLine}</p>
                         </div>
 
-                        {/* Size Dropdown with Pricing */}
-                        {hasVariants && (
-                          <div className="space-y-2">
-                            <label className="text-xs font-medium text-[#2D2D2D]">Select Size:</label>
-                            <select
-                              value={selectedVariantId || variants[0]?.id}
-                              onChange={(e) => handleVariantChange(Number(e.target.value))}
-                              className="w-full border border-[#4b2e19]/20 rounded-lg px-3 py-2 text-sm text-[#2D2D2D] bg-white focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a] cursor-pointer"
-                            >
-                              {variants.map((variant) => {
-                                const variantPrice = variant.Price - (variant.Discount || 0);
-                                const variantOriginalPrice = variant.Price;
-                                const variantSavings = variantOriginalPrice - variantPrice;
-                                return (
-                                  <option key={variant.id} value={variant.id}>
-                                    {variant.Weight}g - ₹{variantPrice}
-                                    {variantSavings > 0 && ` (Save ₹${variantSavings})`}
-                                    {variant.Stock <= 0 && ' - Out of Stock'}
-                                  </option>
-                                );
-                              })}
-                            </select>
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-[#2D2D2D]/70">
-                                {selectedVariant?.Weight}g
+                        {/* Weight and Savings Display */}
+                        {defaultVariant && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs md:text-sm text-[#2D2D2D] font-bold">
+                              {formatWeight(defaultVariant.Weight)}
+                            </span>
+                            {savings > 0 && (
+                              <span className="bg-red-100 text-red-600 px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold">
+                                Save ₹{savings}
                               </span>
-                              {savings > 0 && (
-                                <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
-                                  Save ₹{savings}
-                                </span>
-                              )}
-                            </div>
+                            )}
                           </div>
                         )}
 
                         {/* Price and Add to Cart */}
-                        <div className="flex items-center justify-between pt-1">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xl font-bold text-[#4b2e19]">₹{finalPrice}</span>
-                              {savings > 0 && (
-                                <span className="text-sm text-[#2D2D2D]/60 line-through">₹{originalPrice}</span>
-                              )}
-                            </div>
-                            <div className="text-xs text-[#2D2D2D]/70 mt-0.5">
-                              {product.NumberOfPurchase}+ bought
+                        <div className="flex items-center pt-1 md:pt-2 -mx-2 md:-mx-4 -mb-2 md:-mb-4">
+                          <div className="flex-1 flex items-center justify-between bg-white px-2 md:px-4 py-1.5 md:py-2.5 rounded-l-full shadow-sm">
+                            <div className="flex items-center gap-1.5 md:gap-3 flex-wrap">
+                              <div className="flex items-center gap-1 md:gap-2">
+                                <span className="text-base md:text-2xl font-bold text-[#4b2e19]">₹{finalPrice.toLocaleString('en-IN')}</span>
+                                {savings > 0 && (
+                                  <span className="text-[10px] md:text-sm text-[#2D2D2D]/60 line-through font-semibold">₹{originalPrice.toLocaleString('en-IN')}</span>
+                                )}
+                              </div>
+                              <span className="text-[10px] md:text-xs text-[#2D2D2D]/70 font-medium">
+                                {product.NumberOfPurchase}+ bought
+                              </span>
                             </div>
                           </div>
-                          <button
-                            className="bg-[#2f4f2f] text-white text-xs px-4 py-2 rounded-full hover:bg-[#3d6d3d] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                          <button 
+                            className="bg-[#2f4f2f] text-white text-[10px] md:text-sm px-2 md:px-5 py-1.5 md:py-2.5 rounded-r-full hover:bg-[#3d6d3d] transition-colors duration-200 font-bold disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-md"
                             onClick={() => {
-                              if (selectedVariant) {
-                                handleAddToCart(product, selectedVariant);
+                              if (defaultVariant) {
+                                handleAddToCart(product, defaultVariant);
                               }
                             }}
-                            disabled={cartLoading || !hasVariants || !selectedVariant || (selectedVariant.Stock <= 0)}
+                            disabled={cartLoading || !defaultVariant || (defaultVariant.Stock <= 0)}
                           >
-                            {cartLoading ? 'Adding...' : 'Add to Cart'}
+                            {cartLoading ? 'Adding...' : <span className="hidden md:inline">ADD TO CART</span>}
+                            {!cartLoading && <span className="md:hidden">ADD</span>}
                           </button>
                         </div>
                       </div>

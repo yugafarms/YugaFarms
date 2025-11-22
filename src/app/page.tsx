@@ -279,20 +279,12 @@ const BannerCarousel = () => {
             muted
             playsInline
             className="w-full h-full object-cover"
-            onMouseEnter={(e) => {
-              e.currentTarget.pause();
-              setIsAutoPlaying(false);
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.play();
-              setIsAutoPlaying(true);
-            }}
           >
             <source src={`${BACKEND}${currentItem.url}`} type={currentItem.mime} />
             Your browser does not support the video tag.
           </video>
         ) : (
-          <Image
+      <Image
             src={`${BACKEND}${currentItem.url}`}
             alt={currentItem.alternativeText || currentItem.name || "Banner"}
             fill
@@ -348,6 +340,7 @@ export default function Home() {
   const [currentClientIndex, setCurrentClientIndex] = useState(0);
   const [clientsLoading, setClientsLoading] = useState(true);
   const [clientsError, setClientsError] = useState<string | null>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const fetchTopProducts = async () => {
@@ -411,15 +404,32 @@ export default function Home() {
   // Navigation handlers for client reviews
   const handlePreviousClient = () => {
     if (clients.length > 0) {
+      setIsPaused(true); // Pause auto-rotation when user manually navigates
       setCurrentClientIndex((prev) => (prev - 1 + clients.length) % clients.length);
+      // Resume after 10 seconds
+      setTimeout(() => setIsPaused(false), 10000);
     }
   };
 
   const handleNextClient = () => {
     if (clients.length > 0) {
+      setIsPaused(true); // Pause auto-rotation when user manually navigates
       setCurrentClientIndex((prev) => (prev + 1) % clients.length);
+      // Resume after 10 seconds
+      setTimeout(() => setIsPaused(false), 10000);
     }
   };
+
+  // Auto-rotate client reviews
+  useEffect(() => {
+    if (clients.length <= 1 || isPaused) return;
+
+    const interval = setInterval(() => {
+      setCurrentClientIndex((prev) => (prev + 1) % clients.length);
+    }, 5000); // Change every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [clients.length, isPaused]);
 
   const getProductEmoji = (title: string, type: string) => {
     const titleLower = title.toLowerCase();
@@ -446,6 +456,22 @@ export default function Home() {
   const getProductBadge = (index: number) => {
     const badges = ["Best Seller", "Popular", "Premium", "New", "Family Pack", "Value"];
     return badges[index % badges.length];
+  };
+
+  const formatVolume = (ml: number): string => {
+    if (ml >= 1000) {
+      const liters = ml / 1000;
+      return liters % 1 === 0 ? `${liters} L` : `${liters.toFixed(1)} L`;
+    }
+    return `${ml} ml`;
+  };
+
+  const formatWeight = (grams: number): string => {
+    if (grams >= 1000) {
+      const kg = grams / 1000;
+      return kg % 1 === 0 ? `${kg} kg` : `${kg.toFixed(1)} kg`;
+    }
+    return `${grams} gram`;
   };
 
   const handleAddToCart = async (product: Product, variant: ProductVariant) => {
@@ -488,20 +514,17 @@ export default function Home() {
               </div>
               <Link href="/ghee" className="text-[#2f4f2f] hover:text-[#4b2e19] transition-colors duration-300 font-medium">View all</Link>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {loading ? (
                 // Loading state
-                Array.from({ length: 3 }).map((_, idx) => (
-                  <div key={idx} className="rounded-2xl border border-[#4b2e19]/15 bg-white animate-pulse">
-                    <div className="h-48 bg-gray-200 rounded-t-2xl"></div>
-                    <div className="p-5 space-y-4">
-                      <div className="h-6 bg-gray-200 rounded"></div>
-                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                      <div className="space-y-2">
-                        <div className="h-4 bg-gray-200 rounded"></div>
-                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                      </div>
-                      <div className="h-10 bg-gray-200 rounded"></div>
+                Array.from({ length: 4 }).map((_, idx) => (
+                  <div key={idx} className="rounded-xl md:rounded-2xl bg-white animate-pulse">
+                    <div className="h-48 bg-gray-200 rounded-t-xl md:rounded-t-2xl"></div>
+                    <div className="p-2 md:p-4 space-y-2 md:space-y-3">
+                      <div className="h-4 md:h-6 bg-gray-200 rounded"></div>
+                      <div className="h-3 md:h-4 bg-gray-200 rounded w-3/4"></div>
+                      <div className="h-8 md:h-10 bg-gray-200 rounded"></div>
+                      <div className="h-8 bg-gray-200 rounded"></div>
                     </div>
                   </div>
                 ))
@@ -545,95 +568,91 @@ export default function Home() {
                   const savings = originalPrice - finalPrice;
 
                   return (
-                    <div key={product.id} className="rounded-2xl border border-[#4b2e19]/15 bg-white hover:shadow-lg transition-all duration-300 group">
+                    <div key={product.id} className="rounded-xl md:rounded-2xl transition-all duration-300 group">
                       {/* Product Image */}
                       <Link href={`/product/${product.id}`} className="block">
-                        <div className="relative h-40 bg-gradient-to-br from-[#f5d26a]/20 to-[#f5d26a]/10 rounded-t-2xl border-b border-[#4b2e19]/10 flex items-center justify-center overflow-hidden cursor-pointer">
+                        <div className="relative bg-gradient-to-br from-[#f5d26a]/20 to-[#f5d26a]/10 rounded-t-xl md:rounded-t-2xl border-b border-[#4b2e19]/10 flex items-center justify-center overflow-hidden cursor-pointer aspect-square w-full">
                           {product.Image && product.Image.length > 0 ? (
                             <Image
                               src={`${BACKEND}${product.Image[0].url}`}
                               alt={product.Image[0].alternativeText || product.Title}
                               width={400}
                               height={160}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 aspect-square"
                             />
                           ) : (
-                            <span className="text-5xl">{emoji}</span>
+                            <span className="text-3xl md:text-5xl">{emoji}</span>
                           )}
-                          <div className="absolute top-3 left-3">
-                            <div className="text-xs bg-[#f5d26a] text-[#4b2e19] px-2 py-1 rounded-full font-semibold">{badge}</div>
+                          <div className="absolute top-1.5 left-1.5 md:top-3 md:left-3">
+                            <div className="text-[10px] md:text-xs bg-[#f5d26a] text-[#4b2e19] px-1.5 md:px-2 py-0.5 md:py-1 rounded-full font-semibold">{badge}</div>
                           </div>
-                          <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1">
-                            <div className="flex items-center gap-1">
-                              <svg className="w-3 h-3 text-[#f5d26a]" fill="currentColor" viewBox="0 0 20 20">
+                          <div className="absolute top-1.5 right-1.5 md:top-3 md:right-3 bg-white/90 backdrop-blur-sm rounded-full px-1.5 md:px-2 py-0.5 md:py-1">
+                            <div className="flex items-center gap-0.5 md:gap-1">
+                              <svg className="w-2.5 h-2.5 md:w-3 md:h-3 text-[#f5d26a]" fill="currentColor" viewBox="0 0 20 20">
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
                               </svg>
-                              <span className="text-xs font-semibold text-[#2D2D2D]">{product.Rating}</span>
+                              <span className="text-[10px] md:text-xs font-semibold text-[#2D2D2D]">{product.Rating}</span>
                             </div>
                           </div>
                         </div>
                       </Link>
 
                       {/* Product Details */}
-                      <div className="p-4 space-y-3">
+                      <div className="p-2 md:p-4 space-y-2 md:space-y-3">
                         {/* Title */}
                         <div>
                           <Link href={`/product/${product.id}`} className="block group">
-                            <h3 className="text-base font-semibold text-[#2D2D2D] mb-1 group-hover:text-[#4b2e19] transition-colors line-clamp-2">{product.Title}</h3>
+                            <h3 className="text-xs md:text-base font-bold text-[#2D2D2D] mb-0.5 md:mb-1 group-hover:text-[#4b2e19] transition-colors line-clamp-2 leading-tight">{product.Title}</h3>
                           </Link>
-                          <p className="text-[#2D2D2D]/60 text-xs font-medium line-clamp-1">{product.PunchLine}</p>
+                          <p className="text-[10px] md:text-xs text-[#2D2D2D]/70 font-semibold line-clamp-1 mt-0.5">{product.PunchLine}</p>
                         </div>
 
-                        {/* Size Dropdown with Pricing */}
-                        {hasVariants && (
-                          <div className="space-y-2">
-                            <label className="text-xs font-medium text-[#2D2D2D]">Select Size:</label>
+                        {/* Weight and Savings Display */}
+                        {selectedVariant && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs md:text-sm text-[#2D2D2D] font-bold">
+                              {product.Type === "Ghee" 
+                                ? formatVolume(selectedVariant.Weight)
+                                : formatWeight(selectedVariant.Weight)}
+                            </span>
+                            {savings > 0 && (
+                              <span className="bg-red-100 text-red-600 px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full text-[10px] md:text-xs font-bold">
+                                Save ₹{savings}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Dropdown and Add to Cart */}
+                        <div className="flex items-center">
+                          {/* Variant Dropdown (replaces price section, shows pricing) */}
+                          {hasVariants && (
                             <select
                               value={selectedVariantId || variants[0]?.id}
                               onChange={(e) => handleVariantChange(Number(e.target.value))}
-                              className="w-full border border-[#4b2e19]/20 rounded-lg px-3 py-2 text-sm text-[#2D2D2D] bg-white focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a] cursor-pointer"
+                              className="border border-r-0 border-[#4b2e19]/20 rounded-l-full px-2 md:px-4 py-1.5 md:py-2.5 text-[10px] md:text-sm text-[#2D2D2D] bg-white focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a] cursor-pointer shadow-sm font-semibold w-full"
                             >
                               {variants.map((variant) => {
                                 const variantPrice = variant.Price - (variant.Discount || 0);
                                 const variantOriginalPrice = variant.Price;
                                 const variantSavings = variantOriginalPrice - variantPrice;
+                                const weightDisplay = product.Type === "Ghee" 
+                                  ? formatVolume(variant.Weight)
+                                  : formatWeight(variant.Weight);
                                 return (
                                   <option key={variant.id} value={variant.id}>
-                                    {variant.Weight}g - ₹{variantPrice}
-                                    {variantSavings > 0 && ` (Save ₹${variantSavings})`}
+                                    {weightDisplay} - ₹{variantPrice.toLocaleString('en-IN')}
+                                    {variantSavings > 0 && ` (Save ₹${variantSavings.toLocaleString('en-IN')})`}
                                     {variant.Stock <= 0 && ' - Out of Stock'}
                                   </option>
                                 );
                               })}
                             </select>
-                            <div className="flex items-center justify-between text-xs">
-                              <span className="text-[#2D2D2D]/70">
-                                {selectedVariant?.Weight}g
-                              </span>
-                              {savings > 0 && (
-                                <span className="bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
-                                  Save ₹{savings}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Price and Add to Cart */}
-                        <div className="flex items-center justify-between pt-1">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xl font-bold text-[#4b2e19]">₹{finalPrice}</span>
-                              {savings > 0 && (
-                                <span className="text-sm text-[#2D2D2D]/60 line-through">₹{originalPrice}</span>
-                              )}
-                            </div>
-                            <div className="text-xs text-[#2D2D2D]/70 mt-0.5">
-                              {product.NumberOfPurchase}+ bought
-                            </div>
-                          </div>
+                          )}
+                          
+                          {/* Add to Cart Button */}
                           <button
-                            className="bg-[#2f4f2f] text-white text-xs px-4 py-2 rounded-full hover:bg-[#3d6d3d] transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                            className="bg-[#2f4f2f] text-white text-[10px] md:text-sm px-2 md:px-5 py-1.5 md:py-2.5 rounded-r-full hover:bg-[#3d6d3d] transition-colors duration-200 font-bold disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-md"
                             onClick={() => {
                               if (selectedVariant) {
                                 handleAddToCart(product, selectedVariant);
@@ -641,7 +660,8 @@ export default function Home() {
                             }}
                             disabled={cartLoading || !hasVariants || !selectedVariant || (selectedVariant.Stock <= 0)}
                           >
-                            {cartLoading ? 'Adding...' : 'Add to Cart'}
+                            {cartLoading ? 'Adding...' : <span className="hidden md:inline">ADD TO CART</span>}
+                            {!cartLoading && <span className="md:hidden">ADD</span>}
                           </button>
                         </div>
                       </div>
@@ -718,26 +738,26 @@ export default function Home() {
 
             {/* Navigation Controls */}
             {clients.length > 1 && (
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3">
                 <button 
                   onClick={handlePreviousClient}
                   className="w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
                   aria-label="Previous review"
                 >
                   <svg className="w-4 h-4 text-[#2D2D2D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
                 <button 
                   onClick={handleNextClient}
                   className="w-9 h-9 bg-[#4b2e19] hover:bg-[#2f4f2f] rounded-full flex items-center justify-center transition-colors"
                   aria-label="Next review"
                 >
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
             )}
           </div>
 
@@ -764,14 +784,18 @@ export default function Home() {
               >
                 Try Again
               </button>
-            </div>
+              </div>
           ) : clients.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-[#4b2e19] text-lg">No client reviews available at the moment.</p>
               <p className="text-[#2D2D2D]/70 mt-2">Please check back later.</p>
-            </div>
+                  </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            <div 
+              className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
+              onMouseEnter={() => setIsPaused(true)}
+              onMouseLeave={() => setIsPaused(false)}
+            >
               {/* Left Side - Client Image */}
               <div className="relative">
                 <div className="relative">
@@ -779,7 +803,7 @@ export default function Home() {
                   <div className="w-72 h-72 md:w-80 md:h-80 bg-white rounded-full shadow-lg mx-auto relative overflow-hidden">
                     {/* Overlay Circle with Client Image */}
                     <div className="absolute top-6 left-6 md:top-8 md:left-8 w-60 h-60 md:w-64 md:h-64 bg-gradient-to-br from-[#eef2e9] to-[#f0f4e8] rounded-full overflow-hidden flex items-center justify-center">
-                      {clients[currentClientIndex]?.Image ? (
+                      {clients[currentClientIndex]?.Image?.url ? (
                         <Image 
                           src={`${BACKEND}${clients[currentClientIndex].Image.url}`} 
                           alt={clients[currentClientIndex].Image.alternativeText || clients[currentClientIndex].Name || "Client"} 
@@ -788,7 +812,13 @@ export default function Home() {
                           className="w-full h-full object-cover" 
                         />
                       ) : (
-                        <Image src="/images/client.png" alt="Client" width={256} height={256} className="w-auto h-full object-cover" />
+                        <Image 
+                          src="/images/client.png" 
+                          alt={clients[currentClientIndex]?.Name || "Client"} 
+                          width={256} 
+                          height={256} 
+                          className="w-full h-full object-cover" 
+                        />
                       )}
                     </div>
                   </div>
@@ -796,8 +826,8 @@ export default function Home() {
                   {/* Decorative Elements */}
                   <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-16 h-16 md:w-20 md:h-20 border-2 border-[#f5d26a]/30 rounded-full"></div>
                   <div className="absolute -bottom-3 -left-3 md:-bottom-4 md:-left-4 w-12 h-12 md:w-14 md:h-14 border-2 border-[#4b2e19]/20 rounded-full"></div>
-                </div>
-              </div>
+            </div>
+          </div>
 
               {/* Right Side - Testimonial Card */}
               <div className="relative">
@@ -843,8 +873,8 @@ export default function Home() {
                               fill="currentColor" 
                               viewBox="0 0 20 20"
                             >
-                              <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
-                            </svg>
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
+                          </svg>
                           );
                         })}
                       </div>
@@ -870,7 +900,7 @@ export default function Home() {
                   aria-label={`Go to review ${index + 1}`}
                 />
               ))}
-            </div>
+          </div>
           )}
         </div>
       </section>

@@ -100,82 +100,62 @@ export default function AboutPage() {
            </svg>
          </div>
 
-        {/* Our Heritage Section */}
+        {/* Our Story Section */}
         <section className="py-20 md:py-24 bg-[#eef2e9]">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
-              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6 transition-all duration-700 hover:scale-105">Reviving Ancient Wisdom</h2>
-              <p className="text-xl text-[#2D2D2D]/70 max-w-4xl mx-auto leading-relaxed transition-all duration-700 delay-300">
-                In a world rushing towards modernity, we chose to slow down and embrace the timeless wisdom of our ancestors. 
-                Every product we create is a testament to the ancient art of pure, natural food preparation.
-              </p>
+              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6 transition-all duration-700 hover:scale-105">Our Story</h2>
             </div>
 
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-4xl mx-auto">
               {/* Main Story Section */}
               <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 mb-16 border border-[#4b2e19]/10 transition-all duration-500">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                  {/* Left Side - Story */}
-                  <div className="space-y-6">
-                    <div className="flex items-center gap-4 mb-6 group">
-                      <div className="w-16 h-16 bg-gradient-to-br from-[#ffe189] to-[#ffd93f] rounded-full flex items-center justify-center text-2xl shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:shadow-xl">
-                        <Image src="/images/journey.png" alt="Rooted in Tradition" width={64} height={64} className="w-full h-full object-contain" />
-                      </div>
-                      <div>
-                        <h3 className="text-3xl font-bold text-[#4b2e19] transition-colors duration-300 group-hover:text-[#2f4f2f]">The Journey Begins</h3>
-                        <p className="text-[#bb8c00] font-semibold">Since 1985</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4 text-[#2D2D2D]/80 leading-relaxed">
-                      <p className="text-lg">
-                        It all started in a small village kitchen, where our grandmother would wake up before dawn to churn ghee using the traditional bilona method. 
-                        The rhythmic sound of the wooden churner, the golden hue of pure ghee, and the aroma that filled the entire house - these memories became our foundation.
-                      </p>
-                      <p>
-                        Today, we continue this sacred tradition, but with a mission: to bring this ancient wisdom to modern families who value purity, health, and authenticity. 
-                        Every jar of our ghee and every drop of our honey carries the essence of those early morning rituals.
-                      </p>
-                      <p>
-                        We work directly with small family farms across India, ensuring that our products not only maintain their traditional quality but also support 
-                        the communities that have preserved these methods for generations.
-                      </p>
-                    </div>
+                <div className="space-y-6 text-[#2D2D2D]/80 leading-relaxed">
+                  <p className="text-lg">
+                    At Yuga Farms, our journey began with a question: in a world where everything moves faster, where meals are grabbed, packaged, processed, how well do we really know what we&apos;re eating? We watched as real food—grown and made with care—became overshadowed by convenience, shortcuts, and hidden processing.
+                  </p>
+                  
+                  <p>
+                    We remembered how it used to be: a spoon of warm ghee on simple chapati, the fragrance of golden clarity, the rhythm of seasons and soil and cow and kitchen all working together. We remembered how our elders knew what they were eating and how, how they respected the cow, the land, the churn, the flame.
+                  </p>
+                  
+                  <p>
+                    So we created Yuga Farms with one clear mission: to bring back right food—the kind our ancestors trusted—so that every home can hold onto the traditions of old Bharat, and every body can benefit from what genuine nourishment offers. Our focus is simple yet profound: cow ghee, crafted the way it was meant to be.
+                  </p>
+                  
+                  <div className="mt-8">
+                    <p className="font-semibold text-[#4b2e19] mb-4">Here&apos;s what we do differently:</p>
+                    <ul className="space-y-3 list-none">
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#f5d26a] font-bold mt-1">•</span>
+                        <span>We raise our cows with dignity, on clean feed, free from the shortcuts of industrial production.</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#f5d26a] font-bold mt-1">•</span>
+                        <span>We churn and clarify the ghee using traditional, careful methods—so the flavour, the nutrients, the integrity remain. As one source explains: &quot;The Vedic method of preparing ghee … ensures the ghee retains its nutritional and medicinal properties while being free from harmful additives.&quot;</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#f5d26a] font-bold mt-1">•</span>
+                        <span>We believe that modern manufacturing of fat and oils often loses the soul, the health, and the story of what food should be. That&apos;s why our ghee isn&apos;t just &quot;another cooking fat&quot; — it&apos;s a return to clarity, taste, roots, health.</span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-[#f5d26a] font-bold mt-1">•</span>
+                        <span>Because research shows that cow ghee made with proper methods offers real benefits: for digestion, immunity, brain function and more.</span>
+                      </li>
+                    </ul>
                   </div>
-
-                  {/* Right Side - Visual */}
-                  <div className="relative group">
-                    <div className="max-w-100 max-h-100 mx-auto bg-gradient-to-br relative overflow-hidden">
-                      {/* Inner circles */}
-                      {/* <div className="absolute inset-6 bg-white/40 rounded-full backdrop-blur-sm"></div>
-                      <div className="absolute inset-12 bg-gradient-to-br from-[#f5d26a]/50 to-[#4b2e19]/30 rounded-full backdrop-blur-sm"></div> */}
-
-                      {/* Central content */}
-                      {/* <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
-                        <div className="text-6xl">🏺</div>
-                        <div className="text-center space-y-1">
-                          <div className="text-xl font-bold text-[#4b2e19]">Traditional</div>
-                          <div className="text-[#2D2D2D]/70 text-sm">Bilona Method</div>
-                        </div>
-                      </div> */}
-
-                      {/* Floating elements */}
-                      {/* <div className="absolute top-6 right-6 w-12 h-12 bg-white/50 rounded-full backdrop-blur-sm flex items-center justify-center text-lg shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-12">
-                        🧈
-                      </div>
-                      <div className="absolute bottom-6 left-6 w-12 h-12 bg-white/50 rounded-full backdrop-blur-sm flex items-center justify-center text-lg shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:-rotate-12">
-                        🍯
-                      </div>
-                      <div className="absolute top-1/2 left-3 w-8 h-8 bg-white/40 rounded-full backdrop-blur-sm flex items-center justify-center text-sm shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
-                        🌾
-                      </div>
-                      <div className="absolute top-1/2 right-3 w-8 h-8 bg-white/40 rounded-full backdrop-blur-sm flex items-center justify-center text-sm shadow-lg transition-all duration-500 group-hover:scale-110 group-hover:-rotate-6">
-                        🌿
-                      </div> */}
-
-                      <Image src="/logo final.png" alt="Heritage" width={500} height={500} className="w-full h-full object-cover" />
-                    </div>
-                  </div>
+                  
+                  <p className="mt-6">
+                    Whether you&apos;re sitting down with your family for a home-cooked meal, or pausing for a quiet celebration, or simply choosing how to nourish yourself on a busy day — Yuga Farms is here so that what you put on your plate does more than satisfy hunger. It honours the land, the cow, the churn, the tradition. It nourishes your body. It remembers your roots.
+                  </p>
+                  
+                  <p className="mt-4 font-semibold text-[#4b2e19]">
+                    Because for us at Yuga Farms — ghee isn&apos;t just a cooking fat. It&apos;s the golden thread between tradition and health. Between the old ways of Bharat and the mindful tomorrow we want for ourselves and our children.
+                  </p>
+                  
+                  <p className="mt-4 italic text-center text-[#4b2e19]">
+                    Yuga Farms — where tradition meets health; where genuine cow ghee meets care.
+                  </p>
                 </div>
               </div>
 
@@ -202,8 +182,35 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* Our Promise Section */}
+        {/* A Note From Our Founders */}
         <section className="py-20 md:py-24 bg-gradient-to-br from-[#fdf7f2] to-[#f8f4e6]">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-20">
+              <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6 transition-all duration-700 hover:scale-105">A Note From Our Founders</h2>
+            </div>
+
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#4b2e19]/10 transition-all duration-500">
+                <div className="space-y-6 text-[#2D2D2D]/80 leading-relaxed">
+                  <p className="text-lg">
+                    We&apos;re <span className="font-semibold text-[#4b2e19]">Vishal & Deepak</span> — two friends inspired by India&apos;s food heritage and concerned about a world where meals are rushed and real nourishment is forgotten. In the rush of modern life, we asked: Do we really know what we&apos;re eating?
+                  </p>
+                  
+                  <p>
+                    At Yuga Farms, we&apos;ve chosen a different path. Our focus is clear: bring back the richness of tradition, health, and real flavour — starting with pure cow ghee made from the milk of our beloved indigenous Sahiwal cow.
+                  </p>
+                  
+                  <p>
+                    From pasture to churn to your plate, we&apos;re committed to food that honours the land, the animal, and your well-being. Because choosing our ghee isn&apos;t just about taste. It&apos;s about tradition, health and what we believe real food should be.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Our Promise Section */}
+        <section className="py-20 md:py-24 bg-[#eef2e9]">
           <div className="container mx-auto px-4">
             <div className="text-center mb-20">
               <h2 className="text-4xl md:text-6xl font-[Pacifico] text-[#4b2e19] mb-6 transition-all duration-700 hover:scale-105">Our Sacred Promise</h2>

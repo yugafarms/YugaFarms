@@ -28,9 +28,13 @@ const INDIAN_STATES = [
 ];
 
 export default function AddressModal({ isOpen, onClose, onSave, initialPhone = "" }: AddressModalProps) {
+  // Clean phone number - remove +91 prefix and non-digits, keep only 10 digits
+  const cleanPhone = initialPhone ? initialPhone.replace(/\D/g, '').replace(/^91/, '').slice(0, 10) : "";
+  const isPhoneLocked = !!cleanPhone;
+
   const [address, setAddress] = useState<Address>({
     fullName: "",
-    phone: initialPhone,
+    phone: cleanPhone,
     addressLine1: "",
     addressLine2: "",
     city: "",
@@ -41,7 +45,18 @@ export default function AddressModal({ isOpen, onClose, onSave, initialPhone = "
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Update address state when initialPhone changes
+  React.useEffect(() => {
+    if (cleanPhone && isOpen) {
+      setAddress((prev) => ({ ...prev, phone: cleanPhone }));
+    }
+  }, [cleanPhone, isOpen]);
+
   const updateAddress = (field: keyof Address, value: string) => {
+    // Don't allow phone to be changed if it's locked
+    if (field === "phone" && isPhoneLocked) {
+      return;
+    }
     setAddress((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -92,7 +107,7 @@ export default function AddressModal({ isOpen, onClose, onSave, initialPhone = "
   const handleClose = () => {
     setAddress({
       fullName: "",
-      phone: initialPhone,
+      phone: cleanPhone,
       addressLine1: "",
       addressLine2: "",
       city: "",
@@ -144,14 +159,33 @@ export default function AddressModal({ isOpen, onClose, onSave, initialPhone = "
             </div>
             <div>
               <label className="block text-sm font-semibold text-[#2D2D2D] mb-2">Phone Number *</label>
-              <input
-                type="tel"
-                value={address.phone}
-                onChange={(e) => updateAddress("phone", e.target.value)}
-                className="w-full border border-[#4b2e19]/20 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a]"
-                placeholder="Enter your phone number"
-                required
-              />
+              <div className="flex items-center border border-[#4b2e19]/20 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#f5d26a]/50 focus-within:border-[#f5d26a]">
+                <span className="px-4 py-3 bg-[#f5d26a]/10 text-[#4b2e19] font-semibold border-r border-[#4b2e19]/20">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  value={address.phone}
+                  onChange={(e) => {
+                    if (!isPhoneLocked) {
+                      const digits = e.target.value.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
+                      updateAddress("phone", digits);
+                    }
+                  }}
+                  disabled={isPhoneLocked}
+                  className={`flex-1 px-4 py-3 focus:outline-none ${
+                    isPhoneLocked 
+                      ? 'bg-[#fdf7f2] text-[#2D2D2D]/70 cursor-not-allowed' 
+                      : 'bg-white'
+                  }`}
+                  placeholder="9876543210"
+                  maxLength={10}
+                  required
+                />
+              </div>
+              {isPhoneLocked && (
+                <p className="text-xs text-[#2D2D2D]/60 mt-1">Phone number verified and locked</p>
+              )}
             </div>
           </div>
 

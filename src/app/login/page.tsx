@@ -1,101 +1,210 @@
 "use client";
-import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
+import TopBar from "@/components/TopBar";
+import Footer from "@/components/Footer";
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { sendOTP, loginWithOTP, user } = useAuth();
   const router = useRouter();
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState<"phone" | "otp">("phone");
+  const [phone, setPhone] = useState("");
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(0);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      router.push("/");
+    }
+  }, [user, router]);
+
+  // Countdown effect
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    
+    // Validate phone number (should be exactly 10 digits)
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.length !== 10) {
+      setError("Please enter a valid 10-digit phone number");
+      return;
+    }
+
     setLoading(true);
     try {
-      await login(identifier, password);
-      router.push("/");
+      // Add +91 prefix for OTP sending
+      const fullPhone = `+91${cleanPhone}`;
+      await sendOTP(fullPhone);
+      setStep("otp");
+      setCountdown(60); // 60 second countdown
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      setError(err instanceof Error ? err.message : "Failed to send OTP");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleOTPSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (otp.length !== 6) {
+      setError("Please enter a valid 6-digit OTP");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const cleanPhone = phone.replace(/\D/g, '');
+      const fullPhone = `+91${cleanPhone}`;
+      await loginWithOTP(fullPhone, otp);
+      // Redirect to home after successful login
+      router.push("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Invalid OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    if (countdown > 0) return;
+    
+    setError(null);
+    setLoading(true);
+    try {
+      const cleanPhone = phone.replace(/\D/g, '');
+      const fullPhone = `+91${cleanPhone}`;
+      await sendOTP(fullPhone);
+      setCountdown(60);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to resend OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBackToPhone = () => {
+    setStep("phone");
+    setOtp("");
+    setError(null);
+  };
+
   return (
-    <div className="min-h-[70vh] bg-[#fdf7f2] flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur rounded-xl shadow border border-[#2D2D2D]/10 p-6">
-        <h1 className="text-2xl font-semibold text-[#4b2e19] text-center">Welcome back</h1>
-        <p className="text-sm text-[#2D2D2D]/70 text-center mt-1">Login to continue</p>
-
-        {error && (
-          <div className="mt-4 text-sm text-[#7a1a1a] bg-[#fddedd] border border-[#7a1a1a]/20 rounded p-3">
-            {error}
+    <>
+      <TopBar />
+      <div className="min-h-[calc(100vh-200px)] bg-[#fdf7f2] flex items-center justify-center px-4 pt-32 pb-16">
+        <div className="w-full max-w-md bg-white/80 backdrop-blur rounded-2xl shadow-lg border border-[#2D2D2D]/10 p-8">
+          <div className="text-center mb-6">
+            <h1 className="text-3xl font-bold text-[#4b2e19] mb-2">
+              {step === "phone" ? "Welcome Back" : "Enter OTP"}
+            </h1>
+            <p className="text-sm text-[#2D2D2D]/70">
+              {step === "phone"
+                ? "Login with your phone number to continue"
+                : `We've sent a 6-digit code to +91 ${phone}`}
+            </p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="block text-sm text-[#2D2D2D]/80 mb-1">Email or Username</label>
-            <input
-              type="text"
-              value={identifier}
-              onChange={(e) => setIdentifier(e.target.value)}
-              className="w-full rounded-lg border border-[#2D2D2D]/20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#f5d26a] bg-white"
-              placeholder="you@example.com"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm text-[#2D2D2D]/80 mb-1">Password</label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-[#2D2D2D]/20 px-3 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#f5d26a] bg-white"
-                placeholder="••••••••"
-                required
-              />
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
+          {step === "phone" ? (
+            <form onSubmit={handlePhoneSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#2D2D2D] mb-2">
+                  Phone Number
+                </label>
+                <div className="flex items-center border border-[#4b2e19]/20 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#f5d26a]/50 focus-within:border-[#f5d26a]">
+                  <span className="px-4 py-3 bg-[#f5d26a]/10 text-[#4b2e19] font-semibold border-r border-[#4b2e19]/20">
+                    +91
+                  </span>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                      setPhone(digits);
+                    }}
+                    placeholder="9876543210"
+                    maxLength={10}
+                    className="flex-1 px-4 py-3 focus:outline-none text-[#2D2D2D]"
+                    required
+                  />
+                </div>
+              </div>
               <button
-                type="button"
-                onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#2D2D2D]/70 hover:text-[#4b2e19]"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                type="submit"
+                disabled={loading}
+                className="w-full bg-[#4b2e19] text-white py-3 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {showPassword ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5 0-9-4-9-7 0-1.07.41-2.064 1.125-2.925M6.223 6.223A10.05 10.05 0 0112 5c5 0 9 4 9 7 0 1.07-.41 2.064-1.125 2.925M3 3l18 18" /></svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                )}
+                {loading ? "Sending..." : "Send OTP"}
               </button>
-            </div>
-            <div className="mt-2 text-right">
-              <Link href="/forgot-password" className="text-xs text-[#4b2e19] underline">Forgot password?</Link>
-            </div>
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#4b2e19] text-[#f5d26a] font-semibold py-2 rounded-lg hover:opacity-90 transition disabled:opacity-60"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        
-
-        <p className="text-center text-sm text-[#2D2D2D]/70 mt-4">
-          Don&apos;t have an account? <Link href="/signup" className="text-[#4b2e19] underline">Sign up</Link>
-        </p>
+            </form>
+          ) : (
+            <form onSubmit={handleOTPSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-[#2D2D2D] mb-2">
+                  Enter 6-digit OTP
+                </label>
+                <input
+                  type="text"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="000000"
+                  maxLength={6}
+                  className="w-full border border-[#4b2e19]/20 rounded-xl px-4 py-3 text-center text-2xl tracking-widest focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a] text-[#2D2D2D]"
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading || otp.length !== 6}
+                className="w-full bg-[#4b2e19] text-white py-3 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? "Verifying..." : "Verify & Login"}
+              </button>
+              <div className="text-center space-y-2">
+                <button
+                  type="button"
+                  onClick={handleResendOTP}
+                  disabled={countdown > 0}
+                  className="text-sm text-[#4b2e19] hover:text-[#2f4f2f] disabled:text-[#2D2D2D]/30 disabled:cursor-not-allowed"
+                >
+                  {countdown > 0 ? `Resend OTP in ${countdown}s` : "Resend OTP"}
+                </button>
+                <div>
+                  <button
+                    type="button"
+                    onClick={handleBackToPhone}
+                    className="text-sm text-[#2D2D2D]/70 hover:text-[#2D2D2D] transition-colors"
+                  >
+                    Change phone number
+                  </button>
+                </div>
+              </div>
+            </form>
+          )}
+        </div>
       </div>
-    </div>
+      <Footer />
+    </>
   );
 }
-
-

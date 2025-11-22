@@ -19,6 +19,9 @@ export type CartContextType = {
   totalItems: number;
   totalPrice: number;
   isLoading: boolean;
+  isCartOpen: boolean;
+  setIsCartOpen: (open: boolean) => void;
+  showCheckoutOTP: () => void;
   addToCart: (item: Omit<CartItem, 'quantity'>) => Promise<void>;
   removeFromCart: (productId: number, variantId: number) => Promise<void>;
   updateQuantity: (productId: number, variantId: number, quantity: number) => Promise<void>;
@@ -37,6 +40,7 @@ const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const { user, jwt, refreshUser } = useAuth();
   const isSyncingRef = useRef<boolean>(false);
   
@@ -240,6 +244,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (user && jwt) {
         await saveCartToBackend(updatedItems);
       }
+
+      // Open cart drawer after adding item
+      setIsCartOpen(true);
     } catch (error) {
       console.error("Error adding to cart:", error);
       throw error;
@@ -257,25 +264,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       // Show address modal
       setShowAddressModal(true);
     } else {
-      // User has address, proceed with adding to cart
+      // User has address, if there was a pending cart item, add it
       if (pendingCartItem) {
         await addToCartDirectly(pendingCartItem);
         setPendingCartItem(null);
+      } else if (items.length > 0) {
+        // If OTP was triggered for checkout (no pending item but cart has items), redirect to checkout
+        setIsCartOpen(false);
+        // Use setTimeout to ensure state updates are complete
+        setTimeout(() => {
+          window.location.href = '/checkout';
+        }, 100);
       }
     }
-  }, [checkUserAddress, pendingCartItem, addToCartDirectly]);
+  }, [checkUserAddress, pendingCartItem, addToCartDirectly, items.length]);
 
   const addToCart = useCallback(async (newItem: Omit<CartItem, 'quantity'>) => {
-    // If user is not logged in, show OTP modal
-    if (!user || !jwt) {
-      setPendingCartItem(newItem);
-      setShowOTPModal(true);
-      return;
-    }
-
-    // User is logged in, add directly
+    // Allow adding to cart without login - OTP will be asked at checkout
     await addToCartDirectly(newItem);
-  }, [user, jwt, addToCartDirectly]);
+  }, [addToCartDirectly]);
 
   const removeFromCart = useCallback(async (productId: number, variantId: number) => {
     try {
@@ -358,24 +365,37 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }) => {
     await saveAddressToBackend(address);
     
-    // After saving address, add the pending cart item
+    // After saving address, add the pending cart item if exists
     if (pendingCartItem) {
       await addToCartDirectly(pendingCartItem);
       setPendingCartItem(null);
+    } else if (items.length > 0) {
+      // If no pending item but cart has items, redirect to checkout
+      setIsCartOpen(false);
+      window.location.href = '/checkout';
     }
-  }, [saveAddressToBackend, pendingCartItem, addToCartDirectly]);
+  }, [saveAddressToBackend, pendingCartItem, addToCartDirectly, items.length]);
+
+  const showCheckoutOTP = useCallback(() => {
+    setPendingCartItem(null); // No pending item, just for checkout
+    setIsCartOpen(false); // Close cart drawer when OTP modal opens
+    setShowOTPModal(true);
+  }, []);
 
   const value = useMemo<CartContextType>(() => ({
     items,
     totalItems,
     totalPrice,
     isLoading,
+    isCartOpen,
+    setIsCartOpen,
+    showCheckoutOTP,
     addToCart,
     removeFromCart,
     updateQuantity,
     clearCart,
     syncCart,
-  }), [items, totalItems, totalPrice, isLoading, addToCart, removeFromCart, updateQuantity, clearCart, syncCart]);
+  }), [items, totalItems, totalPrice, isLoading, isCartOpen, showCheckoutOTP, addToCart, removeFromCart, updateQuantity, clearCart, syncCart]);
 
   return (
     <CartContext.Provider value={value}>

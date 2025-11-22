@@ -21,16 +21,18 @@ export default function PhoneOTPModal({ isOpen, onClose, onSuccess }: PhoneOTPMo
     e.preventDefault();
     setError(null);
     
-    // Validate phone number
+    // Validate phone number (should be exactly 10 digits)
     const cleanPhone = phone.replace(/\D/g, '');
-    if (cleanPhone.length < 10 || cleanPhone.length > 15) {
-      setError("Please enter a valid phone number");
+    if (cleanPhone.length !== 10) {
+      setError("Please enter a valid 10-digit phone number");
       return;
     }
 
     setLoading(true);
     try {
-      await sendOTP(cleanPhone);
+      // Add +91 prefix for OTP sending
+      const fullPhone = `+91${cleanPhone}`;
+      await sendOTP(fullPhone);
       setStep("otp");
       setCountdown(60); // 60 second countdown
       
@@ -63,8 +65,9 @@ export default function PhoneOTPModal({ isOpen, onClose, onSuccess }: PhoneOTPMo
     setLoading(true);
     try {
       const cleanPhone = phone.replace(/\D/g, '');
-      await loginWithOTP(cleanPhone, otp);
-      onSuccess(cleanPhone);
+      const fullPhone = `+91${cleanPhone}`;
+      await loginWithOTP(fullPhone, otp);
+      onSuccess(fullPhone);
       handleClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid OTP. Please try again.");
@@ -80,7 +83,8 @@ export default function PhoneOTPModal({ isOpen, onClose, onSuccess }: PhoneOTPMo
     setLoading(true);
     try {
       const cleanPhone = phone.replace(/\D/g, '');
-      await sendOTP(cleanPhone);
+      const fullPhone = `+91${cleanPhone}`;
+      await sendOTP(fullPhone);
       setCountdown(60);
       setError(null);
     } catch (err) {
@@ -120,7 +124,7 @@ export default function PhoneOTPModal({ isOpen, onClose, onSuccess }: PhoneOTPMo
           <p className="text-sm text-[#2D2D2D]/70">
             {step === "phone"
               ? "We'll send you a verification code"
-              : `We've sent a 6-digit code to ${phone}`}
+              : `We've sent a 6-digit code to +91 ${phone}`}
           </p>
         </div>
 
@@ -136,14 +140,23 @@ export default function PhoneOTPModal({ isOpen, onClose, onSuccess }: PhoneOTPMo
               <label className="block text-sm font-semibold text-[#2D2D2D] mb-2">
                 Phone Number
               </label>
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 9876543210"
-                className="w-full border border-[#4b2e19]/20 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a]"
-                required
-              />
+              <div className="flex items-center border border-[#4b2e19]/20 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#f5d26a]/50 focus-within:border-[#f5d26a]">
+                <span className="px-4 py-3 bg-[#f5d26a]/10 text-[#4b2e19] font-semibold border-r border-[#4b2e19]/20">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    setPhone(digits);
+                  }}
+                  placeholder="9876543210"
+                  maxLength={10}
+                  className="flex-1 px-4 py-3 focus:outline-none"
+                  required
+                />
+              </div>
             </div>
             <button
               type="submit"

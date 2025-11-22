@@ -111,7 +111,7 @@ export default function LabReportsPage() {
             </div>
 
             {/* Lab Information */}
-            <div className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 md:p-12 border border-[#4b2e19]/10">
+            <div className="backdrop-blur-sm rounded-3xl p-8 md:p-12">
               <div className="text-center mb-8">
                 <h3 className="text-3xl font-bold text-[#4b2e19] mb-4">Certified Testing Laboratories</h3>
                 <p className="text-[#2D2D2D]/70 max-w-3xl mx-auto">
@@ -153,7 +153,7 @@ export default function LabReportsPage() {
         </section>
 
         {/* Quality Standards Section */}
-        <section className="py-16 md:py-20 bg-gradient-to-br from-[#fdf7f2] to-[#f8f4e6]">
+        {/* <section className="py-16 md:py-20 bg-gradient-to-br from-[#fdf7f2] to-[#f8f4e6]">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
               <h2 className="text-4xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-4">Our Quality Standards</h2>
@@ -195,7 +195,7 @@ export default function LabReportsPage() {
               </div>
             </div>
           </div>
-        </section>
+        </section> */}
 
         {/* Download Section */}
         {/* <section className="py-16 md:py-20 bg-[#eef2e9]">

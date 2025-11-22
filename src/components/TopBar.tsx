@@ -9,8 +9,13 @@ import { useCart } from '../app/context/CartContext'
 export default function TopBar() {
     const pathname = usePathname()
     const isHome = pathname === '/' || pathname === ''
+    const isGhee = pathname === '/ghee' || pathname.startsWith('/ghee/')
+    const isHoney = pathname === '/honey' || pathname.startsWith('/honey/')
+    const isAbout = pathname === '/about' || pathname.startsWith('/about/')
+    const isContact = pathname === '/contact' || pathname.startsWith('/contact/')
     const { user, logout } = useAuth()
-    const { totalItems } = useCart()
+    const { totalItems, setIsCartOpen } = useCart()
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
     
     return (
         <>
@@ -65,28 +70,63 @@ export default function TopBar() {
                                         : 'w-0 group-hover:w-full'
                                 }`}></span>
                             </Link>
-                            <Link href="/ghee" className="relative text-[#2D2D2D] hover:text-[#4b2e19] transition-colors duration-300 font-medium group">
+                            <Link href="/ghee" className={`relative transition-colors duration-300 font-medium group ${
+                                isGhee 
+                                    ? 'text-[#4b2e19]' 
+                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                            }`}>
                                 GHEE
-                                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#f5d26a] transition-all duration-300 group-hover:w-full"></span>
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
+                                    isGhee 
+                                        ? 'w-full' 
+                                        : 'w-0 group-hover:w-full'
+                                }`}></span>
                             </Link>
-                            <Link href="/honey" className="relative text-[#2D2D2D] hover:text-[#4b2e19] transition-colors duration-300 font-medium group">
+                            <Link href="/honey" className={`relative transition-colors duration-300 font-medium group ${
+                                isHoney 
+                                    ? 'text-[#4b2e19]' 
+                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                            }`}>
                                 HONEY
-                                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#f5d26a] transition-all duration-300 group-hover:w-full"></span>
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
+                                    isHoney 
+                                        ? 'w-full' 
+                                        : 'w-0 group-hover:w-full'
+                                }`}></span>
                             </Link>
-                            <Link href="/about" className="relative text-[#2D2D2D] hover:text-[#4b2e19] transition-colors duration-300 font-medium group">
+                            <Link href="/about" className={`relative transition-colors duration-300 font-medium group ${
+                                isAbout 
+                                    ? 'text-[#4b2e19]' 
+                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                            }`}>
                                 ABOUT US
-                                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#f5d26a] transition-all duration-300 group-hover:w-full"></span>
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
+                                    isAbout 
+                                        ? 'w-full' 
+                                        : 'w-0 group-hover:w-full'
+                                }`}></span>
                             </Link>
-                            <Link href="/lab-reports" className="relative text-[#2D2D2D] hover:text-[#4b2e19] transition-colors duration-300 font-medium group">
-                                REPORTS
-                                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#f5d26a] transition-all duration-300 group-hover:w-full"></span>
+                            <Link href="/contact" className={`relative transition-colors duration-300 font-medium group ${
+                                isContact 
+                                    ? 'text-[#4b2e19]' 
+                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                            }`}>
+                                CONTACT
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
+                                    isContact 
+                                        ? 'w-full' 
+                                        : 'w-0 group-hover:w-full'
+                                }`}></span>
                             </Link>
                         </div>
 
                         {/* Right Side Icons */}
                         <div className="flex items-center space-x-4 py-3 md:py-4">
                             {/* Cart Icon */}
-                            <Link href="/cart" className="relative text-[#2D2D2D] hover:text-[#4b2e19] transition-all duration-300 group p-2 rounded-full hover:bg-[#f5d26a]/10">
+                            <button 
+                                onClick={() => setIsCartOpen(true)}
+                                className="relative text-[#2D2D2D] hover:text-[#4b2e19] transition-all duration-300 group p-2 rounded-full hover:bg-[#f5d26a]/10"
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 transition-transform duration-300 group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                 </svg>
@@ -96,7 +136,7 @@ export default function TopBar() {
                                         {totalItems > 99 ? '99+' : totalItems}
                                     </span>
                                 )}
-                            </Link>
+                            </button>
 
                             {/* Auth */}
                             {user ? (
@@ -106,13 +146,86 @@ export default function TopBar() {
                             )}
 
                             {/* Mobile Menu Button */}
-                            <button className="md:hidden text-[#2D2D2D] hover:text-[#4b2e19] transition-colors duration-300 p-2 rounded-full hover:bg-[#f5d26a]/10">
-                                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
+                            <button 
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="md:hidden text-[#2D2D2D] hover:text-[#4b2e19] transition-colors duration-300 p-2 rounded-full hover:bg-[#f5d26a]/10"
+                                aria-label="Toggle menu"
+                            >
+                                {isMobileMenuOpen ? (
+                                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                ) : (
+                                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                )}
                             </button>
                         </div>
                     </nav >
+
+                    {/* Mobile Menu */}
+                    {isMobileMenuOpen && (
+                        <div className="md:hidden border-t border-[#2D2D2D]/10 bg-white/95 backdrop-blur-md">
+                            <div className="flex flex-col py-4 space-y-1">
+                                <Link 
+                                    href="/" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
+                                        isHome 
+                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
+                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                    }`}
+                                >
+                                    HOME
+                                </Link>
+                                <Link 
+                                    href="/ghee" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
+                                        isGhee 
+                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
+                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                    }`}
+                                >
+                                    GHEE
+                                </Link>
+                                <Link 
+                                    href="/honey" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
+                                        isHoney 
+                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
+                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                    }`}
+                                >
+                                    HONEY
+                                </Link>
+                                <Link 
+                                    href="/about" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
+                                        isAbout 
+                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
+                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                    }`}
+                                >
+                                    ABOUT US
+                                </Link>
+                                <Link 
+                                    href="/contact" 
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
+                                        isContact 
+                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
+                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                    }`}
+                                >
+                                    CONTACT
+                                </Link>
+                            </div>
+                        </div>
+                    )}
                 </div >
             </header >
         </>

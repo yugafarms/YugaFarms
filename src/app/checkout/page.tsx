@@ -73,10 +73,17 @@ declare global {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart, showCheckoutOTP } = useCart();
   const { user, jwt } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Show OTP modal if user is not logged in
+  useEffect(() => {
+    if (!user && items.length > 0) {
+      showCheckoutOTP();
+    }
+  }, [user, items.length, showCheckoutOTP]);
   
   // Address states
   const [shippingAddress, setShippingAddress] = useState<Address>({
@@ -102,7 +109,7 @@ export default function CheckoutPage() {
   });
   
   const [useSameAddress, setUseSameAddress] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('COD');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('RAZORPAY');
   const [orderNotes, setOrderNotes] = useState('');
   
   // Calculate totals
@@ -167,8 +174,9 @@ export default function CheckoutPage() {
     if (!address.state.trim()) errors.push('State is required');
     if (!address.pincode.trim()) errors.push('Pincode is required');
     
-    // Phone validation
-    if (address.phone && !/^[6-9]\d{9}$/.test(address.phone)) {
+    // Phone validation - strip +91 and non-digits, then validate
+    const cleanPhone = address.phone.replace(/\D/g, '').replace(/^91/, '');
+    if (address.phone && !/^[6-9]\d{9}$/.test(cleanPhone)) {
       errors.push('Please enter a valid 10-digit phone number');
     }
     
@@ -214,10 +222,21 @@ export default function CheckoutPage() {
       throw new Error('You must be logged in to create an order');
     }
 
+    // Clean phone numbers - ensure only 10 digits are saved (no +91 prefix)
+    const cleanShippingPhone = shippingAddress.phone.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
+    const cleanBillingPhone = useSameAddress 
+      ? cleanShippingPhone 
+      : billingAddress.phone.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
+
     const orderData = {
       items: items,
-      shippingAddress: shippingAddress,
-      billingAddress: useSameAddress ? shippingAddress : billingAddress,
+      shippingAddress: {
+        ...shippingAddress,
+        phone: cleanShippingPhone
+      },
+      billingAddress: useSameAddress 
+        ? { ...shippingAddress, phone: cleanShippingPhone }
+        : { ...billingAddress, phone: cleanBillingPhone },
       subtotal: totalPrice,
       tax: tax,
       shipping: shipping,
@@ -253,11 +272,22 @@ export default function CheckoutPage() {
       throw new Error('You must be logged in to create an order');
     }
 
+    // Clean phone numbers - ensure only 10 digits are saved (no +91 prefix)
+    const cleanShippingPhone = shippingAddress.phone.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
+    const cleanBillingPhone = useSameAddress 
+      ? cleanShippingPhone 
+      : billingAddress.phone.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
+
     // Create order first
     const orderData = {
       items: items,
-      shippingAddress: shippingAddress,
-      billingAddress: useSameAddress ? shippingAddress : billingAddress,
+      shippingAddress: {
+        ...shippingAddress,
+        phone: cleanShippingPhone
+      },
+      billingAddress: useSameAddress 
+        ? { ...shippingAddress, phone: cleanShippingPhone }
+        : { ...billingAddress, phone: cleanBillingPhone },
       subtotal: totalPrice,
       tax: tax,
       shipping: shipping,
@@ -447,13 +477,22 @@ export default function CheckoutPage() {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-[#2D2D2D] mb-2">Phone Number *</label>
-                        <input
-                          type="tel"
-                          value={shippingAddress.phone}
-                          onChange={(e) => setShippingAddress({...shippingAddress, phone: e.target.value})}
-                          className="w-full border border-[#4b2e19]/20 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a]"
-                          placeholder="Enter your phone number"
-                        />
+                        <div className="flex items-center border border-[#4b2e19]/20 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#f5d26a]/50 focus-within:border-[#f5d26a]">
+                          <span className="px-4 py-3 bg-[#f5d26a]/10 text-[#4b2e19] font-semibold border-r border-[#4b2e19]/20">
+                            +91
+                          </span>
+                          <input
+                            type="tel"
+                            value={shippingAddress.phone.replace(/\D/g, '').replace(/^91/, '')}
+                            onChange={(e) => {
+                              const digits = e.target.value.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
+                              setShippingAddress({...shippingAddress, phone: digits});
+                            }}
+                            className="flex-1 px-4 py-3 focus:outline-none"
+                            placeholder="9876543210"
+                            maxLength={10}
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -554,13 +593,22 @@ export default function CheckoutPage() {
                             </div>
                             <div>
                               <label className="block text-sm font-semibold text-[#2D2D2D] mb-2">Phone Number *</label>
-                              <input
-                                type="tel"
-                                value={billingAddress.phone}
-                                onChange={(e) => setBillingAddress({...billingAddress, phone: e.target.value})}
-                                className="w-full border border-[#4b2e19]/20 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 focus:border-[#f5d26a]"
-                                placeholder="Enter your phone number"
-                              />
+                              <div className="flex items-center border border-[#4b2e19]/20 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#f5d26a]/50 focus-within:border-[#f5d26a]">
+                                <span className="px-4 py-3 bg-[#f5d26a]/10 text-[#4b2e19] font-semibold border-r border-[#4b2e19]/20">
+                                  +91
+                                </span>
+                                <input
+                                  type="tel"
+                                  value={billingAddress.phone.replace(/\D/g, '').replace(/^91/, '')}
+                                  onChange={(e) => {
+                                    const digits = e.target.value.replace(/\D/g, '').replace(/^91/, '').slice(0, 10);
+                                    setBillingAddress({...billingAddress, phone: digits});
+                                  }}
+                                  className="flex-1 px-4 py-3 focus:outline-none"
+                                  placeholder="9876543210"
+                                  maxLength={10}
+                                />
+                              </div>
                             </div>
                           </div>
                           {/* Similar fields for billing address */}
@@ -595,33 +643,6 @@ export default function CheckoutPage() {
                   <h2 className="text-2xl font-bold text-[#4b2e19] mb-6">Payment Method</h2>
                   
                   <div className="space-y-4 mb-8">
-                    <div 
-                      className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
-                        paymentMethod === 'COD' ? 'border-[#4b2e19] bg-[#4b2e19]/5' : 'border-[#4b2e19]/20 hover:border-[#4b2e19]/40'
-                      }`}
-                      onClick={() => setPaymentMethod('COD')}
-                    >
-                      <div className="flex items-center">
-                        <input
-                          type="radio"
-                          name="payment"
-                          value="COD"
-                          checked={paymentMethod === 'COD'}
-                          onChange={() => setPaymentMethod('COD')}
-                          className="w-4 h-4 text-[#4b2e19] border-[#4b2e19]/20 rounded focus:ring-[#f5d26a]/50"
-                        />
-                        <div className="ml-3">
-                          <div className="flex items-center">
-                            <span className="text-2xl mr-3">💰</span>
-                            <div>
-                              <h3 className="font-semibold text-[#4b2e19]">Cash on Delivery (COD)</h3>
-                              <p className="text-sm text-[#2D2D2D]/70">Pay when your order is delivered</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
                     <div 
                       className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${
                         paymentMethod === 'RAZORPAY' ? 'border-[#4b2e19] bg-[#4b2e19]/5' : 'border-[#4b2e19]/20 hover:border-[#4b2e19]/40'
