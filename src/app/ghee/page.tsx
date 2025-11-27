@@ -282,9 +282,9 @@ export default function GheePage() {
                                   <span className="text-[10px] md:text-sm text-[#2D2D2D]/60 line-through font-semibold">₹{originalPrice.toLocaleString('en-IN')}</span>
                                 )}
                               </div>
-                              <span className="text-[10px] md:text-xs text-[#2D2D2D]/70 font-medium">
+                              {/* <span className="text-[10px] md:text-xs text-[#2D2D2D]/70 font-medium">
                                 {product.NumberOfPurchase}+ bought
-                              </span>
+                              </span> */}
                             </div>
                           </div>
                           <button 
