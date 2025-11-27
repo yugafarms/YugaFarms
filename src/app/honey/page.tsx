@@ -273,8 +273,8 @@ export default function HoneyPage() {
                         )}
 
                         {/* Price and Add to Cart */}
-                        <div className="flex items-center pt-1 md:pt-2 -mx-2 md:-mx-4 -mb-2 md:-mb-4">
-                          <div className="flex-1 flex items-center justify-between bg-white px-2 md:px-4 py-1.5 md:py-2.5 rounded-l-full shadow-sm">
+                        <div className="flex items-center pt-1 md:pt-2 -mx-2 md:-mx-4 -mb-2 md:-mb-4 bg-white shadow-sm rounded-full">
+                          <div className="flex-1 flex items-center justify-between px-2 md:px-4 rounded-l-full ">
                             <div className="flex items-center gap-1.5 md:gap-3 flex-wrap">
                               <div className="flex items-center gap-1 md:gap-2">
                                 <span className="text-base md:text-2xl font-bold text-[#4b2e19]">₹{finalPrice.toLocaleString('en-IN')}</span>
