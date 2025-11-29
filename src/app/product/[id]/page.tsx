@@ -270,16 +270,18 @@ export default function ProductDetailPage() {
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Product Images */}
-              <div className="space-y-4">
+              <div className="flex flex-col md:flex-row-reverse gap-5">
                 {/* Main Image */}
-                <div className={`relative h-96 lg:h-[500px] bg-gradient-to-br ${gradient} rounded-3xl flex items-center justify-center overflow-hidden`}>
+                <div className={`relative w-full bg-gradient-to-br ${gradient} rounded-3xl flex items-center justify-center overflow-hidden aspect-square`}>
                   {product.Image && product.Image.length > 0 ? (
                     <Image
                       src={`${BACKEND}${product.Image[selectedImageIndex].url}`}
                       alt={product.Image[selectedImageIndex].alternativeText || product.Title}
                       width={800}
-                      height={500}
-                      className="w-full h-full object-cover"
+                      height={800}
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="w-full h-full object-cover aspect-square"
                     />
                   ) : (
                     <>
@@ -300,13 +302,13 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Thumbnail Images */}
-                {product.Image && product.Image.length > 1 && (
-                  <div className="grid grid-cols-4 gap-3">
+                {product.Image && product.Image.length > 0 && (
+                  <div className="flex gap-3 flex-row md:flex-col overflow-x-auto md:overflow-visible">
                     {product.Image.map((image, index) => (
                       <button
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
-                        className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === index
+                        className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all aspect-square ${selectedImageIndex === index
                           ? 'border-[#4b2e19] shadow-lg'
                           : 'border-transparent hover:border-[#4b2e19]/50'
                           }`}
@@ -454,8 +456,8 @@ export default function ProductDetailPage() {
                         <button
                           onClick={toggleLike}
                           className={`px-6 py-4 border-2 border-[#4b2e19] rounded-xl font-semibold transition-colors duration-300 ${isLiked
-                              ? 'bg-[#4b2e19] text-white'
-                              : 'text-[#4b2e19] hover:bg-[#4b2e19] hover:text-white'
+                            ? 'bg-[#4b2e19] text-white'
+                            : 'text-[#4b2e19] hover:bg-[#4b2e19] hover:text-white'
                             }`}
                         >
                           <svg className="w-6 h-6" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
