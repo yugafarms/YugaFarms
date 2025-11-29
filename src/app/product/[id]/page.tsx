@@ -53,21 +53,22 @@ export default function ProductDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
   const { addToCart, isLoading: cartLoading, items: cartItems } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        
+
         // First try to get the product with publication state
         let response = await fetch(`${BACKEND}/api/products/${params.id}?publicationState=live&populate=*`);
-        
+
         if (!response.ok) {
           // If that fails, try without publication state
           response = await fetch(`${BACKEND}/api/products/${params.id}?populate=*`);
         }
-        
+
         if (!response.ok) {
           // If individual fetch fails, try to find the product in the list
           const listResponse = await fetch(`${BACKEND}/api/products?populate=*`);
@@ -85,10 +86,10 @@ export default function ProductDetailPage() {
           }
           throw new Error('Product not found');
         }
-        
+
         const data = await response.json();
         setProduct(data.data);
-        
+
         // Set the first variant as selected by default
         if (data.data?.Variants?.length > 0) {
           setSelectedVariant(data.data.Variants[0]);
@@ -103,12 +104,33 @@ export default function ProductDetailPage() {
 
     if (params.id) {
       fetchProduct();
+
+      // Check if product is liked
+      const likedProducts = JSON.parse(localStorage.getItem('likedProducts') || '{}');
+      if (likedProducts[params.id as string]) {
+        setIsLiked(true);
+      }
     }
   }, [params.id]);
 
+  const toggleLike = () => {
+    if (!product) return;
+
+    const newLikedState = !isLiked;
+    setIsLiked(newLikedState);
+
+    const likedProducts = JSON.parse(localStorage.getItem('likedProducts') || '{}');
+    if (newLikedState) {
+      likedProducts[product.id] = true;
+    } else {
+      delete likedProducts[product.id];
+    }
+    localStorage.setItem('likedProducts', JSON.stringify(likedProducts));
+  };
+
   const handleAddToCart = async () => {
     if (!product || !selectedVariant) return;
-    
+
     try {
       await addToCart({
         productId: product.id,
@@ -163,6 +185,22 @@ export default function ProductDetailPage() {
     }
   };
 
+  const formatUnit = (weight: number, type: string) => {
+    if (type === "Ghee") {
+      if (weight >= 1000) {
+        const liters = weight / 1000;
+        return liters % 1 === 0 ? `${liters} L` : `${liters.toFixed(1)} L`;
+      }
+      return `${weight} ml`;
+    } else {
+      if (weight >= 1000) {
+        const kg = weight / 1000;
+        return kg % 1 === 0 ? `${kg} kg` : `${kg.toFixed(1)} kg`;
+      }
+      return `${weight} g`;
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -188,8 +226,8 @@ export default function ProductDetailPage() {
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="text-center">
               <p className="text-red-600 text-lg mb-4">Error: {error || 'Product not found'}</p>
-              <button 
-                onClick={() => router.back()} 
+              <button
+                onClick={() => router.back()}
                 className="bg-[#4b2e19] text-white px-6 py-2 rounded-lg hover:bg-[#2f4f2f] transition-colors"
               >
                 Go Back
@@ -236,8 +274,8 @@ export default function ProductDetailPage() {
                 {/* Main Image */}
                 <div className={`relative h-96 lg:h-[500px] bg-gradient-to-br ${gradient} rounded-3xl flex items-center justify-center overflow-hidden`}>
                   {product.Image && product.Image.length > 0 ? (
-                    <Image 
-                      src={`${BACKEND}${product.Image[selectedImageIndex].url}`} 
+                    <Image
+                      src={`${BACKEND}${product.Image[selectedImageIndex].url}`}
                       alt={product.Image[selectedImageIndex].alternativeText || product.Title}
                       width={800}
                       height={500}
@@ -249,12 +287,12 @@ export default function ProductDetailPage() {
                       <span className="text-9xl relative z-10 drop-shadow-lg">{emoji}</span>
                     </>
                   )}
-                  
+
                   {/* Rating Badge */}
                   <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg">
                     <div className="flex items-center gap-2">
                       <svg className="w-5 h-5 text-[#f5d26a]" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z"/>
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
                       </svg>
                       <span className="text-lg font-bold text-[#2D2D2D]">{product.Rating}</span>
                     </div>
@@ -268,14 +306,13 @@ export default function ProductDetailPage() {
                       <button
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
-                        className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all ${
-                          selectedImageIndex === index 
-                            ? 'border-[#4b2e19] shadow-lg' 
-                            : 'border-transparent hover:border-[#4b2e19]/50'
-                        }`}
+                        className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all ${selectedImageIndex === index
+                          ? 'border-[#4b2e19] shadow-lg'
+                          : 'border-transparent hover:border-[#4b2e19]/50'
+                          }`}
                       >
-                        <Image 
-                          src={`${BACKEND}${image.url}`} 
+                        <Image
+                          src={`${BACKEND}${image.url}`}
                           alt={image.alternativeText || `${product.Title} ${index + 1}`}
                           width={80}
                           height={80}
@@ -293,14 +330,14 @@ export default function ProductDetailPage() {
                 <div>
                   <h1 className="text-4xl md:text-5xl font-bold text-[#4b2e19] mb-3">{product.Title}</h1>
                   <p className="text-xl text-[#2D2D2D]/80 font-medium mb-4">{product.PunchLine}</p>
-                  
+
                   {/* Rating and Sales */}
                   <div className="flex items-center gap-4 mb-6">
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <svg key={i} className="w-5 h-5 text-[#f5d26a]" fill={i < Math.floor(product.Rating) ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z"/>
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
                           </svg>
                         ))}
                       </div>
@@ -336,21 +373,19 @@ export default function ProductDetailPage() {
                         const variantPrice = variant.Price - (variant.Discount || 0);
                         const variantSavings = variant.Discount || 0;
                         const isSelected = selectedVariant?.id === variant.id;
-                        
+
                         return (
                           <button
                             key={index}
                             onClick={() => setSelectedVariant(variant)}
-                            className={`p-4 rounded-xl border-2 transition-all text-left ${
-                              isSelected 
-                                ? 'border-[#4b2e19] bg-[#4b2e19]/5 shadow-lg' 
-                                : 'border-[#4b2e19]/20 hover:border-[#4b2e19]/50 bg-white'
-                            }`}
+                            className={`p-4 rounded-xl border-2 transition-all text-left ${isSelected
+                              ? 'border-[#4b2e19] bg-[#4b2e19]/5 shadow-lg'
+                              : 'border-[#4b2e19]/20 hover:border-[#4b2e19]/50 bg-white'
+                              }`}
                           >
                             <div className="flex justify-between items-center">
                               <div>
-                                <div className="font-semibold text-[#4b2e19]">{variant.Weight}g</div>
-                                <div className="text-sm text-[#2D2D2D]/70">Stock: {variant.Stock}</div>
+                                <div className="font-semibold text-[#4b2e19]">{formatUnit(variant.Weight, product.Type)}</div>
                               </div>
                               <div className="text-right">
                                 <div className="font-bold text-[#4b2e19]">₹{variantPrice}</div>
@@ -385,19 +420,20 @@ export default function ProductDetailPage() {
                       </div>
                       {selectedVariant && (
                         <div className="text-[#2D2D2D]/70 mt-2">
-                          {selectedVariant.Weight}g • {product.NumberOfPurchase}+ happy customers
+                          {/* {formatUnit(selectedVariant.Weight, product.Type)} • {product.NumberOfPurchase}+ happy customers */}
+                          1000+ happy customers
                         </div>
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-4">
                     {itemInCart ? (
                       <>
                         <div className="flex-1 bg-green-100 text-green-800 py-4 rounded-xl font-semibold text-center border-2 border-green-300 text-lg">
                           ✓ In Cart ({cartQuantity})
                         </div>
-                        <Link 
+                        <Link
                           href="/cart"
                           className="px-6 py-4 border-2 border-[#4b2e19] text-[#4b2e19] rounded-xl font-semibold hover:bg-[#4b2e19] hover:text-white transition-colors duration-300"
                         >
@@ -408,15 +444,21 @@ export default function ProductDetailPage() {
                       </>
                     ) : (
                       <>
-                        <button 
+                        <button
                           className="flex-1 bg-[#4b2e19] text-white py-4 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-lg"
                           onClick={handleAddToCart}
                           disabled={cartLoading || !selectedVariant}
                         >
                           {cartLoading ? 'Adding...' : 'Add to Cart'}
                         </button>
-                        <button className="px-6 py-4 border-2 border-[#4b2e19] text-[#4b2e19] rounded-xl font-semibold hover:bg-[#4b2e19] hover:text-white transition-colors duration-300">
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button
+                          onClick={toggleLike}
+                          className={`px-6 py-4 border-2 border-[#4b2e19] rounded-xl font-semibold transition-colors duration-300 ${isLiked
+                              ? 'bg-[#4b2e19] text-white'
+                              : 'text-[#4b2e19] hover:bg-[#4b2e19] hover:text-white'
+                            }`}
+                        >
+                          <svg className="w-6 h-6" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                           </svg>
                         </button>
@@ -432,7 +474,7 @@ export default function ProductDetailPage() {
         {/* Back to Products */}
         <section className="py-8 bg-[#eef2e9]">
           <div className="container mx-auto px-4 text-center">
-            <Link 
+            <Link
               href={`/${product.Type.toLowerCase()}`}
               className="inline-flex items-center gap-2 bg-[#4b2e19] text-white px-8 py-4 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 shadow-lg hover:shadow-xl"
             >

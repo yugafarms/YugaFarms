@@ -273,7 +273,7 @@ export default function HoneyPage() {
                         )}
 
                         {/* Price and Add to Cart */}
-                        <div className="flex items-center pt-1 md:pt-2 -mx-2 md:-mx-4 -mb-2 md:-mb-4 bg-white shadow-sm rounded-full">
+                        <div className="flex items-center -mx-2 md:-mx-4 -mb-2 md:-mb-4 bg-white shadow-sm rounded-full">
                           <div className="flex-1 flex items-center justify-between px-2 md:px-4 rounded-l-full ">
                             <div className="flex items-center gap-1.5 md:gap-3 flex-wrap">
                               <div className="flex items-center gap-1 md:gap-2">

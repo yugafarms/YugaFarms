@@ -27,10 +27,10 @@ export default function AboutPage() {
             }, 16);
           };
 
-          animateCounter(38, 'years');
-          animateCounter(50, 'families');
+          animateCounter(10, 'years');
+          animateCounter(2, 'families');
           animateCounter(100, 'natural');
-          animateCounter(3, 'generations');
+          animateCounter(2, 'generations');
         }
       },
       { threshold: 0.3 }
