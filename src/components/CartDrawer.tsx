@@ -53,7 +53,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
 
   const handleQuantityChange = async (productId: number, variantId: number, newQuantity: number) => {
     if (newQuantity < 0) return;
-    
+
     try {
       setIsUpdating(true);
       await updateQuantity(productId, variantId, newQuantity);
@@ -88,7 +88,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     }
   };
 
-  const tax = Math.round(totalPrice * 0.18);
+  const tax = 0;
   const finalTotal = totalPrice + tax;
 
   return (
@@ -112,7 +112,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
           (isOpen
             ? 'translate-y-0 md:translate-x-0'
             : 'translate-y-full md:translate-x-full')
-        }`}
+          }`}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-4 md:p-6 border-b border-[#4b2e19]/10">
@@ -177,7 +177,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                         {item.productTitle}
                       </h3>
                       <p className="text-xs text-[#2D2D2D]/70 mb-2">Size: {formatProductWeight(item.weight, item.productTitle)}</p>
-                      
+
                       {/* Quantity Controls */}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -197,7 +197,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                             +
                           </button>
                         </div>
-                        
+
                         <div className="text-right">
                           <p className="text-sm font-bold text-[#4b2e19]">₹{item.price * item.quantity}</p>
                           <button
@@ -230,7 +230,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[#2D2D2D]/70">Shipping</span>
-                <span className="font-semibold text-green-600">Free</span>
+                <span className="font-semibold text-green-600">₹0</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-[#2D2D2D]/70">Tax</span>

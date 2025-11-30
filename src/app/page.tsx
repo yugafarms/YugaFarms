@@ -714,9 +714,9 @@ export default function Home() {
               ))}
             </div>
 
-            <button className="bg-white text-[#4b2e19] px-6 py-2.5 rounded-full font-semibold text-base hover:bg-gray-100 transition-all duration-300 hover:scale-105">
+            <Link href="/about" className="bg-white text-[#4b2e19] px-6 py-2.5 rounded-full font-semibold text-base hover:bg-gray-100 transition-all duration-300 hover:scale-105">
               OUR STORY
-            </button>
+            </Link>
           </div>
         </div>
       </section>

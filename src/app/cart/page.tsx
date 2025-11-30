@@ -16,7 +16,7 @@ export default function CartPage() {
 
   const handleQuantityChange = async (productId: number, variantId: number, newQuantity: number) => {
     if (newQuantity < 0) return;
-    
+
     try {
       setIsUpdating(true);
       await updateQuantity(productId, variantId, newQuantity);
@@ -81,14 +81,14 @@ export default function CartPage() {
                 Looks like you haven&apos;t added any items to your cart yet. Start shopping to fill it up!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link 
-                  href="/ghee" 
+                <Link
+                  href="/ghee"
                   className="bg-[#4b2e19] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 shadow-lg hover:shadow-xl"
                 >
                   Shop Ghee
                 </Link>
-                <Link 
-                  href="/honey" 
+                <Link
+                  href="/honey"
                   className="bg-[#f5d26a] text-[#4b2e19] px-8 py-3 rounded-xl font-semibold hover:bg-[#e6b800] transition-colors duration-300 shadow-lg hover:shadow-xl"
                 >
                   Shop Honey
@@ -125,8 +125,8 @@ export default function CartPage() {
                       {/* Product Image */}
                       <div className="md:w-32 md:h-32 w-full h-48 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-xl flex items-center justify-center overflow-hidden">
                         {item.productImage ? (
-                          <Image 
-                            src={item.productImage} 
+                          <Image
+                            src={item.productImage}
                             alt={item.productTitle}
                             width={128}
                             height={128}
@@ -208,7 +208,7 @@ export default function CartPage() {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl border border-[#4b2e19]/15 shadow-lg p-6 sticky top-24">
                 <h2 className="text-2xl font-bold text-[#4b2e19] mb-6">Order Summary</h2>
-                
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-[#2D2D2D]/70">Items ({totalItems})</span>
@@ -216,22 +216,22 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#2D2D2D]/70">Shipping</span>
-                    <span className="font-semibold text-green-600">Free</span>
+                    <span className="font-semibold text-green-600">₹0</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#2D2D2D]/70">Tax</span>
-                    <span className="font-semibold">₹{Math.round(totalPrice * 0.18)}</span>
+                    <span className="font-semibold">₹0</span>
                   </div>
                   <div className="border-t border-[#4b2e19]/10 pt-4">
                     <div className="flex justify-between">
                       <span className="text-xl font-bold text-[#4b2e19]">Total</span>
-                      <span className="text-xl font-bold text-[#4b2e19]">₹{totalPrice + Math.round(totalPrice * 0.18)}</span>
+                      <span className="text-xl font-bold text-[#4b2e19]">₹{totalPrice}</span>
                     </div>
                   </div>
                 </div>
 
                 {user ? (
-                  <Link 
+                  <Link
                     href="/checkout"
                     className="block w-full bg-[#4b2e19] text-white py-4 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 shadow-lg hover:shadow-xl text-center"
                   >
@@ -239,8 +239,8 @@ export default function CartPage() {
                   </Link>
                 ) : (
                   <div className="space-y-3">
-                    <Link 
-                      href="/login" 
+                    <Link
+                      href="/login"
                       className="block w-full bg-[#4b2e19] text-white py-4 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 shadow-lg hover:shadow-xl text-center"
                     >
                       Login to Checkout

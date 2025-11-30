@@ -69,12 +69,12 @@ export default function OrderSuccessPage() {
             'Authorization': `Bearer ${jwt}`
           }
         });
-        
+
         if (!response.ok) {
           const error = await response.json().catch(() => ({}));
           throw new Error(error?.error?.message || 'Failed to fetch order');
         }
-        
+
         const data = await response.json();
         setOrder(data.data);
       } catch (err) {
@@ -115,7 +115,7 @@ export default function OrderSuccessPage() {
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="text-center">
               <p className="text-red-600 text-lg mb-4">Error: {error || 'Order not found'}</p>
-              <Link 
+              <Link
                 href="/"
                 className="bg-[#4b2e19] text-white px-6 py-2 rounded-lg hover:bg-[#2f4f2f] transition-colors"
               >
@@ -204,8 +204,8 @@ export default function OrderSuccessPage() {
                     <div key={index} className="flex items-center gap-4 p-4 bg-[#f8f4e6]/50 rounded-xl">
                       <div className="w-16 h-16 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-lg flex items-center justify-center overflow-hidden">
                         {item.productImage ? (
-                          <Image 
-                            src={item.productImage} 
+                          <Image
+                            src={item.productImage}
                             alt={item.productTitle}
                             width={64}
                             height={64}
@@ -260,20 +260,20 @@ export default function OrderSuccessPage() {
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl border border-[#4b2e19]/15 shadow-lg p-6 sticky top-24">
                 <h2 className="text-2xl font-bold text-[#4b2e19] mb-6">Order Summary</h2>
-                
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-[#2D2D2D]/70">Subtotal</span>
                     <span className="font-semibold">₹{order.subtotal}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#2D2D2D]/70">Tax (18%)</span>
+                    <span className="text-[#2D2D2D]/70">Tax</span>
                     <span className="font-semibold">₹{order.tax}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-[#2D2D2D]/70">Shipping</span>
                     <span className="font-semibold text-green-600">
-                      {order.shipping === 0 ? 'Free' : `₹${order.shipping}`}
+                      ₹{order.shipping}
                     </span>
                   </div>
                   <div className="border-t border-[#4b2e19]/10 pt-4">
@@ -285,13 +285,13 @@ export default function OrderSuccessPage() {
                 </div>
 
                 <div className="space-y-3">
-                  <Link 
+                  <Link
                     href="/orders"
                     className="block w-full bg-[#4b2e19] text-white py-3 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 shadow-lg hover:shadow-xl text-center"
                   >
                     View All Orders
                   </Link>
-                  <Link 
+                  <Link
                     href="/ghee"
                     className="block w-full border-2 border-[#4b2e19] text-[#4b2e19] py-3 rounded-xl font-semibold hover:bg-[#4b2e19] hover:text-white transition-colors duration-300 text-center"
                   >
