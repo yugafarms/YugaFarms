@@ -423,7 +423,7 @@ export default function ProductDetailPage() {
                       {selectedVariant && (
                         <div className="text-[#2D2D2D]/70 mt-2">
                           {/* {formatUnit(selectedVariant.Weight, product.Type)} • {product.NumberOfPurchase}+ happy customers */}
-                          1000+ happy customers
+                          2000+ happy customers
                         </div>
                       )}
                     </div>
