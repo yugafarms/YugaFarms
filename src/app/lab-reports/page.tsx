@@ -49,28 +49,8 @@ export default function LabReportsPage() {
               {[
                 {
                   name: "Better Bars",
-                  image: "/images/better-bars.png", // Place your image in public/images or update the path accordingly
-                  pdf: "/lab-reports/better-bars.pdf", // Place your PDF in public/lab-reports or update the path accordingly
-                },
-                {
-                  name: "Better Bars",
-                  image: "/images/better-bars.png", // Place your image in public/images or update the path accordingly
-                  pdf: "/lab-reports/better-bars.pdf", // Place your PDF in public/lab-reports or update the path accordingly
-                },
-                {
-                  name: "Better Bars",
-                  image: "/images/better-bars.png", // Place your image in public/images or update the path accordingly
-                  pdf: "/lab-reports/better-bars.pdf", // Place your PDF in public/lab-reports or update the path accordingly
-                },
-                {
-                  name: "Better Bars",
-                  image: "/images/better-bars.png", // Place your image in public/images or update the path accordingly
-                  pdf: "/lab-reports/better-bars.pdf", // Place your PDF in public/lab-reports or update the path accordingly
-                },
-                {
-                  name: "Better Bars",
-                  image: "/images/better-bars.png", // Place your image in public/images or update the path accordingly
-                  pdf: "/lab-reports/better-bars.pdf", // Place your PDF in public/lab-reports or update the path accordingly
+                  image: "/images/cert.png", // Place your image in public/images or update the path accordingly
+                  pdf: "/Yuga Farms (Ghee).pdf", // Place your PDF in public/lab-reports or update the path accordingly
                 },
                 // Add more products here as needed
               ].map((item, idx) => (
