@@ -112,10 +112,17 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('RAZORPAY');
   const [orderNotes, setOrderNotes] = useState('');
 
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [couponError, setCouponError] = useState('');
+  const [couponSuccess, setCouponSuccess] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
+
   // Calculate totals
   const tax = 0;
   const shipping = 0;
-  const finalTotal = totalPrice + tax + shipping;
+  const finalTotal = Math.max(0, totalPrice + tax + shipping - discount);
 
   const loadUserAddress = useCallback(async () => {
     if (!jwt) return;
@@ -144,6 +151,78 @@ export default function CheckoutPage() {
       console.error('Error loading user address:', error);
     }
   }, [jwt]);
+
+  const verifyCoupon = async () => {
+    setCouponError('');
+    setCouponSuccess('');
+
+    if (!couponCode.trim()) {
+      setCouponError('Please enter a coupon code');
+      setDiscount(0);
+      setAppliedCoupon(null);
+      return;
+    }
+
+    try {
+      const response = await fetch(`${BACKEND}/api/coupons?filters[Code][$eq]=${couponCode}`, {
+        headers: {
+          'Authorization': `Bearer ${jwt}` // Using jwt if available, though finding coupons might be public depending on Strapi permissions
+        }
+      });
+
+      const data = await response.json();
+
+      if (!data.data || data.data.length === 0) {
+        setCouponError('Invalid coupon code');
+        setDiscount(0);
+        setAppliedCoupon(null);
+        return;
+      }
+
+      const coupon = data.data[0]; // Assuming Code is unique
+      const couponAttributes = coupon.attributes || coupon; // Handle both structure formats if flattening is enabled/disabled
+      const couponId = coupon.id;
+
+      // Validate Expiry
+      if (new Date() > new Date(couponAttributes.Expiry)) {
+        setCouponError('Coupon has expired');
+        setDiscount(0);
+        setAppliedCoupon(null);
+        return;
+      }
+
+      // Validate Count
+      if (couponAttributes.Count <= 0) {
+        setCouponError('Coupon usage limit reached');
+        setDiscount(0);
+        setAppliedCoupon(null);
+        return;
+      }
+
+      // Calculate Discount
+      let calculatedDiscount = 0;
+      const couponValue = Number(couponAttributes.Value);
+
+      if (couponAttributes.Percentage) {
+        calculatedDiscount = (totalPrice * couponValue) / 100;
+      } else {
+        calculatedDiscount = couponValue;
+      }
+
+      // Cap discount to subtotal
+      calculatedDiscount = Math.min(calculatedDiscount, totalPrice);
+
+      setDiscount(calculatedDiscount);
+      setAppliedCoupon({ id: couponId, ...couponAttributes });
+      setCouponSuccess(`Coupon applied! You saved ₹${calculatedDiscount.toFixed(2)}`);
+
+    } catch (error) {
+      console.error('Coupon verification error:', error);
+      setCouponError('Failed to verify coupon');
+      setDiscount(0);
+      setAppliedCoupon(null);
+    }
+  };
 
   useEffect(() => {
     // Redirect if cart is empty
@@ -243,7 +322,8 @@ export default function CheckoutPage() {
       total: finalTotal,
       paymentMethod: paymentMethod,
       notes: orderNotes,
-      user: user?.id
+      user: user?.id,
+      coupon: appliedCoupon?.id
     };
 
     const response = await fetch(`${BACKEND}/api/orders`, {
@@ -294,7 +374,8 @@ export default function CheckoutPage() {
       total: finalTotal,
       paymentMethod: paymentMethod,
       notes: orderNotes,
-      user: user?.id
+      user: user?.id,
+      coupon: appliedCoupon?.id
     };
 
     const response = await fetch(`${BACKEND}/api/orders`, {
@@ -334,7 +415,7 @@ export default function CheckoutPage() {
     // Initialize Razorpay payment
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
-      amount: finalTotal * 100, // Amount in paise
+      amount: Math.round(finalTotal * 100), // Amount in paise, rounded to integer
       currency: 'INR',
       name: 'YugaFarms',
       description: `Order #${order.data.orderNumber}`,
@@ -703,6 +784,26 @@ export default function CheckoutPage() {
                     </div>
                   ))}
 
+                  <div className="border-t border-[#4b2e19]/10 pt-4 pb-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                        placeholder="Coupon Code"
+                        className="flex-1 border border-[#4b2e19]/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50"
+                      />
+                      <button
+                        onClick={verifyCoupon}
+                        className="bg-[#4b2e19] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2f4f2f] transition-colors"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                    {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
+                    {couponSuccess && <p className="text-green-600 text-xs mt-1">{couponSuccess}</p>}
+                  </div>
+
                   <div className="border-t border-[#4b2e19]/10 pt-4 space-y-2">
                     <div className="flex justify-between">
                       <span className="text-[#2D2D2D]/70">Subtotal</span>
@@ -718,10 +819,16 @@ export default function CheckoutPage() {
                         ₹0
                       </span>
                     </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between text-green-600">
+                        <span className="text-[#2D2D2D]/70">Discount</span>
+                        <span className="font-semibold">-₹{discount.toFixed(2)}</span>
+                      </div>
+                    )}
                     <div className="border-t border-[#4b2e19]/10 pt-2">
                       <div className="flex justify-between">
                         <span className="text-xl font-bold text-[#4b2e19]">Total</span>
-                        <span className="text-xl font-bold text-[#4b2e19]">₹{finalTotal}</span>
+                        <span className="text-xl font-bold text-[#4b2e19]">₹{finalTotal.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>
