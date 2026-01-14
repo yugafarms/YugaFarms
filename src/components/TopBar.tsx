@@ -6,6 +6,14 @@ import React from 'react'
 import { useAuth } from '../app/context/AuthContext'
 import { useCart } from '../app/context/CartContext'
 
+const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
+
+type Offer = {
+    id: number;
+    Text: string;
+    Url: string | null;
+};
+
 export default function TopBar() {
     const pathname = usePathname()
     const isHome = pathname === '/' || pathname === ''
@@ -16,7 +24,23 @@ export default function TopBar() {
     const { user, logout } = useAuth()
     const { totalItems, setIsCartOpen } = useCart()
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
-    
+    const [offers, setOffers] = React.useState<Offer[]>([])
+
+    React.useEffect(() => {
+        const fetchOffers = async () => {
+            try {
+                const res = await fetch(`${BACKEND}/api/nav-offers`)
+                if (res.ok) {
+                    const data = await res.json()
+                    setOffers(data.data || [])
+                }
+            } catch (err) {
+                console.error("Failed to fetch nav offers", err)
+            }
+        }
+        fetchOffers()
+    }, [])
+
     return (
         <>
             {/* Offers Strip */}
@@ -24,18 +48,50 @@ export default function TopBar() {
                 <div className="relative overflow-hidden h-12 flex items-center">
                     <div className="marquee-track will-change-transform font-semibold">
                         <div className="marquee-group">
-                            <span className="mx-6">Lower Prices with GST 2.0</span>
-                            <span className="mx-6">Navratri Special ✨ Flat 15% OFF</span>
-                            <span className="mx-6">Free Hamper on Orders ₹1999+</span>
-                            <span className="mx-6">Free Shipping on ₹699+ orders</span>
-                            <span className="mx-6">Pure Ghee • Lab Tested</span>
+                            {offers.length > 0 ? (
+                                offers.map((offer, idx) => (
+                                    <span key={`offer-1-${idx}`} className="mx-6">
+                                        {offer.Url ? (
+                                            <Link href={offer.Url} className="hover:underline">
+                                                {offer.Text}
+                                            </Link>
+                                        ) : (
+                                            offer.Text
+                                        )}
+                                    </span>
+                                ))
+                            ) : (
+                                <>
+                                    <span className="mx-6">Lower Prices with GST 2.0</span>
+                                    <span className="mx-6">Navratri Special ✨ Flat 15% OFF</span>
+                                    <span className="mx-6">Free Hamper on Orders ₹1999+</span>
+                                    <span className="mx-6">Free Shipping on ₹699+ orders</span>
+                                    <span className="mx-6">Pure Ghee • Lab Tested</span>
+                                </>
+                            )}
                         </div>
                         <div className="marquee-group" aria-hidden="true">
-                            <span className="mx-6">Lower Prices with GST 2.0</span>
-                            <span className="mx-6">Navratri Special ✨ Flat 15% OFF</span>
-                            <span className="mx-6">Free Hamper on Orders ₹1999+</span>
-                            <span className="mx-6">Free Shipping on ₹699+ orders</span>
-                            <span className="mx-6">Pure Ghee • Lab Tested</span>
+                            {offers.length > 0 ? (
+                                offers.map((offer, idx) => (
+                                    <span key={`offer-2-${idx}`} className="mx-6">
+                                        {offer.Url ? (
+                                            <Link href={offer.Url} className="hover:underline">
+                                                {offer.Text}
+                                            </Link>
+                                        ) : (
+                                            offer.Text
+                                        )}
+                                    </span>
+                                ))
+                            ) : (
+                                <>
+                                    <span className="mx-6">Lower Prices with GST 2.0</span>
+                                    <span className="mx-6">Navratri Special ✨ Flat 15% OFF</span>
+                                    <span className="mx-6">Free Hamper on Orders ₹1999+</span>
+                                    <span className="mx-6">Free Shipping on ₹699+ orders</span>
+                                    <span className="mx-6">Pure Ghee • Lab Tested</span>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -58,72 +114,62 @@ export default function TopBar() {
 
                         {/* Navigation Links */}
                         <div className="hidden md:flex items-center space-x-8 py-3 md:py-4">
-                            <Link href="/" className={`relative transition-colors duration-300 font-medium group ${
-                                isHome 
-                                    ? 'text-[#4b2e19]' 
-                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
-                            }`}>
+                            <Link href="/" className={`relative transition-colors duration-300 font-medium group ${isHome
+                                ? 'text-[#4b2e19]'
+                                : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                                }`}>
                                 HOME
-                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
-                                    isHome 
-                                        ? 'w-full' 
-                                        : 'w-0 group-hover:w-full'
-                                }`}></span>
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${isHome
+                                    ? 'w-full'
+                                    : 'w-0 group-hover:w-full'
+                                    }`}></span>
                             </Link>
-                            <Link href="/ghee" className={`relative transition-colors duration-300 font-medium group ${
-                                isGhee 
-                                    ? 'text-[#4b2e19]' 
-                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
-                            }`}>
+                            <Link href="/ghee" className={`relative transition-colors duration-300 font-medium group ${isGhee
+                                ? 'text-[#4b2e19]'
+                                : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                                }`}>
                                 GHEE
-                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
-                                    isGhee 
-                                        ? 'w-full' 
-                                        : 'w-0 group-hover:w-full'
-                                }`}></span>
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${isGhee
+                                    ? 'w-full'
+                                    : 'w-0 group-hover:w-full'
+                                    }`}></span>
                             </Link>
-                            <Link href="/honey" className={`relative transition-colors duration-300 font-medium group ${
-                                isHoney 
-                                    ? 'text-[#4b2e19]' 
-                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
-                            }`}>
+                            <Link href="/honey" className={`relative transition-colors duration-300 font-medium group ${isHoney
+                                ? 'text-[#4b2e19]'
+                                : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                                }`}>
                                 HONEY
-                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
-                                    isHoney 
-                                        ? 'w-full' 
-                                        : 'w-0 group-hover:w-full'
-                                }`}></span>
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${isHoney
+                                    ? 'w-full'
+                                    : 'w-0 group-hover:w-full'
+                                    }`}></span>
                             </Link>
-                            <Link href="/about" className={`relative transition-colors duration-300 font-medium group ${
-                                isAbout 
-                                    ? 'text-[#4b2e19]' 
-                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
-                            }`}>
+                            <Link href="/about" className={`relative transition-colors duration-300 font-medium group ${isAbout
+                                ? 'text-[#4b2e19]'
+                                : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                                }`}>
                                 ABOUT US
-                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
-                                    isAbout 
-                                        ? 'w-full' 
-                                        : 'w-0 group-hover:w-full'
-                                }`}></span>
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${isAbout
+                                    ? 'w-full'
+                                    : 'w-0 group-hover:w-full'
+                                    }`}></span>
                             </Link>
-                            <Link href="/contact" className={`relative transition-colors duration-300 font-medium group ${
-                                isContact 
-                                    ? 'text-[#4b2e19]' 
-                                    : 'text-[#2D2D2D] hover:text-[#4b2e19]'
-                            }`}>
+                            <Link href="/contact" className={`relative transition-colors duration-300 font-medium group ${isContact
+                                ? 'text-[#4b2e19]'
+                                : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                                }`}>
                                 CONTACT
-                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${
-                                    isContact 
-                                        ? 'w-full' 
-                                        : 'w-0 group-hover:w-full'
-                                }`}></span>
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${isContact
+                                    ? 'w-full'
+                                    : 'w-0 group-hover:w-full'
+                                    }`}></span>
                             </Link>
                         </div>
 
                         {/* Right Side Icons */}
                         <div className="flex items-center space-x-4 py-3 md:py-4">
                             {/* Cart Icon */}
-                            <button 
+                            <button
                                 onClick={() => setIsCartOpen(true)}
                                 className="relative text-[#2D2D2D] hover:text-[#4b2e19] transition-all duration-300 group p-2 rounded-full hover:bg-[#f5d26a]/10"
                             >
@@ -146,7 +192,7 @@ export default function TopBar() {
                             )}
 
                             {/* Mobile Menu Button */}
-                            <button 
+                            <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                 className="md:hidden text-[#2D2D2D] hover:text-[#4b2e19] transition-colors duration-300 p-2 rounded-full hover:bg-[#f5d26a]/10"
                                 aria-label="Toggle menu"
@@ -168,58 +214,53 @@ export default function TopBar() {
                     {isMobileMenuOpen && (
                         <div className="md:hidden border-t border-[#2D2D2D]/10 bg-white/95 backdrop-blur-md">
                             <div className="flex flex-col py-4 space-y-1">
-                                <Link 
-                                    href="/" 
+                                <Link
+                                    href="/"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
-                                        isHome 
-                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
-                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
-                                    }`}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${isHome
+                                        ? 'text-[#4b2e19] bg-[#f5d26a]/10'
+                                        : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                        }`}
                                 >
                                     HOME
                                 </Link>
-                                <Link 
-                                    href="/ghee" 
+                                <Link
+                                    href="/ghee"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
-                                        isGhee 
-                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
-                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
-                                    }`}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${isGhee
+                                        ? 'text-[#4b2e19] bg-[#f5d26a]/10'
+                                        : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                        }`}
                                 >
                                     GHEE
                                 </Link>
-                                <Link 
-                                    href="/honey" 
+                                <Link
+                                    href="/honey"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
-                                        isHoney 
-                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
-                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
-                                    }`}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${isHoney
+                                        ? 'text-[#4b2e19] bg-[#f5d26a]/10'
+                                        : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                        }`}
                                 >
                                     HONEY
                                 </Link>
-                                <Link 
-                                    href="/about" 
+                                <Link
+                                    href="/about"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
-                                        isAbout 
-                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
-                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
-                                    }`}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${isAbout
+                                        ? 'text-[#4b2e19] bg-[#f5d26a]/10'
+                                        : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                        }`}
                                 >
                                     ABOUT US
                                 </Link>
-                                <Link 
-                                    href="/contact" 
+                                <Link
+                                    href="/contact"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${
-                                        isContact 
-                                            ? 'text-[#4b2e19] bg-[#f5d26a]/10' 
-                                            : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
-                                    }`}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${isContact
+                                        ? 'text-[#4b2e19] bg-[#f5d26a]/10'
+                                        : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                        }`}
                                 >
                                     CONTACT
                                 </Link>
