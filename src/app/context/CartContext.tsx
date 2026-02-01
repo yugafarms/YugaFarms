@@ -43,7 +43,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
   const { user, jwt, refreshUser } = useAuth();
   const isSyncingRef = useRef<boolean>(false);
-  
+
   // Modal states
   const [showOTPModal, setShowOTPModal] = useState(false);
   const [showAddressModal, setShowAddressModal] = useState(false);
@@ -51,14 +51,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [userPhone, setUserPhone] = useState<string>("");
 
   // Load cart from localStorage on mount
-  
+
   const syncCart = useCallback(async () => {
     if (!user || !jwt || isSyncingRef.current) return;
 
     try {
       isSyncingRef.current = true;
       setIsLoading(true);
-      
+
       // Get current cart from backend
       const response = await fetch(`${BACKEND}/api/users/me`, {
         headers: { Authorization: `Bearer ${jwt}` },
@@ -67,17 +67,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (response.ok) {
         const userData = await response.json();
         const backendCart = userData.cart || [];
-        
+
         // Merge with local cart (backend takes precedence for conflicts)
         // Use functional update to avoid stale closure and infinite loop
         setItems(prevItems => {
           const mergedCart = [...prevItems];
-          
+
           backendCart.forEach((backendItem: CartItem) => {
             const existingIndex = mergedCart.findIndex(
               item => item.productId === backendItem.productId && item.variantId === backendItem.variantId
             );
-            
+
             if (existingIndex >= 0) {
               // Update existing item with backend data
               mergedCart[existingIndex] = backendItem;
@@ -157,12 +157,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const checkUserAddress = useCallback(async (): Promise<boolean> => {
     if (!jwt) return false;
-    
+
     try {
       const response = await fetch(`${BACKEND}/api/users/me`, {
         headers: { Authorization: `Bearer ${jwt}` },
       });
-      
+
       if (response.ok) {
         const userData = await response.json();
         return !!(userData.AddressLine1 && userData.City && userData.State && userData.Pin);
@@ -219,7 +219,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCartDirectly = useCallback(async (newItem: Omit<CartItem, 'quantity'>) => {
     try {
       setIsLoading(true);
-      
+
       const existingItemIndex = items.findIndex(
         item => item.productId === newItem.productId && item.variantId === newItem.variantId
       );
@@ -239,7 +239,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       }
 
       setItems(updatedItems);
-      
+
       // Save to backend if user is logged in
       if (user && jwt) {
         await saveCartToBackend(updatedItems);
@@ -257,27 +257,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const handleOTPSuccess = useCallback(async (phone: string) => {
     setUserPhone(phone);
-    // After OTP login, check if user has address
-    const hasAddress = await checkUserAddress();
-    
-    if (!hasAddress) {
-      // Show address modal
-      setShowAddressModal(true);
-    } else {
-      // User has address, if there was a pending cart item, add it
-      if (pendingCartItem) {
-        await addToCartDirectly(pendingCartItem);
-        setPendingCartItem(null);
-      } else if (items.length > 0) {
-        // If OTP was triggered for checkout (no pending item but cart has items), redirect to checkout
-        setIsCartOpen(false);
-        // Use setTimeout to ensure state updates are complete
-        setTimeout(() => {
-          window.location.href = '/checkout';
-        }, 100);
-      }
+
+    // After OTP login, directly proceed to checkout or add cart item
+    if (pendingCartItem) {
+      // If there was a pending cart item, add it
+      await addToCartDirectly(pendingCartItem);
+      setPendingCartItem(null);
+    } else if (items.length > 0) {
+      // If OTP was triggered for checkout (no pending item but cart has items), redirect to checkout
+      setIsCartOpen(false);
+      // Use setTimeout to ensure state updates are complete
+      setTimeout(() => {
+        window.location.href = '/checkout';
+      }, 100);
     }
-  }, [checkUserAddress, pendingCartItem, addToCartDirectly, items.length]);
+  }, [pendingCartItem, addToCartDirectly, items.length]);
 
   const addToCart = useCallback(async (newItem: Omit<CartItem, 'quantity'>) => {
     // Allow adding to cart without login - OTP will be asked at checkout
@@ -287,13 +281,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const removeFromCart = useCallback(async (productId: number, variantId: number) => {
     try {
       setIsLoading(true);
-      
+
       const updatedItems = items.filter(
         item => !(item.productId === productId && item.variantId === variantId)
       );
 
       setItems(updatedItems);
-      
+
       // Save to backend if user is logged in
       if (user && jwt) {
         await saveCartToBackend(updatedItems);
@@ -309,7 +303,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const updateQuantity = useCallback(async (productId: number, variantId: number, quantity: number) => {
     try {
       setIsLoading(true);
-      
+
       if (quantity <= 0) {
         await removeFromCart(productId, variantId);
         return;
@@ -322,7 +316,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       );
 
       setItems(updatedItems);
-      
+
       // Save to backend if user is logged in
       if (user && jwt) {
         await saveCartToBackend(updatedItems);
@@ -338,9 +332,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearCart = useCallback(async () => {
     try {
       setIsLoading(true);
-      
+
       setItems([]);
-      
+
       // Save to backend if user is logged in
       if (user && jwt) {
         await saveCartToBackend([]);
@@ -364,17 +358,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     landmark?: string;
   }) => {
     await saveAddressToBackend(address);
-    
+
     // After saving address, add the pending cart item if exists
     if (pendingCartItem) {
       await addToCartDirectly(pendingCartItem);
       setPendingCartItem(null);
-    } else if (items.length > 0) {
-      // If no pending item but cart has items, redirect to checkout
-      setIsCartOpen(false);
-      window.location.href = '/checkout';
     }
-  }, [saveAddressToBackend, pendingCartItem, addToCartDirectly, items.length]);
+  }, [saveAddressToBackend, pendingCartItem, addToCartDirectly]);
 
   const showCheckoutOTP = useCallback(() => {
     setPendingCartItem(null); // No pending item, just for checkout

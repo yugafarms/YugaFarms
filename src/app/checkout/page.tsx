@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
@@ -78,10 +78,19 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
+  // Track if OTP modal has been shown to prevent repeated displays
+  const otpModalShownRef = useRef(false);
+
   // Show OTP modal if user is not logged in
   useEffect(() => {
-    if (!user && items.length > 0) {
+    if (!user && items.length > 0 && !otpModalShownRef.current) {
       showCheckoutOTP();
+      otpModalShownRef.current = true;
+    }
+
+    // Reset the flag if user logs out
+    if (user) {
+      otpModalShownRef.current = false;
     }
   }, [user, items.length, showCheckoutOTP]);
 
@@ -231,17 +240,11 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Redirect if user is not logged in
-    if (!user) {
-      router.push('/login?redirect=/checkout');
-      return;
-    }
-
-    // Load user's saved address if available
-    if (user) {
+    // Load user's saved address if user is logged in
+    if (user && jwt) {
       loadUserAddress();
     }
-  }, [items, user, router, loadUserAddress]);
+  }, [items, user, router, loadUserAddress, jwt]);
 
   const validateAddress = (address: Address): string[] => {
     const errors: string[] = [];
@@ -489,7 +492,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0 || !user) {
+  if (items.length === 0) {
     return (
       <>
         <TopBar />
