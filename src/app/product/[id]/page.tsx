@@ -145,6 +145,27 @@ export default function ProductDetailPage() {
     }
   };
 
+  const handleBuyNow = async () => {
+    if (!product || !selectedVariant) return;
+
+    try {
+      // Add to cart first
+      await addToCart({
+        productId: product.id,
+        variantId: selectedVariant.id,
+        price: selectedVariant.Price - (selectedVariant.Discount || 0),
+        weight: selectedVariant.Weight,
+        productTitle: product.Title,
+        productImage: product.Image && product.Image.length > 0 ? `${BACKEND}${product.Image[0].url}` : undefined,
+      });
+
+      // Then redirect to checkout
+      router.push('/checkout');
+    } catch (error) {
+      console.error("Error during buy now:", error);
+    }
+  };
+
   const isItemInCart = () => {
     if (!product || !selectedVariant) return false;
     return cartItems.some(item => item.productId === product.id && item.variantId === selectedVariant.id);
@@ -251,10 +272,10 @@ export default function ProductDetailPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-8">
         {/* Breadcrumb */}
-        <div className="container mx-auto px-4 pt-8">
-          <nav className="flex items-center space-x-2 text-sm text-[#2D2D2D]/70 mb-8">
+        <div className="container mx-auto px-4 pt-0">
+          <nav className="flex items-center space-x-2 text-sm text-[#2D2D2D]/70 mb-0">
             <Link href="/" className="hover:text-[#4b2e19] transition-colors">Home</Link>
             <span>/</span>
             <Link href={`/${product.Type.toLowerCase()}`} className="hover:text-[#4b2e19] transition-colors capitalize">
@@ -266,7 +287,7 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Product Detail Section */}
-        <section className="py-8 md:py-12">
+        <section className="py-4 md:py-6">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
               {/* Product Images */}
@@ -403,8 +424,8 @@ export default function ProductDetailPage() {
                   </div>
                 )}
 
-                {/* Price and Add to Cart */}
-                <div className="bg-white/50 rounded-2xl p-6 border border-[#4b2e19]/10">
+                {/* Price and Add to Cart - Desktop Only */}
+                <div className="hidden md:block bg-white/50 rounded-2xl p-6 border border-[#4b2e19]/10">
                   <div className="flex items-center justify-between mb-6">
                     <div>
                       <div className="flex items-center gap-4">
@@ -454,6 +475,13 @@ export default function ProductDetailPage() {
                           {cartLoading ? 'Adding...' : 'Add to Cart'}
                         </button>
                         <button
+                          className="flex-1 bg-white border-2 border-[#4b2e19] text-[#4b2e19] py-4 rounded-xl font-semibold hover:bg-[#4b2e19] hover:text-white transition-colors duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+                          onClick={handleBuyNow}
+                          disabled={cartLoading || !selectedVariant}
+                        >
+                          {cartLoading ? 'Processing...' : 'Buy Now'}
+                        </button>
+                        <button
                           onClick={toggleLike}
                           className={`px-6 py-4 border-2 border-[#4b2e19] rounded-xl font-semibold transition-colors duration-300 ${isLiked
                             ? 'bg-[#4b2e19] text-white'
@@ -487,6 +515,83 @@ export default function ProductDetailPage() {
             </Link>
           </div>
         </section>
+
+        {/* Fixed Bottom Bar - Mobile Only */}
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#4b2e19]/20 shadow-2xl z-50">
+          <div className="container mx-auto px-4 py-3">
+            {/* Price Info */}
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-[#4b2e19]">₹{currentPrice}</span>
+                  {originalPrice > currentPrice && (
+                    <span className="text-lg text-[#2D2D2D]/60 line-through">₹{originalPrice}</span>
+                  )}
+                </div>
+                {selectedVariant && (
+                  <div className="text-xs text-[#2D2D2D]/70">
+                    {formatUnit(selectedVariant.Weight, product.Type)}
+                  </div>
+                )}
+              </div>
+              {savings > 0 && (
+                <span className="bg-red-100 text-red-600 px-3 py-1 rounded-full text-xs font-semibold">
+                  Save ₹{savings}
+                </span>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-2">
+              {itemInCart ? (
+                <>
+                  <div className="flex-1 bg-green-100 text-green-800 py-3 rounded-lg font-semibold text-center border-2 border-green-300 text-sm">
+                    ✓ In Cart ({cartQuantity})
+                  </div>
+                  <Link
+                    href="/cart"
+                    className="flex items-center justify-center px-4 py-3 border-2 border-[#4b2e19] text-[#4b2e19] rounded-lg font-semibold hover:bg-[#4b2e19] hover:text-white transition-colors duration-300"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <button
+                    className="flex-1 bg-[#4b2e19] text-white py-3 rounded-lg font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    onClick={handleAddToCart}
+                    disabled={cartLoading || !selectedVariant}
+                  >
+                    {cartLoading ? 'Adding...' : 'Add to Cart'}
+                  </button>
+                  <button
+                    className="flex-1 bg-white border-2 border-[#4b2e19] text-[#4b2e19] py-3 rounded-lg font-semibold hover:bg-[#4b2e19] hover:text-white transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    onClick={handleBuyNow}
+                    disabled={cartLoading || !selectedVariant}
+                  >
+                    {cartLoading ? 'Processing...' : 'Buy Now'}
+                  </button>
+                  <button
+                    onClick={toggleLike}
+                    className={`flex items-center justify-center px-4 py-3 border-2 border-[#4b2e19] rounded-lg font-semibold transition-colors duration-300 ${isLiked
+                        ? 'bg-[#4b2e19] text-white'
+                        : 'text-[#4b2e19] hover:bg-[#4b2e19] hover:text-white'
+                      }`}
+                  >
+                    <svg className="w-5 h-5" fill={isLiked ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Spacer for fixed bottom bar on mobile */}
+        <div className="md:hidden h-32"></div>
       </main>
       <Footer />
     </>

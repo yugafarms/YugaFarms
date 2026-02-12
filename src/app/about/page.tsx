@@ -64,17 +64,19 @@ export default function AboutPage() {
 
              {/* Video Section */}
              <div className="max-w-5xl mx-auto mb-20">
-               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#f5d26a]/20 transition-all duration-500 hover:shadow-3xl hover:scale-[1.02] group">
+               <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#f5d26a]/20 transition-all duration-500 hover:shadow-3xl group">
                  <div className="aspect-video bg-gradient-to-br from-[#4b2e19] to-[#2f4f2f] flex items-center justify-center">
-                   {/* YouTube Video Placeholder - Replace with actual video ID */}
-                   <iframe
-                     className="w-full h-full rounded-2xl transition-all duration-500 group-hover:scale-105"
-                     src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=example"
-                     title="Our Farm Story - YugaFarms"
-                     frameBorder="0"
-                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                     allowFullScreen
-                   ></iframe>
+                   <video
+                     className="w-full h-full object-cover rounded-2xl transition-all duration-500"
+                     autoPlay
+                     muted
+                     loop
+                     playsInline
+                     controls
+                   >
+                     <source src="/about.MP4" type="video/mp4" />
+                     Your browser does not support the video tag.
+                   </video>
                  </div>
                  {/* Decorative Elements */}
                  <div className="absolute -top-6 -left-6 w-20 h-20 border-3 border-[#f5d26a]/40 rounded-full transition-all duration-500 group-hover:border-[#f5d26a]/60 group-hover:scale-110"></div>
