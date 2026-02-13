@@ -80,6 +80,8 @@ export default function CheckoutPage() {
 
   // Track if OTP modal has been shown to prevent repeated displays
   const otpModalShownRef = useRef(false);
+  // Ref for payment section to scroll to
+  const paymentSectionRef = useRef<HTMLDivElement>(null);
 
   // Show OTP modal if user is not logged in
   useEffect(() => {
@@ -232,6 +234,19 @@ export default function CheckoutPage() {
       setAppliedCoupon(null);
     }
   };
+
+  // Scroll to payment section when step changes to 2
+  useEffect(() => {
+    if (currentStep === 2 && paymentSectionRef.current) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        paymentSectionRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+  }, [currentStep]);
 
   useEffect(() => {
     // Redirect if cart is empty
@@ -721,7 +736,7 @@ export default function CheckoutPage() {
                 </div>
               ) : (
                 /* Payment Method Selection */
-                <div className="bg-white rounded-2xl border border-[#4b2e19]/15 shadow-lg p-8">
+                <div ref={paymentSectionRef} className="bg-white rounded-2xl border border-[#4b2e19]/15 shadow-lg p-8">
                   <h2 className="text-2xl font-bold text-[#4b2e19] mb-6">Payment Method</h2>
 
                   <div className="space-y-4 mb-8">
