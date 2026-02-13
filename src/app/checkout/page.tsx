@@ -513,7 +513,7 @@ export default function CheckoutPage() {
     <>
       <TopBar />
       <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-0">
-        <div className="container mx-auto px-4 py-16">
+        <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-4">Checkout</h1>
