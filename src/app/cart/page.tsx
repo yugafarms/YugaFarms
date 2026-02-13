@@ -72,7 +72,7 @@ export default function CartPage() {
     return (
       <>
         <TopBar />
-        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6">
           <div className="container mx-auto px-4 py-16">
             <div className="text-center">
               <div className="text-8xl mb-6">🛒</div>
@@ -105,8 +105,8 @@ export default function CartPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
-        <div className="container mx-auto px-4 py-16">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-0">
+        <div className="container mx-auto px-4 py-8">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-4">Your Cart</h1>
