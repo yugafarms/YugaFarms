@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -53,6 +53,7 @@ export default function OrderSuccessPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const purchaseTrackedRef = useRef(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -77,6 +78,19 @@ export default function OrderSuccessPage() {
 
         const data = await response.json();
         setOrder(data.data);
+
+        // Track Purchase event with Meta Pixel
+        if (!purchaseTrackedRef.current && typeof window !== 'undefined' && (window as any).fbq) {
+          (window as any).fbq('track', 'Purchase', {
+            value: data.data.total,
+            currency: 'INR',
+            content_name: 'YugaFarms Order',
+            content_ids: data.data.items.map((item: any) => item.productId.toString()),
+            content_type: 'product',
+            num_items: data.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0),
+          });
+          purchaseTrackedRef.current = true;
+        }
       } catch (err) {
         console.error('Error fetching order:', err);
         setError(err instanceof Error ? err.message : 'Failed to load order');

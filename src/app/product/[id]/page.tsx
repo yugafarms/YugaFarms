@@ -94,6 +94,17 @@ export default function ProductDetailPage() {
         if (data.data?.Variants?.length > 0) {
           setSelectedVariant(data.data.Variants[0]);
         }
+
+        // Track ViewContent event with Meta Pixel
+        if (typeof window !== "undefined" && (window as any).fbq) {
+          (window as any).fbq('track', 'ViewContent', {
+            content_name: data.data.Title,
+            content_ids: [data.data.id.toString()],
+            content_type: 'product',
+            value: data.data.Variants?.[0]?.Price || 0,
+            currency: 'INR'
+          });
+        }
       } catch (err) {
         console.error('Error fetching product:', err);
         setError(err instanceof Error ? err.message : 'Failed to load product');

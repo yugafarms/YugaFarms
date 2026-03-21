@@ -77,6 +77,21 @@ export default function CheckoutPage() {
   const { user, jwt } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const checkoutTrackedRef = useRef(false);
+
+  // Track InitiateCheckout
+  useEffect(() => {
+    if (!checkoutTrackedRef.current && items.length > 0 && typeof window !== "undefined" && (window as any).fbq) {
+      (window as any).fbq('track', 'InitiateCheckout', {
+        value: totalPrice,
+        currency: 'INR',
+        num_items: items.reduce((sum, item) => sum + item.quantity, 0),
+        content_ids: items.map(item => item.productId.toString()),
+        content_type: 'product'
+      });
+      checkoutTrackedRef.current = true;
+    }
+  }, [items, totalPrice]);
 
   // Track if OTP modal has been shown to prevent repeated displays
   const otpModalShownRef = useRef(false);

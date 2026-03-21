@@ -240,6 +240,17 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       setItems(updatedItems);
 
+      // Meta Pixel AddToCart tracking
+      if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq('track', 'AddToCart', {
+          value: newItem.price,
+          currency: 'INR',
+          content_name: newItem.productTitle,
+          content_ids: [newItem.productId.toString()],
+          content_type: 'product',
+        });
+      }
+
       // Save to backend if user is logged in
       if (user && jwt) {
         await saveCartToBackend(updatedItems);
