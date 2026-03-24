@@ -98,7 +98,7 @@ const BannerCarousel = () => {
         }
         const data = await res.json();
         const bannerArray = data?.data?.Banner || [];
-        
+
         if (bannerArray.length > 0) {
           setBannerItems(bannerArray);
         }
@@ -155,7 +155,7 @@ const BannerCarousel = () => {
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
@@ -166,14 +166,14 @@ const BannerCarousel = () => {
       setIsAutoPlaying(false);
       setTimeout(() => setIsAutoPlaying(true), 10000);
     }
-    
+
     if (isRightSwipe && bannerItems.length > 1) {
       // Swipe right - go to previous slide
       setCurrentIndex((prev) => (prev - 1 + bannerItems.length) % bannerItems.length);
       setIsAutoPlaying(false);
       setTimeout(() => setIsAutoPlaying(true), 10000);
     }
-    
+
     // Reset touch positions
     setTouchStart(null);
     setTouchEnd(null);
@@ -188,7 +188,7 @@ const BannerCarousel = () => {
 
     const handleMouseUp = () => {
       if (!isDragging) return;
-      
+
       if (mouseStart !== null && mouseEnd !== null) {
         const distance = mouseStart - mouseEnd;
         const isLeftSwipe = distance > minSwipeDistance;
@@ -200,7 +200,7 @@ const BannerCarousel = () => {
           setIsAutoPlaying(false);
           setTimeout(() => setIsAutoPlaying(true), 10000);
         }
-        
+
         if (isRightSwipe && bannerItems.length > 1) {
           // Swipe right - go to previous slide
           setCurrentIndex((prev) => (prev - 1 + bannerItems.length) % bannerItems.length);
@@ -208,7 +208,7 @@ const BannerCarousel = () => {
           setTimeout(() => setIsAutoPlaying(true), 10000);
         }
       }
-      
+
       // Reset mouse positions
       setIsDragging(false);
       setMouseStart(null);
@@ -262,7 +262,7 @@ const BannerCarousel = () => {
   const isVideo = currentItem.mime?.startsWith('video/');
 
   return (
-    <div 
+    <div
       className="relative w-full aspect-[720/300] overflow-hidden touch-pan-y select-none cursor-grab active:cursor-grabbing"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -284,7 +284,7 @@ const BannerCarousel = () => {
             Your browser does not support the video tag.
           </video>
         ) : (
-      <Image
+          <Image
             src={`${BACKEND}${currentItem.url}`}
             alt={currentItem.alternativeText || currentItem.name || "Banner"}
             fill
@@ -302,11 +302,10 @@ const BannerCarousel = () => {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === currentIndex
+              className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
                   ? 'bg-white w-8'
                   : 'bg-white/50 hover:bg-white/75 w-2'
-              }`}
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
@@ -334,13 +333,11 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const { addToCart, isLoading: cartLoading } = useCart();
   const [selectedVariants, setSelectedVariants] = useState<Record<number, number>>({});
-  
+
   // Client reviews state
   const [clients, setClients] = useState<Client[]>([]);
-  const [currentClientIndex, setCurrentClientIndex] = useState(0);
   const [clientsLoading, setClientsLoading] = useState(true);
   const [clientsError, setClientsError] = useState<string | null>(null);
-  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const fetchTopProducts = async () => {
@@ -356,7 +353,7 @@ export default function Home() {
         const data = await response.json();
         const products = data.data || [];
         setTopProducts(products);
-        
+
         // Set default selected variant (first variant) for each product
         const defaultVariants: Record<number, number> = {};
         products.forEach((product: Product) => {
@@ -382,11 +379,11 @@ export default function Home() {
       try {
         setClientsLoading(true);
         const response = await fetch(`${BACKEND}/api/clients?populate=*`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch clients');
         }
-        
+
         const data = await response.json();
         const clientsData = data.data || [];
         setClients(clientsData);
@@ -397,39 +394,9 @@ export default function Home() {
         setClientsLoading(false);
       }
     };
-    
+
     fetchClients();
   }, []);
-
-  // Navigation handlers for client reviews
-  const handlePreviousClient = () => {
-    if (clients.length > 0) {
-      setIsPaused(true); // Pause auto-rotation when user manually navigates
-      setCurrentClientIndex((prev) => (prev - 1 + clients.length) % clients.length);
-      // Resume after 10 seconds
-      setTimeout(() => setIsPaused(false), 10000);
-    }
-  };
-
-  const handleNextClient = () => {
-    if (clients.length > 0) {
-      setIsPaused(true); // Pause auto-rotation when user manually navigates
-      setCurrentClientIndex((prev) => (prev + 1) % clients.length);
-      // Resume after 10 seconds
-      setTimeout(() => setIsPaused(false), 10000);
-    }
-  };
-
-  // Auto-rotate client reviews
-  useEffect(() => {
-    if (clients.length <= 1 || isPaused) return;
-
-    const interval = setInterval(() => {
-      setCurrentClientIndex((prev) => (prev + 1) % clients.length);
-    }, 5000); // Change every 5 seconds
-
-    return () => clearInterval(interval);
-  }, [clients.length, isPaused]);
 
   const getProductEmoji = (title: string, type: string) => {
     const titleLower = title.toLowerCase();
@@ -555,7 +522,7 @@ export default function Home() {
                   const hasVariants = variants.length > 0;
                   const selectedVariantId = selectedVariants[product.id];
                   const selectedVariant = variants.find(v => v.id === selectedVariantId) || variants[0];
-                  
+
                   const handleVariantChange = (variantId: number) => {
                     setSelectedVariants(prev => ({
                       ...prev,
@@ -611,7 +578,7 @@ export default function Home() {
                         {selectedVariant && (
                           <div className="flex items-center justify-between">
                             <span className="text-xs md:text-sm text-[#2D2D2D] font-bold">
-                              {product.Type === "Ghee" 
+                              {product.Type === "Ghee"
                                 ? formatVolume(selectedVariant.Weight)
                                 : formatWeight(selectedVariant.Weight)}
                             </span>
@@ -636,7 +603,7 @@ export default function Home() {
                                 const variantPrice = variant.Price - (variant.Discount || 0);
                                 const variantOriginalPrice = variant.Price;
                                 const variantSavings = variantOriginalPrice - variantPrice;
-                                const weightDisplay = product.Type === "Ghee" 
+                                const weightDisplay = product.Type === "Ghee"
                                   ? formatVolume(variant.Weight)
                                   : formatWeight(variant.Weight);
                                 return (
@@ -649,7 +616,7 @@ export default function Home() {
                               })}
                             </select>
                           )}
-                          
+
                           {/* Add to Cart Button */}
                           <button
                             className="bg-[#2f4f2f] text-white text-[10px] md:text-sm px-2 md:px-5 py-1.5 md:py-2.5 rounded-r-full hover:bg-[#3d6d3d] transition-colors duration-200 font-bold disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap shadow-md"
@@ -722,58 +689,26 @@ export default function Home() {
       </section>
 
       {/* Client Reviews */}
-      <section className="py-12 md:py-16 bg-[#eef2e9]">
+      <section className="py-12 md:py-20 bg-[#f9f9f9]">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="flex items-end justify-between mb-8">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-[#2D2D2D] mb-2">
-                Client <span className="text-[#4b2e19] relative">
-                  Reviews
-                  <div className="absolute -bottom-1 left-0 right-0 h-1 bg-[#f5d26a] rounded-full"></div>
-                </span>
-              </h2>
-              <p className="text-[#2D2D2D]/70 text-base">Hear what our satisfied customers have to say about their experiences.</p>
-            </div>
+          <h2 className="text-2xl md:text-[32px] font-medium text-center text-[#4A4A4A] mb-12 tracking-wide">
+            What our Customers has to Say
+          </h2>
 
-            {/* Navigation Controls */}
-            {clients.length > 1 && (
-            <div className="flex items-center gap-3">
-                <button 
-                  onClick={handlePreviousClient}
-                  className="w-9 h-9 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
-                  aria-label="Previous review"
-                >
-                  <svg className="w-4 h-4 text-[#2D2D2D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-                <button 
-                  onClick={handleNextClient}
-                  className="w-9 h-9 bg-[#4b2e19] hover:bg-[#2f4f2f] rounded-full flex items-center justify-center transition-colors"
-                  aria-label="Next review"
-                >
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-            )}
-          </div>
-
-          {/* Main Content */}
           {clientsLoading ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-              <div className="w-72 h-72 md:w-80 md:h-80 bg-gray-200 rounded-full mx-auto animate-pulse"></div>
-              <div className="bg-white rounded-2xl p-6 md:p-8 animate-pulse">
-                <div className="space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-full"></div>
-                  <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                  <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-                  <div className="h-6 bg-gray-200 rounded w-1/3 mt-4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 animate-pulse">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex flex-col items-center">
+                  <div className="w-32 h-32 md:w-40 md:h-40 bg-gray-200 rounded-full mb-6 relative overflow-hidden"></div>
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, j) => <div key={j} className="w-4 h-4 bg-gray-200 rounded-full"></div>)}
+                  </div>
+                  <div className="h-4 w-full bg-gray-200 mb-2 max-w-xs"></div>
+                  <div className="h-4 w-5/6 bg-gray-200 mb-2 max-w-xs"></div>
+                  <div className="h-4 w-4/6 bg-gray-200 mb-6 max-w-xs"></div>
+                  <div className="h-4 w-24 bg-gray-200"></div>
                 </div>
-              </div>
+              ))}
             </div>
           ) : clientsError ? (
             <div className="text-center py-12">
@@ -784,123 +719,61 @@ export default function Home() {
               >
                 Try Again
               </button>
-              </div>
+            </div>
           ) : clients.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-[#4b2e19] text-lg">No client reviews available at the moment.</p>
-              <p className="text-[#2D2D2D]/70 mt-2">Please check back later.</p>
-                  </div>
+            </div>
           ) : (
-            <div 
-              className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
-              {/* Left Side - Client Image */}
-              <div className="relative">
-                <div className="relative">
-                  {/* Background Circle */}
-                  <div className="w-72 h-72 md:w-80 md:h-80 bg-white rounded-full shadow-lg mx-auto relative overflow-hidden">
-                    {/* Overlay Circle with Client Image */}
-                    <div className="absolute top-6 left-6 md:top-8 md:left-8 w-60 h-60 md:w-64 md:h-64 bg-gradient-to-br from-[#eef2e9] to-[#f0f4e8] rounded-full overflow-hidden flex items-center justify-center">
-                      {clients[currentClientIndex]?.Image?.url ? (
-                        <Image 
-                          src={`${BACKEND}${clients[currentClientIndex].Image.url}`} 
-                          alt={clients[currentClientIndex].Image.alternativeText || clients[currentClientIndex].Name || "Client"} 
-                          width={256} 
-                          height={256} 
-                          className="w-full h-full object-cover" 
-                        />
-                      ) : (
-                        <Image 
-                          src="/images/client.png" 
-                          alt={clients[currentClientIndex]?.Name || "Client"} 
-                          width={256} 
-                          height={256} 
-                          className="w-full h-full object-cover" 
-                        />
-                      )}
-                    </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14">
+              {clients.map((client, idx) => (
+                <div key={idx} className="flex flex-col items-center text-center group">
+                  <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden mb-6 filter drop-shadow-md group-hover:scale-105 transition-transform duration-500">
+                    {client.Image?.url ? (
+                      <Image
+                        src={`${BACKEND}${client.Image.url}`}
+                        alt={client.Image.alternativeText || client.Name || "Client"}
+                        width={200}
+                        height={200}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Image
+                        src="/images/client.png"
+                        alt={client?.Name || "Client"}
+                        width={200}
+                        height={200}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
                   </div>
 
-                  {/* Decorative Elements */}
-                  <div className="absolute -top-3 -right-3 md:-top-4 md:-right-4 w-16 h-16 md:w-20 md:h-20 border-2 border-[#f5d26a]/30 rounded-full"></div>
-                  <div className="absolute -bottom-3 -left-3 md:-bottom-4 md:-left-4 w-12 h-12 md:w-14 md:h-14 border-2 border-[#4b2e19]/20 rounded-full"></div>
-            </div>
-          </div>
-
-              {/* Right Side - Testimonial Card */}
-              <div className="relative">
-                {/* Chat Icon */}
-                <div className="absolute -top-3 -left-3 md:-top-4 md:-left-4 w-10 h-10 md:w-12 md:h-12 bg-[#4b2e19] rounded-full flex items-center justify-center z-10">
-                  <svg className="w-5 h-5 md:w-6 md:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                </div>
-
-                {/* Testimonial Card */}
-                <div className="bg-white rounded-2xl p-6 md:p-8 ml-3 md:ml-4">
-                  <div className="space-y-3">
-                    {/* Quote */}
-                    <p className="text-[#2D2D2D] text-base md:text-lg leading-relaxed">
-                      &quot;{clients[currentClientIndex]?.Review || 'No review available.'}&quot;
-                    </p>
-
-                    {/* Reviewer Info */}
-                    <div className="space-y-1">
-                      <div className="font-bold text-[#2D2D2D] text-base md:text-lg">
-                        {clients[currentClientIndex]?.Name || 'Anonymous'}
-                      </div>
-                      {clients[currentClientIndex]?.Designation && (
-                        <div className="text-[#2D2D2D]/70 text-sm">
-                          {clients[currentClientIndex].Designation}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Rating */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#4b2e19] font-bold text-sm md:text-base">
-                        {clients[currentClientIndex]?.Rating?.toFixed(1) || '0.0'}
-                      </span>
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: 5 }).map((_, i) => {
-                          const rating = clients[currentClientIndex]?.Rating || 0;
-                          return (
-                            <svg 
-                              key={i} 
-                              className={`w-4 h-4 md:w-5 md:h-5 ${i < Math.round(rating) ? 'text-[#f5d26a]' : 'text-gray-300'}`} 
-                              fill="currentColor" 
-                              viewBox="0 0 20 20"
-                            >
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.88 8.72c-.783-.57-.38-1.81.588-1.81H6.93a1 1 0 00.95-.69l1.07-3.292z" />
-                          </svg>
-                          );
-                        })}
-                      </div>
-                    </div>
+                  {/* Stars */}
+                  <div className="flex items-center gap-[3px] mb-5 text-[#4A4A4A]">
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const rating = client.Rating || 5;
+                      return (
+                        <svg
+                          key={i}
+                          className={`w-[14px] h-[14px] md:w-[16px] md:h-[16px] ${i < Math.round(rating) ? 'text-[#4A4A4A]' : 'text-[#D1D1D1]'} fill-current`}
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
+                      );
+                    })}
                   </div>
-                </div>
-              </div>
-            </div>
-          )}
 
-          {/* Dots Indicator for Multiple Reviews */}
-          {clients.length > 1 && (
-            <div className="flex justify-center gap-2 mt-8">
-              {clients.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentClientIndex(index)}
-                  className={`h-2 rounded-full transition-all duration-300 ${
-                    index === currentClientIndex
-                      ? 'bg-[#4b2e19] w-8'
-                      : 'bg-[#4b2e19]/30 hover:bg-[#4b2e19]/50 w-2'
-                  }`}
-                  aria-label={`Go to review ${index + 1}`}
-                />
+                  <p className="text-[#6D6D6D] text-[13px] md:text-[14px] leading-[1.8] mb-6 max-w-sm px-4 font-light">
+                    {client.Review || 'No review available.'}
+                  </p>
+
+                  <h3 className="text-[#8D8D8D] font-normal text-[13px] md:text-[14px] tracking-wide">
+                    {client.Name || 'Anonymous'}
+                  </h3>
+                </div>
               ))}
-          </div>
+            </div>
           )}
         </div>
       </section>
@@ -992,6 +865,44 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Certifications & Compliance Section */}
+      <section className="py-12 md:py-16 bg-white border-t border-[#eef2e9] relative z-30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <div className="inline-block relative">
+              <h2 className="text-2xl md:text-3xl font-bold text-[#4b2e19] mb-2">Certified Quality & Safety</h2>
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-16 h-0.5 bg-[#f5d26a] rounded-full"></div>
+            </div>
+            <p className="text-[#2D2D2D]/70 max-w-2xl mx-auto mt-4 text-sm md:text-base">
+              We adhere to the highest global standards to ensure every product you receive is pure, safe, and of exceptional quality.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-12">
+            {[
+              { name: "ISO", sub: "9001:2015", desc: "Quality Management", img: "/cert/iso.png" },
+              { name: "FSSAI", sub: "Certified", desc: "Food Safety Standard", img: "/cert/fssai.png" },
+              { name: "FDA", sub: "Registered", desc: "Compliant Facility", img: "/cert/fda.png" },
+              { name: "GMP", sub: "Certified", desc: "Good Manufacturing", img: "/cert/gmp.png" },
+              { name: "HACCP", sub: "Compliant", desc: "Hazard Control", img: "/cert/haccp.png" }
+            ].map((cert, idx) => (
+              <div key={idx} className="flex flex-col items-center group">
+                <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[#fdf7f2] to-white border border-[#eef2e9] shadow-[0_4px_20px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center mb-3">
+                  <Image src={cert.img} alt={cert.name} width={48} height={48} className="w-full h-full object-contain" />
+                </div>
+                <span className="text-xs md:text-sm font-semibold text-[#2D2D2D]/80 text-center">
+                  {cert.name}
+                  <br />
+                  {cert.sub}
+                  {/* {cert.desc} */}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <Footer />
     </>
   );
