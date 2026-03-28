@@ -780,6 +780,32 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                     </div>
+
+                    <div
+                      className={`border-2 rounded-xl p-4 cursor-pointer transition-all ${paymentMethod === 'COD' ? 'border-[#4b2e19] bg-[#4b2e19]/5' : 'border-[#4b2e19]/20 hover:border-[#4b2e19]/40'
+                        }`}
+                      onClick={() => setPaymentMethod('COD')}
+                    >
+                      <div className="flex items-center">
+                        <input
+                          type="radio"
+                          name="payment"
+                          value="COD"
+                          checked={paymentMethod === 'COD'}
+                          onChange={() => setPaymentMethod('COD')}
+                          className="w-4 h-4 text-[#4b2e19] border-[#4b2e19]/20 rounded focus:ring-[#f5d26a]/50"
+                        />
+                        <div className="ml-3">
+                          <div className="flex items-center">
+                            <span className="text-2xl mr-3">💵</span>
+                            <div>
+                              <h3 className="font-semibold text-[#4b2e19]">Cash on Delivery</h3>
+                              <p className="text-sm text-[#2D2D2D]/70">Pay when your order is delivered to you</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   <div className="flex justify-between">

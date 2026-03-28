@@ -45,7 +45,7 @@ export default function TopBar() {
         <>
             {/* Offers Strip */}
             <div className="fixed top-0 left-0 right-0 z-[60] bg-[#4b2e19] text-[#f5d26a] text-sm">
-                <div className="relative overflow-hidden h-12 flex items-center">
+                <div className="relative overflow-hidden h-10 flex items-center">
                     <div className="marquee-track will-change-transform font-semibold">
                         <div className="marquee-group">
                             {offers.length > 0 ? (
@@ -98,7 +98,7 @@ export default function TopBar() {
             </div>
 
             {/* Header */}
-            <header className="bg-[#fdf7f2]/70 backdrop-blur-md fixed w-full top-12 z-50 border-b border-[#2D2D2D]/10">
+            <header className="bg-[#fdf7f2]/70 backdrop-blur-md fixed w-full top-10 z-50 border-b border-[#2D2D2D]/10">
                 <div className="container mx-auto px-4">
                     <nav className="flex items-center justify-between">
                         {/* Logo */}
@@ -113,7 +113,7 @@ export default function TopBar() {
                         </Link>
 
                         {/* Navigation Links */}
-                        <div className="hidden md:flex items-center space-x-8 py-3 md:py-4">
+                        <div className="hidden md:flex items-center space-x-8">
                             <Link href="/" className={`relative transition-colors duration-300 font-medium group ${isHome
                                 ? 'text-[#4b2e19]'
                                 : 'text-[#2D2D2D] hover:text-[#4b2e19]'
@@ -167,7 +167,7 @@ export default function TopBar() {
                         </div>
 
                         {/* Right Side Icons */}
-                        <div className="flex items-center space-x-4 py-3 md:py-4">
+                        <div className="flex items-center space-x-4 py-2">
                             {/* Cart Icon */}
                             <button
                                 onClick={() => setIsCartOpen(true)}

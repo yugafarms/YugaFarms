@@ -398,9 +398,10 @@ export default function ProductDetailPage() {
                   {/* Short Description & Key Benefits */}
                   <div className="mt-6 pt-5 border-t border-[#eef2e9]">
                     <p className="text-[#2D2D2D]/80 text-[13px] md:text-[14px] leading-relaxed mb-5">
-                      {product.Type === 'Ghee' 
+                      {/* {product.Type === 'Ghee' 
                         ? "India's finest certified Cultured Ghee crafted from desi cow milk using the ancient Vedic Bilona method. Free from preservatives, artificial flavors, and chemicals. Aids digestion, boosts immunity, and reduces inflammation."
-                        : product.Description.substring(0, 150) + "..."}
+                        : product.Description.substring(0, 150) + "..."} */}
+                      {product.Description}
                     </p>
                     
                     {/* Benefit Icons */}
@@ -436,14 +437,14 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Description */}
-                <div className="prose prose-lg max-w-none">
+                {/* <div className="prose prose-lg max-w-none">
                   <h3 className="text-2xl font-bold text-[#4b2e19] mb-3">About This Product</h3>
                   <p className="text-[#2D2D2D]/80 leading-relaxed text-lg">{product.Description}</p>
-                </div>
+                </div> */}
 
                 {/* Tags/Features */}
                 <div>
-                  <h3 className="text-2xl font-bold text-[#4b2e19] mb-3">Key Features</h3>
+                  {/* <h3 className="text-2xl font-bold text-[#4b2e19] mb-3">Key Features</h3> */}
                   <div className="flex flex-wrap gap-3">
                     {product.Tags.map((tag, index) => (
                       <span key={index} className="bg-[#eef2e9] text-[#4b2e19] px-4 py-2 rounded-full font-medium text-sm">
