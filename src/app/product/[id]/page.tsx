@@ -55,6 +55,7 @@ export default function ProductDetailPage() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+  const [openInfoTab, setOpenInfoTab] = useState<string | null>('description');
   const { addToCart, isLoading: cartLoading, items: cartItems } = useCart();
 
   useEffect(() => {
@@ -436,11 +437,7 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* Description */}
-                {/* <div className="prose prose-lg max-w-none">
-                  <h3 className="text-2xl font-bold text-[#4b2e19] mb-3">About This Product</h3>
-                  <p className="text-[#2D2D2D]/80 leading-relaxed text-lg">{product.Description}</p>
-                </div> */}
+
 
                 {/* Tags/Features */}
                 <div>
@@ -576,6 +573,81 @@ export default function ProductDetailPage() {
                     </svg>
                     <span className="text-[9px] md:text-[11px] text-[#2D2D2D]/80 leading-tight font-medium uppercase tracking-wide">COD<br/>available</span>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Accordion Info Full Width Section */}
+        <section className="py-8 md:py-12 bg-[#fdfcf5] relative z-10 w-full overflow-hidden">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="bg-white/80 p-8 rounded-2xl shadow-sm border border-[#eef2e9]">
+              {/* Item 1: DESCRIPTION */}
+              <div className="border-b border-[#eef2e9]">
+                <button
+                  onClick={() => setOpenInfoTab(openInfoTab === 'description' ? null : 'description')}
+                  className="w-full py-5 flex flex-row items-center justify-between focus:outline-none group"
+                >
+                  <span className="text-sm md:text-base font-bold text-[#2f4f2f] uppercase tracking-widest group-hover:text-[#4b2e19] transition-colors">Description</span>
+                  <span className="text-[#2f4f2f] text-2xl font-light leading-none group-hover:text-[#4b2e19] transition-colors">{openInfoTab === 'description' ? '−' : '+'}</span>
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openInfoTab === 'description' ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <p className="text-sm md:text-base text-[#2D2D2D]/80 leading-relaxed">
+                    {product.Description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Item 2: INGREDIENTS */}
+              <div className="border-b border-[#eef2e9]">
+                <button
+                  onClick={() => setOpenInfoTab(openInfoTab === 'ingredients' ? null : 'ingredients')}
+                  className="w-full py-5 flex flex-row items-center justify-between focus:outline-none group"
+                >
+                  <span className="text-sm md:text-base font-bold text-[#2f4f2f] uppercase tracking-widest group-hover:text-[#4b2e19] transition-colors">Ingredients</span>
+                  <span className="text-[#2f4f2f] text-2xl font-light leading-none group-hover:text-[#4b2e19] transition-colors">{openInfoTab === 'ingredients' ? '−' : '+'}</span>
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openInfoTab === 'ingredients' ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <p className="text-sm md:text-base text-[#2D2D2D]/80 leading-relaxed">
+                    {product.Type === "Ghee" ? "100% Pure A2 Cow Milk Fat." : "100% Pure Raw Honey."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Item 3: BENEFITS */}
+              <div className="border-b border-[#eef2e9]">
+                <button
+                  onClick={() => setOpenInfoTab(openInfoTab === 'benefits' ? null : 'benefits')}
+                  className="w-full py-5 flex flex-row items-center justify-between focus:outline-none group"
+                >
+                  <span className="text-sm md:text-base font-bold text-[#2f4f2f] uppercase tracking-widest group-hover:text-[#4b2e19] transition-colors">Benefits</span>
+                  <span className="text-[#2f4f2f] text-2xl font-light leading-none group-hover:text-[#4b2e19] transition-colors">{openInfoTab === 'benefits' ? '−' : '+'}</span>
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openInfoTab === 'benefits' ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <p className="text-sm md:text-base text-[#2D2D2D]/80 leading-relaxed">
+                    {product.Type === "Ghee" 
+                      ? "Aids digestion, boosts immunity, reduces inflammation, and promotes overall well-being with essential fatty acids."
+                      : "Rich in antioxidants, soothes sore throats, acts as a natural energy booster, and supports gut health."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Item 4: STORAGE INFO */}
+              <div className="border-b border-[#eef2e9]">
+                <button
+                  onClick={() => setOpenInfoTab(openInfoTab === 'storage' ? null : 'storage')}
+                  className="w-full py-5 flex flex-row items-center justify-between focus:outline-none group"
+                >
+                  <span className="text-sm md:text-base font-bold text-[#2f4f2f] uppercase tracking-widest group-hover:text-[#4b2e19] transition-colors">Storage Info</span>
+                  <span className="text-[#2f4f2f] text-2xl font-light leading-none group-hover:text-[#4b2e19] transition-colors">{openInfoTab === 'storage' ? '−' : '+'}</span>
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ease-in-out ${openInfoTab === 'storage' ? 'max-h-96 pb-6 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <p className="text-sm md:text-base text-[#2D2D2D]/80 leading-relaxed">
+                    {product.Type === "Ghee" 
+                      ? "Store in a cool, dry place away from direct sunlight. Do not refrigerate. Always use a clean and dry spoon."
+                      : "Store at room temperature in a dry place. Do not refrigerate. Crystallization is natural; place jar in warm water to reliquefy."}
+                  </p>
                 </div>
               </div>
             </div>
