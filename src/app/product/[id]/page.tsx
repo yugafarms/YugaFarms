@@ -288,23 +288,23 @@ export default function ProductDetailPage() {
       <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-8">
         {/* Breadcrumb */}
         <div className="container mx-auto px-4 pt-0">
-          <nav className="flex items-center space-x-2 text-sm text-[#2D2D2D]/70 mb-0">
-            <Link href="/" className="hover:text-[#4b2e19] transition-colors">Home</Link>
-            <span>/</span>
-            <Link href={`/${product.Type.toLowerCase()}`} className="hover:text-[#4b2e19] transition-colors capitalize">
+          <nav className="flex items-center space-x-2 text-sm text-[#2D2D2D]/70 mb-0 w-full overflow-hidden">
+            <Link href="/" className="hover:text-[#4b2e19] transition-colors shrink-0 whitespace-nowrap">Home</Link>
+            <span className="shrink-0">/</span>
+            <Link href={`/${product.Type.toLowerCase()}`} className="hover:text-[#4b2e19] transition-colors capitalize shrink-0 whitespace-nowrap">
               {product.Type}
             </Link>
-            <span>/</span>
-            <span className="text-[#4b2e19] font-medium">{product.Title}</span>
+            <span className="shrink-0">/</span>
+            <span className="text-[#4b2e19] font-medium truncate min-w-0">{product.Title}</span>
           </nav>
         </div>
 
         {/* Product Detail Section */}
         <section className="py-4 md:py-6">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
               {/* Product Images */}
-              <div className="flex flex-col gap-6 sticky top-24 self-start">
+              <div className="flex flex-col gap-6">
                 {/* Main Image */}
                 <div className={`relative w-full bg-gradient-to-br ${gradient} rounded-3xl flex items-center justify-center overflow-hidden aspect-square`}>
                   {product.Image && product.Image.length > 0 ? (
@@ -337,12 +337,12 @@ export default function ProductDetailPage() {
 
                 {/* Thumbnail Images */}
                 {product.Image && product.Image.length > 0 && (
-                  <div className="flex gap-4 flex-row overflow-x-auto pb-2 hidden-scrollbar">
+                  <div className="flex gap-4 flex-row overflow-x-auto pb-2 custom-scrollbar snap-x snap-mandatory">
                     {product.Image.map((image, index) => (
                       <button
                         key={index}
                         onClick={() => setSelectedImageIndex(index)}
-                        className={`relative h-20 rounded-xl overflow-hidden border-2 transition-all aspect-square ${selectedImageIndex === index
+                        className={`relative h-20 shrink-0 snap-start rounded-xl overflow-hidden border-2 transition-all aspect-square ${selectedImageIndex === index
                           ? 'border-[#4b2e19] shadow-lg'
                           : 'border-transparent hover:border-[#4b2e19]/50'
                           }`}
@@ -361,7 +361,7 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Product Information */}
-              <div className="space-y-6">
+              <div className="flex flex-col gap-6">
                 {/* Title, Rating, and Price Details */}
                 <div className="bg-white border-2 border-[#eef2e9] p-5 md:p-6 rounded-xl shadow-sm">
                   <h1 className="text-2xl md:text-3xl font-bold text-[#2D2D2D] mb-1">{product.Title}</h1>
@@ -541,7 +541,7 @@ export default function ProductDetailPage() {
                 {/* Trust Badges / USPs */}
                 <div className="grid grid-cols-4 gap-2 pt-4 md:pt-6 border-t border-[#eef2e9] mt-2">
                   <div className="flex flex-col items-center text-center group">
-                    <svg className="w-7 h-7 md:w-8 md:h-8 mb-2 text-[#4b2e19] group-hover:text-[#f5d26a] transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-10 h-10 md:w-12 md:h-12 mb-2 text-[#4b2e19] group-hover:text-[#f5d26a] transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l3 3.5v5.5a2 2 0 01-2 2H3a2 2 0 01-2-2V7a2 2 0 012-2h5z" />
                       <circle cx="6" cy="18" r="2" strokeWidth={1.5} />
                       <circle cx="18" cy="18" r="2" strokeWidth={1.5} />
@@ -551,7 +551,7 @@ export default function ProductDetailPage() {
                   </div>
                   
                   <div className="flex flex-col items-center text-center group">
-                    <svg className="w-7 h-7 md:w-8 md:h-8 mb-2 text-[#4b2e19] group-hover:text-[#f5d26a] transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-10 h-10 md:w-12 md:h-12 mb-2 text-[#4b2e19] group-hover:text-[#f5d26a] transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 16.5l1.5 1.5 3-3" />
                     </svg>
@@ -559,7 +559,7 @@ export default function ProductDetailPage() {
                   </div>
 
                   <div className="flex flex-col items-center text-center group">
-                    <svg className="w-7 h-7 md:w-8 md:h-8 mb-2 text-[#4b2e19] group-hover:text-[#f5d26a] transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-10 h-10 md:w-12 md:h-12 mb-2 text-[#4b2e19] group-hover:text-[#f5d26a] transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 2A10 10 0 002 12a10 10 0 0010 10 10 10 0 0010-10A10 10 0 0012 2zm0 4a2 2 0 110 4 2 2 0 010-4zm0 12c-2.67 0-8-1.34-8-4v-1.55c2.19-2 5.56-2.45 8-2.45s5.81.45 8 2.45V14c0 2.66-5.33 4-8 4z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 16v-6" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 13c0-2 3-5 3-5s3 3 3 5" />
@@ -568,7 +568,7 @@ export default function ProductDetailPage() {
                   </div>
 
                   <div className="flex flex-col items-center text-center group">
-                    <svg className="w-7 h-7 md:w-8 md:h-8 mb-2 text-[#4b2e19] group-hover:text-[#f5d26a] transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-10 h-10 md:w-12 md:h-12 mb-2 text-[#4b2e19] group-hover:text-[#f5d26a] transition-colors duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                     <span className="text-[9px] md:text-[11px] text-[#2D2D2D]/80 leading-tight font-medium uppercase tracking-wide">COD<br/>available</span>

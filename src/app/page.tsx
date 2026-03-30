@@ -240,7 +240,7 @@ const BannerCarousel = () => {
 
   if (loading) {
     return (
-      <div className="w-full aspect-[720/300] flex items-center justify-center bg-[#fdf7f2]">
+      <div className="w-full aspect-[1200/400] flex items-center justify-center bg-[#fdf7f2]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4b2e19]"></div>
       </div>
     );
@@ -248,7 +248,7 @@ const BannerCarousel = () => {
 
   if (error) {
     return (
-      <div className="w-full aspect-[720/300] flex items-center justify-center bg-red-100 text-red-800">
+      <div className="w-full aspect-[1200/400] flex items-center justify-center bg-red-100 text-red-800">
         Failed to load banner: {error}
       </div>
     );
@@ -263,7 +263,7 @@ const BannerCarousel = () => {
 
   return (
     <div
-      className="relative w-full aspect-[720/300] overflow-hidden touch-pan-y select-none cursor-grab active:cursor-grabbing"
+      className="relative w-full aspect-[1200/400] overflow-hidden touch-pan-y select-none cursor-grab active:cursor-grabbing"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -464,8 +464,8 @@ export default function Home() {
       </main>
 
       {/* Wave into Our Top Picks */}
-      <div aria-hidden className="relative z-20 -mt-2">
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="block w-full h-[70px] md:h-[90px] text-[#eef2e9] fill-current">
+      <div aria-hidden className="relative z-20 -mt-20">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="block w-full h-[90px] text-[#eef2e9] fill-current">
           <path d="M0,80 C120,40 240,120 360,80 S600,40 720,80 960,120 1080,80 1320,40 1440,80 L1440,120 L0,120 Z"></path>
         </svg>
       </div>
@@ -691,8 +691,8 @@ export default function Home() {
       {/* Client Reviews */}
       <section className="py-12 md:py-20 bg-[#f9f9f9]">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-[32px] font-medium text-center text-[#4A4A4A] mb-12 tracking-wide">
-            What our Customers has to Say
+          <h2 className="text-2xl md:text-[32px] font-semibold text-center text-[#2f4f2f] mb-12">
+            What Do Our Customers Say
           </h2>
 
           {clientsLoading ? (
@@ -725,52 +725,54 @@ export default function Home() {
               <p className="text-[#4b2e19] text-lg">No client reviews available at the moment.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-14">
+            <div className="flex overflow-x-auto gap-4 md:grid md:grid-cols-3 md:gap-8 pb-8 px-4 -mx-4 md:mx-0 md:px-0 md:pb-0 snap-x snap-mandatory [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {clients.map((client, idx) => (
-                <div key={idx} className="flex flex-col items-center text-center group">
-                  <div className="w-40 h-40 md:w-48 md:h-48 rounded-full overflow-hidden mb-6 filter drop-shadow-md group-hover:scale-105 transition-transform duration-500">
-                    {client.Image?.url ? (
-                      <Image
-                        src={`${BACKEND}${client.Image.url}`}
-                        alt={client.Image.alternativeText || client.Name || "Client"}
-                        width={200}
-                        height={200}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Image
-                        src="/images/client.png"
-                        alt={client?.Name || "Client"}
-                        width={200}
-                        height={200}
-                        className="w-full h-full object-cover"
-                      />
-                    )}
-                  </div>
-
-                  {/* Stars */}
-                  <div className="flex items-center gap-[3px] mb-5 text-[#4A4A4A]">
-                    {Array.from({ length: 5 }).map((_, i) => {
-                      const rating = client.Rating || 5;
-                      return (
-                        <svg
-                          key={i}
-                          className={`w-[14px] h-[14px] md:w-[16px] md:h-[16px] ${i < Math.round(rating) ? 'text-[#4A4A4A]' : 'text-[#D1D1D1]'} fill-current`}
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                        </svg>
-                      );
-                    })}
-                  </div>
-
-                  <p className="text-[#6D6D6D] text-[13px] md:text-[14px] leading-[1.8] mb-6 max-w-sm px-4 font-light">
+                <div key={idx} className="min-w-[85%] sm:min-w-[60%] md:min-w-0 snap-center flex flex-col justify-between group bg-white rounded-2xl p-6 md:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] border border-gray-100 h-full">
+                  <p className="text-[#6D6D6D] text-[13px] md:text-[14px] leading-relaxed mb-8 font-light text-left">
                     {client.Review || 'No review available.'}
                   </p>
 
-                  <h3 className="text-[#8D8D8D] font-normal text-[13px] md:text-[14px] tracking-wide">
-                    {client.Name || 'Anonymous'}
-                  </h3>
+                  <div className="flex items-center gap-4 mt-auto">
+                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden flex-shrink-0 filter drop-shadow-sm border-2 border-gray-50 bg-gray-100">
+                      {client.Image?.url ? (
+                        <Image
+                          src={`${BACKEND}${client.Image.url}`}
+                          alt={client.Image.alternativeText || client.Name || "Client"}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Image
+                          src="/images/client.png"
+                          alt={client?.Name || "Client"}
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </div>
+                    
+                    <div className="flex flex-col items-start gap-1">
+                      <h3 className="text-[#2D2D2D] font-bold text-[14px] md:text-[16px]">
+                        {client.Name || 'Anonymous'}
+                      </h3>
+                      <div className="flex items-center gap-[2px]">
+                        {Array.from({ length: 5 }).map((_, i) => {
+                          const rating = client.Rating || 5;
+                          return (
+                            <svg
+                              key={i}
+                              className={`w-[14px] h-[14px] ${i < Math.round(rating) ? 'text-[#f5d26a]' : 'text-[#D1D1D1]'} fill-current`}
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                            </svg>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

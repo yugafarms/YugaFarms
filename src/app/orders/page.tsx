@@ -123,6 +123,23 @@ export default function OrdersPage() {
     }
   };
 
+  const formatWeight = (title: string, weight: number): string => {
+    const isGhee = title.toLowerCase().includes('ghee');
+    if (isGhee) {
+      if (weight >= 1000) {
+        const liters = weight / 1000;
+        return liters % 1 === 0 ? `${liters} L` : `${liters.toFixed(1)} L`;
+      }
+      return `${weight} ml`;
+    } else {
+      if (weight >= 1000) {
+        const kg = weight / 1000;
+        return kg % 1 === 0 ? `${kg} kg` : `${kg.toFixed(1)} kg`;
+      }
+      return `${weight} g`;
+    }
+  };
+
   const canCancelOrder = (order: Order) => {
     return order.orderStatus === 'PENDING' || order.orderStatus === 'CONFIRMED';
   };
@@ -295,7 +312,7 @@ export default function OrdersPage() {
                           </div>
                           <div className="flex-1">
                             <h5 className="font-medium text-[#4b2e19]">{item.productTitle}</h5>
-                            <p className="text-sm text-[#2D2D2D]/70">{item.weight}g × {item.quantity}</p>
+                            <p className="text-sm text-[#2D2D2D]/70">{formatWeight(item.productTitle, item.weight)} × {item.quantity}</p>
                           </div>
                           <div className="text-right">
                             <p className="font-semibold text-[#4b2e19]">₹{item.price * item.quantity}</p>

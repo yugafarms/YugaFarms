@@ -170,9 +170,9 @@ export default function GheePage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-10">
          {/* Hero Section */}
-         <div className="relative pt-5 md:pt-7">
+         <div className="relative pt-0">
            <div className="container mx-auto px-4">
              <div className="text-center mb-10">
                <div className="inline-block relative">
