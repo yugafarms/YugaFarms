@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://yugafarms.com"),
   title: {
     default: "YugaFarms - Pure & Natural Ghee | Rooted in Purity",
     template: "%s | YugaFarms",

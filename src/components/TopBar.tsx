@@ -19,6 +19,7 @@ export default function TopBar() {
     const isHome = pathname === '/' || pathname === ''
     const isGhee = pathname === '/ghee' || pathname.startsWith('/ghee/')
     const isHoney = pathname === '/honey' || pathname.startsWith('/honey/')
+    const isBlogs = pathname === '/blogs' || pathname.startsWith('/blogs/')
     const isAbout = pathname === '/about' || pathname.startsWith('/about/')
     const isContact = pathname === '/contact' || pathname.startsWith('/contact/')
     const { user, logout } = useAuth()
@@ -144,6 +145,16 @@ export default function TopBar() {
                                     : 'w-0 group-hover:w-full'
                                     }`}></span>
                             </Link>
+                            <Link href="/blogs" className={`relative transition-colors duration-300 font-medium group ${isBlogs
+                                ? 'text-[#4b2e19]'
+                                : 'text-[#2D2D2D] hover:text-[#4b2e19]'
+                                }`}>
+                                BLOGS
+                                <span className={`absolute -bottom-1 left-0 h-0.5 bg-[#f5d26a] transition-all duration-300 ${isBlogs
+                                    ? 'w-full'
+                                    : 'w-0 group-hover:w-full'
+                                    }`}></span>
+                            </Link>
                             <Link href="/about" className={`relative transition-colors duration-300 font-medium group ${isAbout
                                 ? 'text-[#4b2e19]'
                                 : 'text-[#2D2D2D] hover:text-[#4b2e19]'
@@ -243,6 +254,16 @@ export default function TopBar() {
                                         }`}
                                 >
                                     HONEY
+                                </Link>
+                                <Link
+                                    href="/blogs"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className={`px-4 py-3 transition-colors duration-300 font-medium ${isBlogs
+                                        ? 'text-[#4b2e19] bg-[#f5d26a]/10'
+                                        : 'text-[#2D2D2D] hover:text-[#4b2e19] hover:bg-[#f5d26a]/5'
+                                        }`}
+                                >
+                                    BLOGS
                                 </Link>
                                 <Link
                                     href="/about"
