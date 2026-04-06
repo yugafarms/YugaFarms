@@ -54,3 +54,10 @@
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #9ca3af;
 }
+
+/* Bottom nav bar safe-area padding on mobile */
+@media (max-width: 767px) {
+  main {
+    padding-bottom: 5rem; /* 80px — height of the bottom nav bar */
+  }
+}
