@@ -196,11 +196,12 @@ export default function CheckoutPage() {
     }
   }, [jwt]);
 
-  const verifyCoupon = async () => {
+  const verifyCoupon = async (codeOverride?: string) => {
+    const codeToVerify = (codeOverride ?? couponCode).trim().toUpperCase();
     setCouponError('');
     setCouponSuccess('');
 
-    if (!couponCode.trim()) {
+    if (!codeToVerify) {
       setCouponError('Please enter a coupon code');
       setDiscount(0);
       setAppliedCoupon(null);
@@ -208,7 +209,7 @@ export default function CheckoutPage() {
     }
 
     try {
-      const response = await fetch(`${BACKEND}/api/coupons?filters[Code][$eq]=${couponCode}`, {
+      const response = await fetch(`${BACKEND}/api/coupons?filters[Code][$eq]=${codeToVerify}`, {
         headers: {
           'Authorization': `Bearer ${jwt}` // Using jwt if available, though finding coupons might be public depending on Strapi permissions
         }
@@ -259,6 +260,7 @@ export default function CheckoutPage() {
       setDiscount(calculatedDiscount);
       setAppliedCoupon({ id: couponId, ...couponAttributes });
       setCouponSuccess(`Coupon applied! You saved ₹${calculatedDiscount.toFixed(2)}`);
+      setCouponCode(codeToVerify);
 
     } catch (error) {
       console.error('Coupon verification error:', error);
@@ -585,6 +587,43 @@ export default function CheckoutPage() {
             </div>
           </div>
 
+          {/* Mobile-first coupon access */}
+          <div className="lg:hidden bg-white rounded-2xl border border-[#4b2e19]/15 shadow-lg p-4 mb-6">
+            <label htmlFor="coupon-code-mobile" className="block text-sm font-semibold text-[#4b2e19] mb-2">
+              Have a coupon?
+            </label>
+            <p className="text-xs text-[#2D2D2D]/70 mb-3">
+              Apply now before placing your order.
+            </p>
+            <div className="flex gap-2">
+              <input
+                id="coupon-code-mobile"
+                type="text"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                placeholder="Enter coupon code (e.g. NEW5)"
+                className="flex-1 border border-[#4b2e19]/20 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50"
+              />
+              <button
+                onClick={() => verifyCoupon()}
+                className="bg-[#4b2e19] text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#2f4f2f] transition-colors"
+              >
+                Apply
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-3">
+              <button
+                type="button"
+                onClick={() => verifyCoupon('NEW5')}
+                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-[#4b2e19]/20 bg-[#f5d26a]/20 text-[#4b2e19] hover:bg-[#f5d26a]/35 transition-colors"
+              >
+                Use NEW5
+              </button>
+            </div>
+            {couponError && <p className="text-red-500 text-xs mt-2">{couponError}</p>}
+            {couponSuccess && <p className="text-green-600 text-xs mt-2">{couponSuccess}</p>}
+          </div>
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
@@ -861,20 +900,37 @@ export default function CheckoutPage() {
                     </div>
                   ))}
 
-                  <div className="border-t border-[#4b2e19]/10 pt-4 pb-2">
+                  <div className="hidden lg:block border-t border-[#4b2e19]/10 pt-4 pb-2">
+                    <label htmlFor="coupon-code" className="block text-sm font-semibold text-[#4b2e19] mb-2">
+                      Have a coupon?
+                    </label>
+                    <p className="text-xs text-[#2D2D2D]/70 mb-3">
+                      Enter your code below or tap a suggested coupon.
+                    </p>
                     <div className="flex gap-2">
                       <input
+                        id="coupon-code"
                         type="text"
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        placeholder="Coupon Code"
-                        className="flex-1 border border-[#4b2e19]/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50"
+                        placeholder="Enter coupon code (e.g. NEW5)"
+                        className="flex-1 border border-[#4b2e19]/20 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50"
+                        aria-describedby="coupon-helper-text"
                       />
                       <button
-                        onClick={verifyCoupon}
-                        className="bg-[#4b2e19] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2f4f2f] transition-colors"
+                        onClick={() => verifyCoupon()}
+                        className="bg-[#4b2e19] text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#2f4f2f] transition-colors"
                       >
                         Apply
+                      </button>
+                    </div>
+                    <div id="coupon-helper-text" className="flex flex-wrap gap-2 mt-3">
+                      <button
+                        type="button"
+                        onClick={() => verifyCoupon('NEW5')}
+                        className="text-xs font-semibold px-3 py-1.5 rounded-full border border-[#4b2e19]/20 bg-[#f5d26a]/20 text-[#4b2e19] hover:bg-[#f5d26a]/35 transition-colors"
+                      >
+                        Use NEW5
                       </button>
                     </div>
                     {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
