@@ -245,7 +245,7 @@ export default function TopBar() {
             <header className="bg-white/90 backdrop-blur-md fixed w-full top-10 z-50 border-b border-gray-100 shadow-sm">
 
                 {/* ── Desktop: single row — logo left | nav center | cart+auth right ── */}
-                <div className="hidden md:flex items-center h-16 px-6 gap-6">
+                <div className="hidden md:flex items-center h-14 px-6 gap-6">
 
                     {/* Logo — left */}
                     <Link href="/" className="flex-shrink-0 flex items-center">
@@ -333,7 +333,7 @@ export default function TopBar() {
                 </div>
 
                 {/* ── Mobile: hamburger left | logo center | cart right ── */}
-                <div className="flex md:hidden items-center justify-between px-4 h-16">
+                <div className="flex md:hidden items-center justify-between px-4 h-14">
                     {/* Hamburger */}
                     <button
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -527,44 +527,6 @@ export default function TopBar() {
                     </div>
                 </div>
             </div>
-
-            {/* ── Bottom Navigation Bar (Mobile) ───────────────────────── */}
-            <nav className="fixed bottom-0 left-0 right-0 z-[60] bg-white border-t border-gray-200 md:hidden shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
-                <div className="flex items-stretch h-16">
-                    {[
-                        { href: '/', label: 'Home', icon: <IconHome />, active: isHome },
-                        { href: '/products', label: 'All', icon: <IconAll />, active: false },
-                        { href: '/deals', label: 'Deal Zone', icon: <IconDealZone />, active: false, featured: true },
-                        { href: '/trending', label: 'Trending', icon: <IconTrending />, active: false },
-                        { href: user ? '/profile' : '/login', label: 'Account', icon: <IconAccount />, active: false },
-                    ].map((item, idx) => (
-                        <Link
-                            key={idx}
-                            href={item.href}
-                            className={`flex flex-col items-center justify-center flex-1 gap-1 text-[10px] font-medium transition-colors duration-200 ${item.featured
-                                ? 'text-white'
-                                : item.active
-                                    ? 'text-[#4b2e19]'
-                                    : 'text-[#888] hover:text-[#4b2e19]'
-                                } ${item.featured ? 'relative' : ''}`}
-                        >
-                            {item.featured ? (
-                                <span className="flex flex-col items-center justify-center bg-[#4b2e19] rounded-2xl px-3 py-2 -mt-5 shadow-lg">
-                                    <span className="text-[#f5d26a]">{item.icon}</span>
-                                    <span className="text-[9px] font-bold text-[#f5d26a] mt-0.5">{item.label}</span>
-                                </span>
-                            ) : (
-                                <>
-                                    <span className={item.active ? 'text-[#4b2e19]' : 'text-[#888] group-hover:text-[#4b2e19]'}>
-                                        {item.icon}
-                                    </span>
-                                    <span>{item.label}</span>
-                                </>
-                            )}
-                        </Link>
-                    ))}
-                </div>
-            </nav>
         </>
     )
 }

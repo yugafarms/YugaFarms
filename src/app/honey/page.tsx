@@ -170,18 +170,18 @@ export default function HoneyPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-10">
+      <main className="bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
          {/* Hero Section */}
          <div className="relative pt-0">
            <div className="container mx-auto px-4">
-             <div className="text-center mb-10">
+             <div className="text-center mb-6 md:mb-10">
                <div className="inline-block relative">
-                 <h1 className="text-5xl md:text-7xl font-[Pacifico] text-[#4b2e19] mb-4">
+                 <h1 className="text-4xl md:text-7xl font-[Pacifico] text-[#4b2e19] mb-2 md:mb-4">
                    Pure <span className="text-[#f5d26a]">Honey</span> Collection
                  </h1>
                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-[#f5d26a] to-[#4b2e19] rounded-full"></div>
                </div>
-               <p className="text-xl text-[#2D2D2D]/70 mt-6 max-w-3xl mx-auto">
+               <p className="text-base md:text-xl text-[#2D2D2D]/70 mt-4 md:mt-6 max-w-2xl md:max-w-3xl mx-auto">
                  Raw, unfiltered honey straight from nature&apos;s bounty. Experience the pure sweetness and health benefits of authentic honey.
                </p>
              </div>
@@ -189,14 +189,14 @@ export default function HoneyPage() {
          </div>
 
          {/* Wave into Honey Products */}
-         <div aria-hidden className="relative z-20 -mt-2">
-           <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="block w-full h-[70px] md:h-[90px] text-[#eef2e9] fill-current">
+         <div aria-hidden className="relative z-20 -mt-1 md:-mt-2">
+           <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="block w-full h-[44px] md:h-[90px] text-[#eef2e9] fill-current">
              <path d="M0,80 C120,40 240,120 360,80 S600,40 720,80 960,120 1080,80 1320,40 1440,80 L1440,120 L0,120 Z"></path>
            </svg>
          </div>
 
         {/* Honey Products Section */}
-        <section className="py-16 md:py-20 bg-[#eef2e9]">
+        <section className="py-8 md:py-20 bg-[#eef2e9]">
           <div className="container mx-auto px-4">
 
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
@@ -353,8 +353,8 @@ export default function HoneyPage() {
         </section> */}
 
          {/* Wave back to cream before Footer */}
-         <div aria-hidden className="relative z-20 -mt-2 bg-[#fdf7f2]">
-           <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="block w-full h-[70px] md:h-[90px] text-[#eef2e9] fill-current">
+         <div aria-hidden className="relative z-20 -mt-1 md:-mt-2 bg-[#fdf7f2]">
+           <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="block w-full h-[34px] md:h-[90px] text-[#eef2e9] fill-current">
              <path d="M0,40 C120,80 240,0 360,40 S600,80 720,40 960,0 1080,40 1320,80 1440,40 L1440,0 L0,0 Z"></path>
            </svg>
          </div>
