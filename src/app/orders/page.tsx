@@ -188,7 +188,7 @@ export default function OrdersPage() {
     return (
       <>
         <TopBar />
-        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4b2e19] mx-auto mb-4"></div>
@@ -205,7 +205,7 @@ export default function OrdersPage() {
     return (
       <>
         <TopBar />
-        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="text-center">
               <p className="text-red-600 text-lg mb-4">Error: {error}</p>
@@ -226,12 +226,12 @@ export default function OrdersPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
-        <div className="container mx-auto px-4 py-16">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
+        <div className="container mx-auto px-4 py-8 md:py-16">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-4">My Orders</h1>
-            <p className="text-lg text-[#2D2D2D]/70">
+          <div className="text-center mb-6 md:mb-12">
+            <h1 className="text-3xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-2 md:mb-4">My Orders</h1>
+            <p className="text-base md:text-lg text-[#2D2D2D]/70">
               Track and manage your orders
             </p>
           </div>
