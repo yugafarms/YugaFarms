@@ -240,7 +240,7 @@ const BannerCarousel = () => {
 
   if (loading) {
     return (
-      <div className="w-full aspect-[1200/400] flex items-center justify-center bg-[#fdf7f2]">
+      <div className="w-full aspect-[3/2] md:aspect-[1200/400] flex items-center justify-center bg-[#fdf7f2]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4b2e19]"></div>
       </div>
     );
@@ -248,7 +248,7 @@ const BannerCarousel = () => {
 
   if (error) {
     return (
-      <div className="w-full aspect-[1200/400] flex items-center justify-center bg-red-100 text-red-800">
+      <div className="w-full aspect-[3/2] md:aspect-[1200/400] flex items-center justify-center bg-red-100 text-red-800">
         Failed to load banner: {error}
       </div>
     );
@@ -263,7 +263,7 @@ const BannerCarousel = () => {
 
   return (
     <div
-      className="relative w-full aspect-[1200/400] overflow-hidden touch-pan-y select-none cursor-grab active:cursor-grabbing"
+      className="relative w-full aspect-[3/2] md:aspect-[1200/400] overflow-hidden touch-pan-y select-none cursor-grab active:cursor-grabbing"
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -278,7 +278,7 @@ const BannerCarousel = () => {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover object-[center_20%] md:object-center"
           >
             <source src={`${BACKEND}${currentItem.url}`} type={currentItem.mime} />
             Your browser does not support the video tag.
@@ -288,7 +288,7 @@ const BannerCarousel = () => {
             src={`${BACKEND}${currentItem.url}`}
             alt={currentItem.alternativeText || currentItem.name || "Banner"}
             fill
-            className="object-cover"
+            className="object-cover object-[center_20%] md:object-center"
             priority={currentIndex === 0}
             sizes="100vw"
           />
@@ -303,8 +303,8 @@ const BannerCarousel = () => {
               key={index}
               onClick={() => goToSlide(index)}
               className={`h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                  ? 'bg-white w-8'
-                  : 'bg-white/50 hover:bg-white/75 w-2'
+                ? 'bg-white w-8'
+                : 'bg-white/50 hover:bg-white/75 w-2'
                 }`}
               aria-label={`Go to slide ${index + 1}`}
             />
@@ -464,14 +464,12 @@ export default function Home() {
       </main>
 
       {/* Wave into Our Top Picks */}
-      <div aria-hidden className="relative z-20 -mt-20">
-        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" className="block w-full h-[90px] text-[#eef2e9] fill-current">
-          <path d="M0,80 C120,40 240,120 360,80 S600,40 720,80 960,120 1080,80 1320,40 1440,80 L1440,120 L0,120 Z"></path>
-        </svg>
+      <div className="container mx-auto px-4 -mt-20 md:mt-0 py-2 text-center bg-[#eef2e9] flex flex-col gap-1 relative z-10 pt-6">
+        <h1 className="m-0 text-2xl md:text-3xl font-bold text-[#4b2e19]">Welcome To YugaFarms!</h1>
+        <p className="m-0 text-lg md:text-xl text-[#2D2D2D]/70">You're One Step Closer to Purity</p>
       </div>
-
       {/* Our Top Picks (soft sage background) */}
-      <div className="bg-[#eef2e9] py-12 md:py-16">
+      <div className="bg-[#eef2e9] py-6">
         <section className="relative z-30">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-8">
@@ -752,7 +750,7 @@ export default function Home() {
                         />
                       )}
                     </div>
-                    
+
                     <div className="flex flex-col items-start gap-1">
                       <h3 className="text-[#2D2D2D] font-bold text-[14px] md:text-[16px]">
                         {client.Name || 'Anonymous'}
