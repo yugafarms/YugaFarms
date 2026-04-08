@@ -150,6 +150,24 @@ export default function CheckoutPage() {
   const shipping = 0;
   const finalTotal = Math.max(0, totalPrice + tax + shipping - discount);
 
+  const formatItemUnit = (title: string, weight: number): string => {
+    const isGhee = title.toLowerCase().includes('ghee');
+
+    if (isGhee) {
+      if (weight >= 1000) {
+        const liters = weight / 1000;
+        return liters % 1 === 0 ? `${liters} L` : `${liters.toFixed(1)} L`;
+      }
+      return `${weight} ml`;
+    }
+
+    if (weight >= 1000) {
+      const kg = weight / 1000;
+      return kg % 1 === 0 ? `${kg} kg` : `${kg.toFixed(1)} kg`;
+    }
+    return `${weight} g`;
+  };
+
   const loadUserAddress = useCallback(async () => {
     if (!jwt) return;
 
@@ -837,7 +855,7 @@ export default function CheckoutPage() {
                     <div key={`${item.productId}-${item.variantId}`} className="flex justify-between items-center">
                       <div className="flex-1">
                         <p className="font-medium text-[#2D2D2D] text-sm">{item.productTitle}</p>
-                        <p className="text-xs text-[#2D2D2D]/70">{item.weight}g × {item.quantity}</p>
+                        <p className="text-xs text-[#2D2D2D]/70">{formatItemUnit(item.productTitle, item.weight)} × {item.quantity}</p>
                       </div>
                       <span className="font-semibold text-[#4b2e19]">₹{item.price * item.quantity}</span>
                     </div>
