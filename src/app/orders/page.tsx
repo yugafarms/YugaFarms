@@ -348,14 +348,14 @@ export default function OrdersPage() {
                           >
                             View Details
                           </Link>
-                          {canCancelOrder(order) && (
+                          {/* {canCancelOrder(order) && (
                             <button
                               onClick={() => handleCancelOrder(order.id)}
                               className="bg-red-500 text-white px-6 py-2 rounded-xl font-semibold hover:bg-red-600 transition-colors duration-300 shadow-lg hover:shadow-xl"
                             >
                               Cancel Order
                             </button>
-                          )}
+                          )} */}
                         </div>
                       </div>
                     </div>
