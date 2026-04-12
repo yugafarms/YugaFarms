@@ -107,7 +107,7 @@ export default function LoginPage() {
   return (
     <>
       <TopBar />
-      <div className="min-h-[calc(100vh-200px)] bg-[#fdf7f2] flex items-center justify-center px-4 pt-32 pb-16">
+      <div className="min-h-[calc(100vh-200px)] bg-[#fdf7f2] flex items-center justify-center px-4 pt-16 md:pt-24 pb-12">
         <div className="w-full max-w-md bg-white/80 backdrop-blur rounded-2xl shadow-lg border border-[#2D2D2D]/10 p-8">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-[#4b2e19] mb-2">

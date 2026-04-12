@@ -46,11 +46,11 @@ export default function AboutPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
          {/* Hero Section with Video */}
-         <div className="relative pt-16 md:pt-20">
+         <div className="relative pt-0 md:pt-2">
            <div className="container mx-auto px-4">
-             <div className="text-center mb-16">
+             <div className="text-center mb-6 md:mb-10">
                <div className="inline-block relative">
                  <h1 className="text-5xl md:text-7xl font-[Pacifico] text-[#4b2e19] mb-4 transition-all duration-700 hover:scale-105">
                    Our <span className="text-[#f5d26a]">Story</span>
@@ -63,7 +63,7 @@ export default function AboutPage() {
              </div>
 
              {/* Video Section */}
-             <div className="max-w-5xl mx-auto mb-20">
+             <div className="max-w-5xl mx-auto mb-12 md:mb-16">
                <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-[#f5d26a]/20 transition-all duration-500 hover:shadow-3xl group">
                  <div className="aspect-video bg-gradient-to-br from-[#4b2e19] to-[#2f4f2f] flex items-center justify-center">
                    <video

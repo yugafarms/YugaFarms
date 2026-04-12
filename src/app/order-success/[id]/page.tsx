@@ -108,7 +108,7 @@ export default function OrderSuccessPage() {
     return (
       <>
         <TopBar />
-        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4b2e19] mx-auto mb-4"></div>
@@ -125,7 +125,7 @@ export default function OrderSuccessPage() {
     return (
       <>
         <TopBar />
-        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="text-center">
               <p className="text-red-600 text-lg mb-4">Error: {error || 'Order not found'}</p>
@@ -166,7 +166,7 @@ export default function OrderSuccessPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
         <div className="container mx-auto px-4 py-16">
           {/* Success Header */}
           <div className="text-center mb-12">

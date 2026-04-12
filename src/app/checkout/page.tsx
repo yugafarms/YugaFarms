@@ -473,7 +473,7 @@ export default function CheckoutPage() {
     return (
       <>
         <TopBar />
-        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
           <div className="flex items-center justify-center min-h-[50vh]">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4b2e19] mx-auto mb-4"></div>
@@ -489,18 +489,18 @@ export default function CheckoutPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-0">
-        <div className="container mx-auto px-4 py-8">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
+        <div className="container mx-auto px-4 py-4 md:py-6">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-4">Checkout</h1>
+          <div className="text-center mb-6 md:mb-8">
+            <h1 className="text-4xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-2 md:mb-4">Checkout</h1>
             <p className="text-lg text-[#2D2D2D]/70">
               Complete your order in {currentStep === 1 ? '2' : '1'} step{currentStep === 1 ? 's' : ''}
             </p>
           </div>
 
           {/* Progress Steps */}
-          <div className="flex justify-center mb-12">
+          <div className="flex justify-center mb-6 md:mb-8">
             <div className="flex items-center space-x-4">
               <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${currentStep >= 1 ? 'bg-[#4b2e19] border-[#4b2e19] text-white' : 'border-[#4b2e19]/30 text-[#4b2e19]/30'
                 }`}>

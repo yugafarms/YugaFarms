@@ -56,7 +56,7 @@ export default function ClientBlogPage({ slug }: { slug: string }) {
     return (
       <>
         <TopBar />
-        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] pt-12 pb-20 flex justify-center items-center">
+        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] pt-6 md:pt-10 pb-12 flex justify-center items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4b2e19]"></div>
         </main>
         <Footer />
@@ -68,7 +68,7 @@ export default function ClientBlogPage({ slug }: { slug: string }) {
     return (
       <>
         <TopBar />
-        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] pt-32 pb-20">
+        <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] pt-6 md:pt-10 pb-12">
           <div className="container mx-auto px-4 text-center max-w-2xl">
              <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-12 shadow-sm border border-[#4b2e19]/10">
                <h1 className="text-4xl font-bold text-[#4b2e19] mb-4">Oops!</h1>
@@ -87,8 +87,8 @@ export default function ClientBlogPage({ slug }: { slug: string }) {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] pb-20 relative">
-         <div className="container mx-auto px-4 max-w-6xl pt-8">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] pb-12 md:pb-16 relative">
+         <div className="container mx-auto px-4 max-w-6xl pt-4 md:pt-6">
             {/* Breadcrumb Back */}
             <Link href="/blogs" className="inline-flex items-center text-[#4b2e19]/70 hover:text-[#2f4f2f] mb-8 font-semibold transition-colors">
                <span className="mr-2">←</span> Back to all blogs

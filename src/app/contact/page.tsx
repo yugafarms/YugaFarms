@@ -164,11 +164,11 @@ export default function ContactPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
         {/* Hero Section */}
-        <div className="relative pt-16 md:pt-20">
+        <div className="relative pt-0 md:pt-2">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
+            <div className="text-center mb-6 md:mb-10">
               <div className="inline-block relative">
                 <h1 className="text-5xl md:text-7xl font-[Pacifico] text-[#4b2e19] mb-4 transition-all duration-700 hover:scale-105">
                   Get in <span className="text-[#f5d26a]">Touch</span>
@@ -191,7 +191,7 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Section */}
-        <section className="py-20 md:py-24 bg-[#eef2e9]">
+        <section className="py-12 md:py-16 bg-[#eef2e9]">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -389,10 +389,10 @@ export default function ContactPage() {
         </section>
 
         {/* Map Section (Optional) */}
-        <section className="py-20 md:py-24 bg-gradient-to-br from-[#fdf7f2] to-[#f8f4e6]">
+        <section className="py-12 md:py-16 bg-gradient-to-br from-[#fdf7f2] to-[#f8f4e6]">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-12">
+              <div className="text-center mb-8 md:mb-10">
                 <h2 className="text-3xl md:text-4xl font-bold text-[#4b2e19] mb-4">Find Us on Map</h2>
                 <p className="text-[#2D2D2D]/70 text-lg">Visit our location in Janouli, Palwal, Haryana</p>
               </div>

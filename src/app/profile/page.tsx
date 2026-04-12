@@ -154,7 +154,7 @@ export default function ProfilePage() {
   return (
     <>
       <TopBar />
-      <div className="min-h-[70vh] bg-[#fdf7f2] flex items-start justify-center px-4 py-8">
+      <div className="min-h-[70vh] bg-[#fdf7f2] flex items-start justify-center px-4 py-4 md:py-6">
         <div className="w-full max-w-3xl bg-white/80 backdrop-blur rounded-xl shadow border border-[#2D2D2D]/10 p-6">
           <h1 className="text-2xl font-semibold text-[#4b2e19]">Manage profile</h1>
           <p className="text-sm text-[#2D2D2D]/70">Update your personal details and addresses</p>

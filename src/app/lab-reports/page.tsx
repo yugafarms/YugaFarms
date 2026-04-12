@@ -8,11 +8,11 @@ export default function LabReportsPage() {
   return (
     <>
       <TopBar />
-      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-20">
+      <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
          {/* Hero Section */}
-         <div className="relative pt-16 md:pt-20">
+         <div className="relative pt-0 md:pt-2">
            <div className="container mx-auto px-4">
-             <div className="text-center mb-16">
+             <div className="text-center mb-6 md:mb-10">
                <div className="inline-block relative">
                  <h1 className="text-5xl md:text-7xl font-[Pacifico] text-[#4b2e19] mb-4">
                    Lab <span className="text-[#f5d26a]">Test Reports</span>
