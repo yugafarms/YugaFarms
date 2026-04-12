@@ -93,34 +93,41 @@ export default function OrdersPage() {
 
   const getPaymentStatusColor = (status: string) => {
     switch (status) {
-      case 'PAID': return 'text-green-600 bg-green-100';
-      case 'PENDING': return 'text-yellow-600 bg-yellow-100';
-      case 'FAILED': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
+      case 'PAID': return 'text-green-700 bg-green-50 border border-green-200/80';
+      case 'PENDING': return 'text-amber-800 bg-amber-50 border border-amber-200/80';
+      case 'FAILED': return 'text-red-700 bg-red-50 border border-red-200/80';
+      default: return 'text-[#2D2D2D]/70 bg-[#f5f5f5] border border-gray-200/80';
     }
   };
 
   const getOrderStatusColor = (status: string) => {
     switch (status) {
-      case 'CONFIRMED': return 'text-blue-600 bg-blue-100';
-      case 'PROCESSING': return 'text-purple-600 bg-purple-100';
-      case 'SHIPPED': return 'text-indigo-600 bg-indigo-100';
-      case 'DELIVERED': return 'text-green-600 bg-green-100';
-      case 'CANCELLED': return 'text-red-600 bg-red-100';
-      default: return 'text-yellow-600 bg-yellow-100';
+      case 'CONFIRMED': return 'text-sky-800 bg-sky-50 border border-sky-200/80';
+      case 'PROCESSING': return 'text-violet-800 bg-violet-50 border border-violet-200/80';
+      case 'SHIPPED': return 'text-indigo-800 bg-indigo-50 border border-indigo-200/80';
+      case 'DELIVERED': return 'text-green-800 bg-green-50 border border-green-200/80';
+      case 'CANCELLED': return 'text-red-800 bg-red-50 border border-red-200/80';
+      default: return 'text-amber-800 bg-amber-50 border border-amber-200/80';
     }
   };
 
-  const getOrderStatusIcon = (status: string) => {
-    switch (status) {
-      case 'PENDING': return '⏳';
-      case 'CONFIRMED': return '✅';
-      case 'PROCESSING': return '🔄';
-      case 'SHIPPED': return '🚚';
-      case 'DELIVERED': return '📦';
-      case 'CANCELLED': return '❌';
-      default: return '❓';
-    }
+  const orderStatusLabel = (status: string) => {
+    const map: Record<string, string> = {
+      PENDING: 'Pending',
+      CONFIRMED: 'Confirmed',
+      PROCESSING: 'Processing',
+      SHIPPED: 'Shipped',
+      DELIVERED: 'Delivered',
+      CANCELLED: 'Cancelled',
+    };
+    return map[status] ?? status;
+  };
+
+  const paymentLabel = (status: string) => {
+    if (status === 'PAID') return 'Paid';
+    if (status === 'PENDING') return 'Payment pending';
+    if (status === 'FAILED') return 'Failed';
+    return status;
   };
 
   const formatWeight = (title: string, weight: number): string => {
@@ -137,50 +144,6 @@ export default function OrdersPage() {
         return kg % 1 === 0 ? `${kg} kg` : `${kg.toFixed(1)} kg`;
       }
       return `${weight} g`;
-    }
-  };
-
-  const canCancelOrder = (order: Order) => {
-    return order.orderStatus === 'PENDING' || order.orderStatus === 'CONFIRMED';
-  };
-
-  const handleCancelOrder = async (orderId: number) => {
-    if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
-      return;
-    }
-
-    if (!jwt) {
-      alert('You must be logged in to cancel orders');
-      return;
-    }
-
-    try {
-      const response = await fetch(`${BACKEND}/api/orders/${orderId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${jwt}`
-        },
-        body: JSON.stringify({
-          data: {
-            orderStatus: 'CANCELLED'
-          }
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData?.error?.message || 'Failed to cancel order');
-      }
-
-      const result = await response.json();
-      alert('Order cancelled successfully');
-      
-      // Refresh orders list
-      fetchOrders();
-    } catch (error) {
-      console.error('Error cancelling order:', error);
-      alert(error instanceof Error ? error.message : 'Failed to cancel order');
     }
   };
 
@@ -227,142 +190,136 @@ export default function OrdersPage() {
     <>
       <TopBar />
       <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] relative overflow-hidden pt-6 md:pt-10">
-        <div className="container mx-auto px-4 py-8 md:py-16">
-          {/* Header */}
-          <div className="text-center mb-6 md:mb-12">
-            <h1 className="text-3xl md:text-5xl font-[Pacifico] text-[#4b2e19] mb-2 md:mb-4">My Orders</h1>
-            <p className="text-base md:text-lg text-[#2D2D2D]/70">
-              Track and manage your orders
+        <div className="container mx-auto px-3 sm:px-4 py-4 md:py-8 max-w-3xl lg:max-w-4xl">
+          <div className="mb-4 md:mb-6">
+            <h1 className="text-2xl md:text-4xl font-[Pacifico] text-[#4b2e19]">My orders</h1>
+            <p className="text-sm text-[#2D2D2D]/70 mt-0.5">
+              {orders.length === 0 ? 'Your purchases will show up here' : `${orders.length} order${orders.length === 1 ? '' : 's'}`}
             </p>
           </div>
 
           {orders.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-8xl mb-6">📦</div>
-              <h2 className="text-3xl font-bold text-[#4b2e19] mb-4">No Orders Yet</h2>
-              <p className="text-lg text-[#2D2D2D]/70 mb-8 max-w-md mx-auto">
-                You haven&apos;t placed any orders yet. Start shopping to see your orders here!
+            <div className="text-center py-10 md:py-14 bg-white/80 rounded-xl border border-[#4b2e19]/10 px-4">
+              <div className="text-5xl md:text-6xl mb-3">📦</div>
+              <h2 className="text-lg md:text-xl font-bold text-[#4b2e19] mb-2">No orders yet</h2>
+              <p className="text-sm text-[#2D2D2D]/70 mb-6 max-w-sm mx-auto">
+                When you buy something, you&apos;ll see it here with tracking and receipt.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link 
-                  href="/ghee" 
-                  className="bg-[#4b2e19] text-white px-8 py-3 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 shadow-lg hover:shadow-xl"
+              <div className="flex flex-col sm:flex-row gap-2 justify-center max-w-xs mx-auto sm:max-w-none">
+                <Link
+                  href="/ghee"
+                  className="bg-[#4b2e19] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#2f4f2f] transition-colors"
                 >
-                  Shop Ghee
+                  Shop ghee
                 </Link>
-                <Link 
-                  href="/honey" 
-                  className="bg-[#f5d26a] text-[#4b2e19] px-8 py-3 rounded-xl font-semibold hover:bg-[#e6b800] transition-colors duration-300 shadow-lg hover:shadow-xl"
+                <Link
+                  href="/honey"
+                  className="bg-[#f5d26a] text-[#4b2e19] px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#e6b800] transition-colors"
                 >
-                  Shop Honey
+                  Shop honey
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
+            <ul className="space-y-3 md:space-y-4">
               {orders.map((order) => (
-                <div key={order.id} className="bg-white rounded-2xl border border-[#4b2e19]/15 shadow-lg overflow-hidden">
-                  {/* Order Header */}
-                  <div className="p-6 border-b border-[#4b2e19]/10">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div>
-                        <h3 className="text-xl font-bold text-[#4b2e19]">Order #{order.orderNumber}</h3>
-                        <p className="text-sm text-[#2D2D2D]/70">
-                          Placed on {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </p>
+                <li key={order.id}>
+                  <article className="bg-white rounded-xl border border-[#4b2e19]/12 shadow-sm overflow-hidden">
+                    {/* Top: meta + total + CTA */}
+                    <div className="px-3 py-3 md:px-4 md:py-3.5 border-b border-[#4b2e19]/8 bg-[#fdf7f2]/40">
+                      <div className="flex flex-wrap items-start justify-between gap-2 gap-y-1">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-[#4b2e19] text-sm md:text-base truncate">
+                            #{order.orderNumber}
+                          </p>
+                          <p className="text-[11px] md:text-xs text-[#2D2D2D]/65">
+                            {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                            <span className="hidden sm:inline">
+                              {' · '}
+                              {new Date(order.createdAt).toLocaleTimeString('en-IN', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="text-[10px] uppercase tracking-wide text-[#2D2D2D]/50">Total</p>
+                          <p className="text-base md:text-lg font-bold text-[#4b2e19]">₹{Number(order.total).toFixed(2)}</p>
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-3">
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getPaymentStatusColor(order.paymentStatus)}`}>
-                          Payment: {order.paymentStatus}
+                      <div className="flex flex-wrap gap-1.5 mt-2.5">
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-xs font-medium ${getOrderStatusColor(order.orderStatus)}`}>
+                          {orderStatusLabel(order.orderStatus)}
                         </span>
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getOrderStatusColor(order.orderStatus)}`}>
-                          {getOrderStatusIcon(order.orderStatus)} {order.orderStatus}
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-xs font-medium ${getPaymentStatusColor(order.paymentStatus)}`}>
+                          {paymentLabel(order.paymentStatus)}
                         </span>
-                        <span className="px-3 py-1 rounded-full text-sm font-semibold bg-[#4b2e19]/10 text-[#4b2e19]">
-                          {order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Online Payment'}
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] md:text-xs font-medium bg-[#4b2e19]/8 text-[#4b2e19] border border-[#4b2e19]/15">
+                          {order.paymentMethod === 'COD' ? 'COD' : 'Online'}
                         </span>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Order Items */}
-                  <div className="p-6">
-                    <h4 className="text-lg font-semibold text-[#4b2e19] mb-4">Order Items</h4>
-                    <div className="space-y-3">
+                    {/* Line items — compact */}
+                    <div className="px-3 py-2 md:px-4 md:py-2.5 divide-y divide-[#4b2e19]/6">
                       {order.items.map((item, index) => (
-                        <div key={index} className="flex items-center gap-4 p-3 bg-[#f8f4e6]/50 rounded-xl">
-                          <div className="w-12 h-12 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-lg flex items-center justify-center overflow-hidden">
+                        <div key={index} className="flex items-center gap-2.5 py-2 first:pt-0 last:pb-0">
+                          <div className="w-9 h-9 md:w-10 md:h-10 shrink-0 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-md overflow-hidden flex items-center justify-center">
                             {item.productImage ? (
-                              <Image 
-                                src={item.productImage} 
+                              <Image
+                                src={item.productImage}
                                 alt={item.productTitle}
-                                width={48}
-                                height={48}
+                                width={40}
+                                height={40}
                                 className="w-full h-full object-cover"
                               />
                             ) : (
-                              <span className="text-lg">🛒</span>
+                              <span className="text-sm">🛒</span>
                             )}
                           </div>
-                          <div className="flex-1">
-                            <h5 className="font-medium text-[#4b2e19]">{item.productTitle}</h5>
-                            <p className="text-sm text-[#2D2D2D]/70">{formatWeight(item.productTitle, item.weight)} × {item.quantity}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs md:text-sm font-medium text-[#2D2D2D] line-clamp-2 leading-snug">
+                              {item.productTitle}
+                            </p>
+                            <p className="text-[10px] md:text-xs text-[#2D2D2D]/55">
+                              {formatWeight(item.productTitle, item.weight)} × {item.quantity}
+                            </p>
                           </div>
-                          <div className="text-right">
-                            <p className="font-semibold text-[#4b2e19]">₹{item.price * item.quantity}</p>
-                            <p className="text-sm text-[#2D2D2D]/70">₹{item.price} each</p>
-                          </div>
+                          <p className="text-xs md:text-sm font-semibold text-[#4b2e19] shrink-0 tabular-nums">
+                            ₹{item.price * item.quantity}
+                          </p>
                         </div>
                       ))}
                     </div>
-                  </div>
 
-                  {/* Order Summary */}
-                  <div className="p-6 bg-[#f8f4e6]/30 border-t border-[#4b2e19]/10">
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                      <div className="space-y-1">
-                        <p className="text-sm text-[#2D2D2D]/70">
-                          <span className="font-medium">Shipping to:</span> {order.shippingAddress.city}, {order.shippingAddress.state}
-                        </p>
-                        {order.notes && (
-                          <p className="text-sm text-[#2D2D2D]/70">
-                            <span className="font-medium">Notes:</span> {order.notes}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
-                          <p className="text-sm text-[#2D2D2D]/70">Total Amount</p>
-                          <p className="text-2xl font-bold text-[#4b2e19]">₹{order.total}</p>
-                        </div>
-                        <div className="flex gap-3">
-                          <Link 
-                            href={`/order-success/${order.id}`}
-                            className="bg-[#4b2e19] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#2f4f2f] transition-colors duration-300 shadow-lg hover:shadow-xl"
-                          >
-                            View Details
-                          </Link>
-                          {/* {canCancelOrder(order) && (
-                            <button
-                              onClick={() => handleCancelOrder(order.id)}
-                              className="bg-red-500 text-white px-6 py-2 rounded-xl font-semibold hover:bg-red-600 transition-colors duration-300 shadow-lg hover:shadow-xl"
-                            >
-                              Cancel Order
-                            </button>
-                          )} */}
-                        </div>
-                      </div>
+                    {/* Ship + action */}
+                    <div className="px-3 py-2.5 md:px-4 md:py-3 bg-[#f8f4e6]/25 border-t border-[#4b2e19]/8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <p className="text-[11px] md:text-xs text-[#2D2D2D]/70 min-w-0">
+                        <span className="text-[#2D2D2D]/50">Ship to · </span>
+                        {order.shippingAddress.city}, {order.shippingAddress.state}
+                      </p>
+                      <Link
+                        href={`/order-success/${order.id}`}
+                        className="shrink-0 inline-flex justify-center items-center bg-[#4b2e19] text-white px-4 py-2 rounded-lg text-xs md:text-sm font-semibold hover:bg-[#2f4f2f] transition-colors w-full sm:w-auto"
+                      >
+                        View receipt
+                      </Link>
                     </div>
-                  </div>
-                </div>
+                    {order.notes && (
+                      <p className="px-3 py-2 md:px-4 text-[11px] text-[#2D2D2D]/65 border-t border-[#4b2e19]/6 bg-white">
+                        <span className="font-medium text-[#2D2D2D]/80">Note: </span>
+                        {order.notes}
+                      </p>
+                    )}
+                  </article>
+                </li>
               ))}
-            </div>
+            </ul>
           )}
         </div>
       </main>
