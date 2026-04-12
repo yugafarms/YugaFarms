@@ -366,19 +366,30 @@ export default function TopBar() {
                         />
                     </Link>
 
-                    {/* Cart */}
-                    <button
-                        onClick={() => setIsCartOpen(true)}
-                        className="relative flex items-center justify-center w-9 h-9 rounded-full text-[#4b2e19] hover:bg-[#4b2e19]/8 transition-colors duration-200"
-                        aria-label="Cart"
-                    >
-                        <IconCart />
-                        {totalItems > 0 && (
-                            <span className="absolute -top-0.5 -right-0.5 bg-[#4b2e19] text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center leading-none">
-                                {totalItems > 9 ? '9+' : totalItems}
-                            </span>
+                    <div className="flex items-center gap-1.5 shrink-0 z-[51]">
+                        {user ? (
+                            <ProfileMenu username={user.username} email={user.email} onLogout={logout} />
+                        ) : (
+                            <Link
+                                href="/login"
+                                className="text-xs bg-[#4b2e19] text-[#f5d26a] px-3 py-1.5 rounded-full font-medium hover:opacity-90"
+                            >
+                                Login
+                            </Link>
                         )}
-                    </button>
+                        <button
+                            onClick={() => setIsCartOpen(true)}
+                            className="relative flex items-center justify-center w-9 h-9 rounded-full text-[#4b2e19] hover:bg-[#4b2e19]/8 transition-colors duration-200"
+                            aria-label="Cart"
+                        >
+                            <IconCart />
+                            {totalItems > 0 && (
+                                <span className="absolute -top-0.5 -right-0.5 bg-[#4b2e19] text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center leading-none">
+                                    {totalItems > 9 ? '9+' : totalItems}
+                                </span>
+                            )}
+                        </button>
+                    </div>
                 </div>
 
             </header>
@@ -400,6 +411,26 @@ export default function TopBar() {
             >
                 {/* Category Links */}
                 <nav className="flex-1">
+                    {user && (
+                        <div className="border-b border-gray-200 bg-white">
+                            <Link
+                                href="/profile"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-4 px-5 py-4 border-b border-gray-100 hover:bg-[#fdf7f2] transition-colors"
+                            >
+                                <span className="text-[#4b2e19]/70"><IconAccount /></span>
+                                <span className="text-[15px] font-medium text-[#2D2D2D]">Manage profile</span>
+                            </Link>
+                            <Link
+                                href="/orders"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center gap-4 px-5 py-4 border-b border-gray-200 hover:bg-[#fdf7f2] transition-colors"
+                            >
+                                <span className="text-[#4b2e19]/70"><IconCart /></span>
+                                <span className="text-[15px] font-medium text-[#2D2D2D]">My orders</span>
+                            </Link>
+                        </div>
+                    )}
                     {menuCategories.map((item, idx) => {
                         // Shop: accordion with sub-items
                         if (item.subItems) {
@@ -562,7 +593,7 @@ function ProfileMenu({ username, email, onLogout }: { username: string; email: s
                 {initials}
             </button>
             {open && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden z-[70]">
+                <div className="absolute right-0 mt-2 w-52 bg-white border border-gray-100 rounded-xl shadow-xl overflow-hidden z-[80]">
                     <div className="px-4 py-3 border-b border-gray-100">
                         <div className="text-sm font-semibold text-[#4b2e19] truncate">{username}</div>
                         <div className="text-xs text-gray-400 truncate">{email}</div>
