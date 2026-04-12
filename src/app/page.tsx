@@ -477,7 +477,13 @@ export default function Home() {
                 <h2 className="text-2xl md:text-3xl font-bold text-[#4b2e19]">Our Top Picks</h2>
                 <div className="absolute -bottom-1 left-0 w-16 h-0.5 bg-[#f5d26a] rounded-full"></div>
               </div>
-              <Link href="/ghee" className="text-[#2f4f2f] hover:text-[#4b2e19] transition-colors duration-300 font-medium">View all</Link>
+              <Link
+                href="/ghee"
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#4b2e19] px-4 py-2.5 text-sm font-semibold text-white shadow-md ring-2 ring-[#4b2e19]/20 ring-offset-2 ring-offset-[#eef2e9] transition-all duration-300 hover:bg-[#2f4f2f] hover:shadow-lg hover:ring-[#f5d26a]/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f5d26a] focus-visible:ring-offset-2"
+              >
+                View all
+                <span aria-hidden className="text-[#f5d26a]">→</span>
+              </Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
               {loading ? (
