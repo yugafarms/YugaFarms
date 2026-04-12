@@ -101,10 +101,10 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
       {/* Drawer */}
       <div
         className={`fixed z-[101] bg-white transition-transform duration-300 ease-in-out shadow-2xl flex min-h-0 flex-col ${
-          // Mobile: bottom drawer — taller viewport + min-h-0 for scroll
+          // Mobile: bottom sheet
           'w-full h-[92dvh] max-h-[92dvh] bottom-0 rounded-t-2xl md:rounded-none ' +
-          // Desktop: right sidebar
-          'md:w-96 md:right-0 md:top-0 md:h-full ' +
+          // Desktop: pin top+bottom so the panel is always full viewport height (no gap underneath)
+          'md:w-96 md:right-0 md:top-0 md:bottom-0 md:h-auto md:max-h-none ' +
           // Transform states
           (isOpen
             ? 'translate-y-0 md:translate-x-0'

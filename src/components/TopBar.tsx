@@ -411,6 +411,20 @@ export default function TopBar() {
             >
                 {/* Category Links */}
                 <nav className="flex-1">
+                    <Link
+                        href="/"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center justify-between px-5 py-4 border-b border-gray-200 bg-white hover:bg-[#fdf7f2] transition-colors duration-150 group"
+                    >
+                        <div className="flex items-center gap-4">
+                            <span className="text-[#4b2e19]/70 group-hover:text-[#4b2e19] transition-colors">
+                                <IconHome />
+                            </span>
+                            <span className="text-[15px] font-medium text-[#2D2D2D] group-hover:text-[#4b2e19] transition-colors">
+                                Home
+                            </span>
+                        </div>
+                    </Link>
                     {user && (
                         <div className="border-b border-gray-200 bg-white">
                             <Link
