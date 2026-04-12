@@ -106,8 +106,6 @@ export default function CheckoutPage() {
 
   // Track if OTP modal has been shown to prevent repeated displays
   const otpModalShownRef = useRef(false);
-  // Ref for payment section to scroll to
-  const paymentSectionRef = useRef<HTMLDivElement>(null);
 
   // Show OTP modal if user is not logged in
   useEffect(() => {
@@ -181,19 +179,6 @@ export default function CheckoutPage() {
       console.error('Error loading user address:', error);
     }
   }, [jwt]);
-
-  // Scroll to payment section when step changes to 2
-  useEffect(() => {
-    if (currentStep === 2 && paymentSectionRef.current) {
-      // Small delay to ensure DOM is updated
-      setTimeout(() => {
-        paymentSectionRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
-      }, 100);
-    }
-  }, [currentStep]);
 
   useEffect(() => {
     // Redirect if cart is empty
@@ -730,7 +715,7 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               ) : (
-                <div ref={paymentSectionRef} className="bg-white rounded-xl md:rounded-2xl border border-[#4b2e19]/15 shadow-md md:shadow-lg p-4 md:p-8">
+                <div className="bg-white rounded-xl md:rounded-2xl border border-[#4b2e19]/15 shadow-md md:shadow-lg p-4 md:p-8">
                   <button
                     type="button"
                     onClick={() => setCurrentStep(1)}
