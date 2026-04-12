@@ -31,7 +31,10 @@ export default function CouponApplyBlock({
 
   return (
     <div className={className}>
-      <label htmlFor={inputId} className="block text-sm font-semibold text-[#4b2e19] mb-2">
+      <label
+        htmlFor={inputId}
+        className={`block font-semibold text-[#4b2e19] ${isDrawer ? "text-xs mb-1" : "text-sm mb-2"}`}
+      >
         Have a coupon?
       </label>
       {!isDrawer && (
@@ -41,7 +44,7 @@ export default function CouponApplyBlock({
             : "Apply a code — it stays saved for checkout."}
         </p>
       )}
-      <div className="flex gap-2">
+      <div className={`flex gap-1.5 ${isDrawer ? "md:gap-2" : "gap-2"}`}>
         <input
           id={inputId}
           type="text"
@@ -49,24 +52,30 @@ export default function CouponApplyBlock({
           onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
           placeholder="e.g. NEW5"
           disabled={couponVerifying}
-          className="flex-1 border border-[#4b2e19]/20 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 disabled:opacity-60"
+          className={`flex-1 border border-[#4b2e19]/20 rounded-md focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50 disabled:opacity-60 ${
+            isDrawer
+              ? "px-2 py-1.5 text-xs min-w-0"
+              : "rounded-lg px-3 py-2.5 text-sm"
+          }`}
         />
         <button
           type="button"
           onClick={() => verifyCoupon()}
           disabled={couponVerifying || totalPrice <= 0}
-          className="bg-[#4b2e19] text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#2f4f2f] transition-colors disabled:opacity-50 shrink-0"
+          className={`bg-[#4b2e19] text-white rounded-md font-semibold hover:bg-[#2f4f2f] transition-colors disabled:opacity-50 shrink-0 ${
+            isDrawer ? "px-3 py-1.5 text-xs" : "rounded-lg px-4 py-2.5 text-sm"
+          }`}
         >
           {couponVerifying ? "…" : "Apply"}
         </button>
       </div>
-      <div className="flex flex-wrap gap-2 mt-3 items-center">
+      <div className={`flex flex-wrap items-center ${isDrawer ? "gap-1.5 mt-1.5" : "gap-2 mt-3"}`}>
         <button
           type="button"
           onClick={() => verifyCoupon("NEW5")}
           disabled={couponVerifying || totalPrice <= 0}
-          className={`text-xs font-semibold px-3 py-1.5 rounded-full border border-[#4b2e19]/20 bg-[#f5d26a]/20 text-[#4b2e19] hover:bg-[#f5d26a]/35 transition-colors disabled:opacity-50 ${
-            isDrawer ? "" : ""
+          className={`font-semibold rounded-full border border-[#4b2e19]/20 bg-[#f5d26a]/20 text-[#4b2e19] hover:bg-[#f5d26a]/35 transition-colors disabled:opacity-50 ${
+            isDrawer ? "text-[10px] px-2 py-0.5" : "text-xs px-3 py-1.5"
           }`}
         >
           Use NEW5
@@ -75,14 +84,22 @@ export default function CouponApplyBlock({
           <button
             type="button"
             onClick={removeCoupon}
-            className="text-xs font-medium text-red-600 hover:text-red-800"
+            className={`font-medium text-red-600 hover:text-red-800 ${isDrawer ? "text-[10px]" : "text-xs"}`}
           >
             Remove
           </button>
         )}
       </div>
-      {couponError && <p className="text-red-500 text-xs mt-2">{couponError}</p>}
-      {couponSuccess && <p className="text-green-600 text-xs mt-2">{couponSuccess}</p>}
+      {couponError && (
+        <p className={`text-red-500 ${isDrawer ? "text-[10px] mt-1 leading-tight" : "text-xs mt-2"}`}>{couponError}</p>
+      )}
+      {couponSuccess && (
+        <p
+          className={`text-green-600 ${isDrawer ? "text-[10px] mt-1 leading-tight line-clamp-2" : "text-xs mt-2"}`}
+        >
+          {couponSuccess}
+        </p>
+      )}
     </div>
   );
 }

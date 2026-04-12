@@ -23,7 +23,10 @@ export type CartContextType = {
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
   showCheckoutOTP: () => void;
-  addToCart: (item: Omit<CartItem, 'quantity'>) => Promise<void>;
+  addToCart: (
+    item: Omit<CartItem, "quantity">,
+    options?: { openCart?: boolean }
+  ) => Promise<void>;
   removeFromCart: (productId: number, variantId: number) => Promise<void>;
   updateQuantity: (productId: number, variantId: number, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
@@ -355,55 +358,62 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user, jwt, refreshUser]);
 
-  const addToCartDirectly = useCallback(async (newItem: Omit<CartItem, 'quantity'>) => {
-    try {
-      setIsLoading(true);
+  const addToCartDirectly = useCallback(
+    async (
+      newItem: Omit<CartItem, "quantity">,
+      options?: { openCart?: boolean }
+    ) => {
+      try {
+        setIsLoading(true);
 
-      const existingItemIndex = items.findIndex(
-        item => item.productId === newItem.productId && item.variantId === newItem.variantId
-      );
-
-      let updatedItems: CartItem[];
-
-      if (existingItemIndex >= 0) {
-        // Update existing item quantity
-        updatedItems = items.map((item, index) =>
-          index === existingItemIndex
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
+        const existingItemIndex = items.findIndex(
+          item => item.productId === newItem.productId && item.variantId === newItem.variantId
         );
-      } else {
-        // Add new item
-        updatedItems = [...items, { ...newItem, quantity: 1 }];
+
+        let updatedItems: CartItem[];
+
+        if (existingItemIndex >= 0) {
+          // Update existing item quantity
+          updatedItems = items.map((item, index) =>
+            index === existingItemIndex
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          );
+        } else {
+          // Add new item
+          updatedItems = [...items, { ...newItem, quantity: 1 }];
+        }
+
+        setItems(updatedItems);
+
+        // Meta Pixel AddToCart tracking
+        if (typeof window !== "undefined" && (window as any).fbq) {
+          (window as any).fbq('track', 'AddToCart', {
+            value: newItem.price,
+            currency: 'INR',
+            content_name: newItem.productTitle,
+            content_ids: [newItem.productId.toString()],
+            content_type: 'product',
+          });
+        }
+
+        // Save to backend if user is logged in
+        if (user && jwt) {
+          await saveCartToBackend(updatedItems);
+        }
+
+        if (options?.openCart !== false) {
+          setIsCartOpen(true);
+        }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+        throw error;
+      } finally {
+        setIsLoading(false);
       }
-
-      setItems(updatedItems);
-
-      // Meta Pixel AddToCart tracking
-      if (typeof window !== "undefined" && (window as any).fbq) {
-        (window as any).fbq('track', 'AddToCart', {
-          value: newItem.price,
-          currency: 'INR',
-          content_name: newItem.productTitle,
-          content_ids: [newItem.productId.toString()],
-          content_type: 'product',
-        });
-      }
-
-      // Save to backend if user is logged in
-      if (user && jwt) {
-        await saveCartToBackend(updatedItems);
-      }
-
-      // Open cart drawer after adding item
-      setIsCartOpen(true);
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      throw error;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [items, user, jwt, saveCartToBackend]);
+    },
+    [items, user, jwt, saveCartToBackend]
+  );
 
   const handleOTPSuccess = useCallback(async (phone: string) => {
     setUserPhone(phone);
@@ -423,10 +433,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }
   }, [pendingCartItem, addToCartDirectly, items.length]);
 
-  const addToCart = useCallback(async (newItem: Omit<CartItem, 'quantity'>) => {
-    // Allow adding to cart without login - OTP will be asked at checkout
-    await addToCartDirectly(newItem);
-  }, [addToCartDirectly]);
+  const addToCart = useCallback(
+    async (
+      newItem: Omit<CartItem, "quantity">,
+      options?: { openCart?: boolean }
+    ) => {
+      await addToCartDirectly(newItem, options);
+    },
+    [addToCartDirectly]
+  );
 
   const removeFromCart = useCallback(async (productId: number, variantId: number) => {
     try {

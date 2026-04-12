@@ -18,7 +18,6 @@ export default function CartPage() {
     isLoading,
     updateQuantity,
     removeFromCart,
-    clearCart,
     discount,
   } = useCart();
   const { user } = useAuth();
@@ -45,19 +44,6 @@ export default function CartPage() {
       console.error("Error removing item:", error);
     } finally {
       setIsUpdating(false);
-    }
-  };
-
-  const handleClearCart = async () => {
-    if (window.confirm("Are you sure you want to clear your cart?")) {
-      try {
-        setIsUpdating(true);
-        await clearCart();
-      } catch (error) {
-        console.error("Error clearing cart:", error);
-      } finally {
-        setIsUpdating(false);
-      }
     }
   };
 
@@ -202,15 +188,13 @@ export default function CartPage() {
                 </div>
               ))}
 
-              {/* Clear Cart Button */}
               <div className="text-center">
-                <button
-                  onClick={handleClearCart}
-                  disabled={isUpdating}
-                  className="text-red-600 hover:text-red-800 transition-colors duration-300 disabled:opacity-50"
+                <Link
+                  href="/"
+                  className="text-[#4b2e19] hover:text-[#2f4f2f] font-semibold transition-colors duration-300"
                 >
-                  Clear Cart
-                </button>
+                  Continue Shopping
+                </Link>
               </div>
             </div>
 

@@ -56,7 +56,7 @@ export default function ProductDetailPage() {
   const [isLiked, setIsLiked] = useState(false);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [openInfoTab, setOpenInfoTab] = useState<string | null>('description');
-  const { addToCart, isLoading: cartLoading, items: cartItems } = useCart();
+  const { addToCart, isLoading: cartLoading, items: cartItems, setIsCartOpen } = useCart();
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -162,17 +162,19 @@ export default function ProductDetailPage() {
     if (!product || !selectedVariant) return;
 
     try {
-      // Add to cart first
-      await addToCart({
-        productId: product.id,
-        variantId: selectedVariant.id,
-        price: selectedVariant.Price - (selectedVariant.Discount || 0),
-        weight: selectedVariant.Weight,
-        productTitle: product.Title,
-        productImage: product.Image && product.Image.length > 0 ? `${BACKEND}${product.Image[0].url}` : undefined,
-      });
+      setIsCartOpen(false);
+      await addToCart(
+        {
+          productId: product.id,
+          variantId: selectedVariant.id,
+          price: selectedVariant.Price - (selectedVariant.Discount || 0),
+          weight: selectedVariant.Weight,
+          productTitle: product.Title,
+          productImage: product.Image && product.Image.length > 0 ? `${BACKEND}${product.Image[0].url}` : undefined,
+        },
+        { openCart: false }
+      );
 
-      // Then redirect to checkout
       router.push('/checkout');
     } catch (error) {
       console.error("Error during buy now:", error);
