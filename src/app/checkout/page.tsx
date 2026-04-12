@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
+import CouponApplyBlock from "@/components/CouponApplyBlock";
 import { useCart } from "@/app/context/CartContext";
 import { useAuth } from "@/app/context/AuthContext";
 
@@ -73,7 +74,14 @@ declare global {
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, totalPrice, clearCart, showCheckoutOTP } = useCart();
+  const {
+    items,
+    totalPrice,
+    clearCart,
+    showCheckoutOTP,
+    discount,
+    appliedCoupon,
+  } = useCart();
   const { user, jwt } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -138,13 +146,6 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('RAZORPAY');
   const [orderNotes, setOrderNotes] = useState('');
 
-  // Coupon state
-  const [couponCode, setCouponCode] = useState('');
-  const [couponError, setCouponError] = useState('');
-  const [couponSuccess, setCouponSuccess] = useState('');
-  const [discount, setDiscount] = useState(0);
-  const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
-
   // Calculate totals
   const tax = 0;
   const shipping = 0;
@@ -195,80 +196,6 @@ export default function CheckoutPage() {
       console.error('Error loading user address:', error);
     }
   }, [jwt]);
-
-  const verifyCoupon = async (codeOverride?: string) => {
-    const codeToVerify = (codeOverride ?? couponCode).trim().toUpperCase();
-    setCouponError('');
-    setCouponSuccess('');
-
-    if (!codeToVerify) {
-      setCouponError('Please enter a coupon code');
-      setDiscount(0);
-      setAppliedCoupon(null);
-      return;
-    }
-
-    try {
-      const response = await fetch(`${BACKEND}/api/coupons?filters[Code][$eq]=${codeToVerify}`, {
-        headers: {
-          'Authorization': `Bearer ${jwt}` // Using jwt if available, though finding coupons might be public depending on Strapi permissions
-        }
-      });
-
-      const data = await response.json();
-
-      if (!data.data || data.data.length === 0) {
-        setCouponError('Invalid coupon code');
-        setDiscount(0);
-        setAppliedCoupon(null);
-        return;
-      }
-
-      const coupon = data.data[0]; // Assuming Code is unique
-      const couponAttributes = coupon.attributes || coupon; // Handle both structure formats if flattening is enabled/disabled
-      const couponId = coupon.id;
-
-      // Validate Expiry
-      if (new Date() > new Date(couponAttributes.Expiry)) {
-        setCouponError('Coupon has expired');
-        setDiscount(0);
-        setAppliedCoupon(null);
-        return;
-      }
-
-      // Validate Count
-      if (couponAttributes.Count <= 0) {
-        setCouponError('Coupon usage limit reached');
-        setDiscount(0);
-        setAppliedCoupon(null);
-        return;
-      }
-
-      // Calculate Discount
-      let calculatedDiscount = 0;
-      const couponValue = Number(couponAttributes.Value);
-
-      if (couponAttributes.Percentage) {
-        calculatedDiscount = (totalPrice * couponValue) / 100;
-      } else {
-        calculatedDiscount = couponValue;
-      }
-
-      // Cap discount to subtotal
-      calculatedDiscount = Math.min(calculatedDiscount, totalPrice);
-
-      setDiscount(calculatedDiscount);
-      setAppliedCoupon({ id: couponId, ...couponAttributes });
-      setCouponSuccess(`Coupon applied! You saved ₹${calculatedDiscount.toFixed(2)}`);
-      setCouponCode(codeToVerify);
-
-    } catch (error) {
-      console.error('Coupon verification error:', error);
-      setCouponError('Failed to verify coupon');
-      setDiscount(0);
-      setAppliedCoupon(null);
-    }
-  };
 
   // Scroll to payment section when step changes to 2
   useEffect(() => {
@@ -589,39 +516,7 @@ export default function CheckoutPage() {
 
           {/* Mobile-first coupon access */}
           <div className="lg:hidden bg-white rounded-2xl border border-[#4b2e19]/15 shadow-lg p-4 mb-6">
-            <label htmlFor="coupon-code-mobile" className="block text-sm font-semibold text-[#4b2e19] mb-2">
-              Have a coupon?
-            </label>
-            <p className="text-xs text-[#2D2D2D]/70 mb-3">
-              Apply now before placing your order.
-            </p>
-            <div className="flex gap-2">
-              <input
-                id="coupon-code-mobile"
-                type="text"
-                value={couponCode}
-                onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                placeholder="Enter coupon code (e.g. NEW5)"
-                className="flex-1 border border-[#4b2e19]/20 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50"
-              />
-              <button
-                onClick={() => verifyCoupon()}
-                className="bg-[#4b2e19] text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#2f4f2f] transition-colors"
-              >
-                Apply
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-3">
-              <button
-                type="button"
-                onClick={() => verifyCoupon('NEW5')}
-                className="text-xs font-semibold px-3 py-1.5 rounded-full border border-[#4b2e19]/20 bg-[#f5d26a]/20 text-[#4b2e19] hover:bg-[#f5d26a]/35 transition-colors"
-              >
-                Use NEW5
-              </button>
-            </div>
-            {couponError && <p className="text-red-500 text-xs mt-2">{couponError}</p>}
-            {couponSuccess && <p className="text-green-600 text-xs mt-2">{couponSuccess}</p>}
+            <CouponApplyBlock variant="checkout" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -901,40 +796,7 @@ export default function CheckoutPage() {
                   ))}
 
                   <div className="hidden lg:block border-t border-[#4b2e19]/10 pt-4 pb-2">
-                    <label htmlFor="coupon-code" className="block text-sm font-semibold text-[#4b2e19] mb-2">
-                      Have a coupon?
-                    </label>
-                    <p className="text-xs text-[#2D2D2D]/70 mb-3">
-                      Enter your code below or tap a suggested coupon.
-                    </p>
-                    <div className="flex gap-2">
-                      <input
-                        id="coupon-code"
-                        type="text"
-                        value={couponCode}
-                        onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                        placeholder="Enter coupon code (e.g. NEW5)"
-                        className="flex-1 border border-[#4b2e19]/20 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#f5d26a]/50"
-                        aria-describedby="coupon-helper-text"
-                      />
-                      <button
-                        onClick={() => verifyCoupon()}
-                        className="bg-[#4b2e19] text-white px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#2f4f2f] transition-colors"
-                      >
-                        Apply
-                      </button>
-                    </div>
-                    <div id="coupon-helper-text" className="flex flex-wrap gap-2 mt-3">
-                      <button
-                        type="button"
-                        onClick={() => verifyCoupon('NEW5')}
-                        className="text-xs font-semibold px-3 py-1.5 rounded-full border border-[#4b2e19]/20 bg-[#f5d26a]/20 text-[#4b2e19] hover:bg-[#f5d26a]/35 transition-colors"
-                      >
-                        Use NEW5
-                      </button>
-                    </div>
-                    {couponError && <p className="text-red-500 text-xs mt-1">{couponError}</p>}
-                    {couponSuccess && <p className="text-green-600 text-xs mt-1">{couponSuccess}</p>}
+                    <CouponApplyBlock variant="checkout" />
                   </div>
 
                   <div className="border-t border-[#4b2e19]/10 pt-4 space-y-2">

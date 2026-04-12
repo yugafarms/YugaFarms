@@ -1,6 +1,7 @@
 'use client'
 import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
+import CouponApplyBlock from "@/components/CouponApplyBlock";
 import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
 import Image from "next/image";
@@ -10,7 +11,16 @@ import { useState } from "react";
 // const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
 export default function CartPage() {
-  const { items, totalItems, totalPrice, isLoading, updateQuantity, removeFromCart, clearCart } = useCart();
+  const {
+    items,
+    totalItems,
+    totalPrice,
+    isLoading,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    discount,
+  } = useCart();
   const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -209,11 +219,19 @@ export default function CartPage() {
               <div className="bg-white rounded-2xl border border-[#4b2e19]/15 shadow-lg p-6 sticky top-24">
                 <h2 className="text-2xl font-bold text-[#4b2e19] mb-6">Order Summary</h2>
 
+                <CouponApplyBlock variant="page" className="mb-6 pb-6 border-b border-[#4b2e19]/10" />
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between">
                     <span className="text-[#2D2D2D]/70">Items ({totalItems})</span>
                     <span className="font-semibold">₹{totalPrice}</span>
                   </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span className="text-[#2D2D2D]/70">Discount</span>
+                      <span className="font-semibold">-₹{discount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-[#2D2D2D]/70">Shipping</span>
                     <span className="font-semibold text-green-600">₹0</span>
@@ -225,7 +243,9 @@ export default function CartPage() {
                   <div className="border-t border-[#4b2e19]/10 pt-4">
                     <div className="flex justify-between">
                       <span className="text-xl font-bold text-[#4b2e19]">Total</span>
-                      <span className="text-xl font-bold text-[#4b2e19]">₹{totalPrice}</span>
+                      <span className="text-xl font-bold text-[#4b2e19]">
+                        ₹{Math.max(0, totalPrice - discount).toFixed(2)}
+                      </span>
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 'use client'
 import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
+import CouponApplyBlock from "@/components/CouponApplyBlock";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -11,7 +12,17 @@ interface CartDrawerProps {
 }
 
 export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
-  const { items, totalItems, totalPrice, isLoading, updateQuantity, removeFromCart, clearCart, showCheckoutOTP } = useCart();
+  const {
+    items,
+    totalItems,
+    totalPrice,
+    isLoading,
+    updateQuantity,
+    removeFromCart,
+    clearCart,
+    showCheckoutOTP,
+    discount,
+  } = useCart();
   const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -89,7 +100,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
   };
 
   const tax = 0;
-  const finalTotal = totalPrice + tax;
+  const finalTotal = Math.max(0, totalPrice + tax - discount);
 
   return (
     <>
@@ -223,11 +234,19 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         {items.length > 0 && (
           <div className="border-t border-[#4b2e19]/10 bg-white p-4 md:p-6 space-y-4">
             {/* Order Summary */}
+            <CouponApplyBlock variant="drawer" className="pb-2" />
+
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-[#2D2D2D]/70">Items ({totalItems})</span>
                 <span className="font-semibold">₹{totalPrice}</span>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span className="text-[#2D2D2D]/70">Discount</span>
+                  <span className="font-semibold">-₹{discount.toFixed(2)}</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm">
                 <span className="text-[#2D2D2D]/70">Shipping</span>
                 <span className="font-semibold text-green-600">₹0</span>
@@ -239,7 +258,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
               <div className="border-t border-[#4b2e19]/10 pt-2">
                 <div className="flex justify-between">
                   <span className="font-bold text-[#4b2e19]">Total</span>
-                  <span className="font-bold text-[#4b2e19]">₹{finalTotal}</span>
+                  <span className="font-bold text-[#4b2e19]">₹{finalTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>
