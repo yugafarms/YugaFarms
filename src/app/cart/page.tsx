@@ -4,9 +4,10 @@ import { useCart } from "@/app/context/CartContext";
 import CouponApplyBlock from "@/components/CouponApplyBlock";
 import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
+import { trackViewCart } from "@/lib/gtag";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 
 // const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -22,6 +23,17 @@ export default function CartPage() {
   } = useCart();
   const { user } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
+  const cartPageViewSentRef = useRef(false);
+
+  useEffect(() => {
+    if (isLoading || items.length === 0) {
+      cartPageViewSentRef.current = false;
+      return;
+    }
+    if (cartPageViewSentRef.current) return;
+    cartPageViewSentRef.current = true;
+    trackViewCart(items);
+  }, [isLoading, items]);
 
   const handleQuantityChange = async (productId: number, variantId: number, newQuantity: number) => {
     if (newQuantity < 0) return;

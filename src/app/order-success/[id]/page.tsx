@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/app/context/AuthContext";
+import { trackPurchase } from "@/lib/gtag";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -79,15 +80,24 @@ export default function OrderSuccessPage() {
         const data = await response.json();
         setOrder(data.data);
 
-        // Track Purchase event with Meta Pixel
-        if (!purchaseTrackedRef.current && typeof window !== 'undefined' && (window as any).fbq) {
-          (window as any).fbq('track', 'Purchase', {
+        if (!purchaseTrackedRef.current && typeof window !== "undefined") {
+          if ((window as any).fbq) {
+            (window as any).fbq('track', 'Purchase', {
+              value: data.data.total,
+              currency: 'INR',
+              content_name: 'YugaFarms Order',
+              content_ids: data.data.items.map((item: OrderItem) => item.productId.toString()),
+              content_type: 'product',
+              num_items: data.data.items.reduce((sum: number, item: OrderItem) => sum + item.quantity, 0),
+            });
+          }
+          trackPurchase({
+            transactionId: String(data.data.orderNumber ?? data.data.id),
             value: data.data.total,
-            currency: 'INR',
-            content_name: 'YugaFarms Order',
-            content_ids: data.data.items.map((item: any) => item.productId.toString()),
-            content_type: 'product',
-            num_items: data.data.items.reduce((sum: number, item: any) => sum + item.quantity, 0),
+            tax: data.data.tax,
+            shipping: data.data.shipping,
+            currency: "INR",
+            items: data.data.items,
           });
           purchaseTrackedRef.current = true;
         }

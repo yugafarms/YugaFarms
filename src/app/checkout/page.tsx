@@ -10,6 +10,7 @@ import {
   YGF_CHECKOUT_CONTACT_KEY,
   dispatchPixelContactUpdated,
 } from "@/lib/metaAdvancedMatching";
+import { trackBeginCheckout } from "@/lib/gtag";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -94,9 +95,11 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const checkoutTrackedRef = useRef(false);
 
-  // Track InitiateCheckout
+  // Meta: InitiateCheckout · GA4: begin_checkout
   useEffect(() => {
-    if (!checkoutTrackedRef.current && items.length > 0 && typeof window !== "undefined" && (window as any).fbq) {
+    if (checkoutTrackedRef.current || items.length === 0 || typeof window === "undefined") return;
+
+    if ((window as any).fbq) {
       (window as any).fbq('track', 'InitiateCheckout', {
         value: totalPrice,
         currency: 'INR',
@@ -104,9 +107,17 @@ export default function CheckoutPage() {
         content_ids: items.map(item => item.productId.toString()),
         content_type: 'product'
       });
-      checkoutTrackedRef.current = true;
     }
-  }, [items, totalPrice]);
+
+    const value = Math.max(0, totalPrice - discount);
+    trackBeginCheckout(
+      items,
+      value,
+      "INR",
+      appliedCoupon?.Code
+    );
+    checkoutTrackedRef.current = true;
+  }, [items, totalPrice, discount, appliedCoupon]);
 
   // Track if OTP modal has been shown to prevent repeated displays
   const otpModalShownRef = useRef(false);

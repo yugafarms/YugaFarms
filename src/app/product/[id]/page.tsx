@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { useCart } from "@/app/context/CartContext";
+import { trackViewItem } from "@/lib/gtag";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -97,7 +98,7 @@ export default function ProductDetailPage() {
           setSelectedVariant(data.data.Variants[0]);
         }
 
-        // Track ViewContent event with Meta Pixel
+        // Track ViewContent event with Meta Pixel (GA4 view_item fires when selectedVariant is set)
         if (typeof window !== "undefined" && (window as any).fbq) {
           (window as any).fbq('track', 'ViewContent', {
             content_name: data.data.Title,
@@ -125,6 +126,18 @@ export default function ProductDetailPage() {
       }
     }
   }, [params.id]);
+
+  useEffect(() => {
+    if (!product || !selectedVariant) return;
+    const price = selectedVariant.Price - (selectedVariant.Discount || 0);
+    trackViewItem({
+      item_id: `${product.id}_${selectedVariant.id}`,
+      item_name: product.Title,
+      item_variant: String(selectedVariant.Weight),
+      price,
+      quantity: 1,
+    });
+  }, [product, selectedVariant]);
 
   const toggleLike = () => {
     if (!product) return;

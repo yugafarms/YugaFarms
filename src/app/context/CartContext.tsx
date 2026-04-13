@@ -4,6 +4,11 @@ import { useAuth } from "./AuthContext";
 import PhoneOTPModal from "@/components/PhoneOTPModal";
 import AddressModal from "@/components/AddressModal";
 import { AppliedCoupon, computeDiscountForSubtotal } from "@/lib/coupon";
+import {
+  lineToGaItem,
+  trackAddToCart,
+  trackRemoveFromCart,
+} from "@/lib/gtag";
 
 export type CartItem = {
   productId: number;
@@ -397,6 +402,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           });
         }
 
+        trackAddToCart(lineToGaItem({ ...newItem, quantity: 1 }));
+
         // Save to backend if user is logged in
         if (user && jwt) {
           await saveCartToBackend(updatedItems);
@@ -447,6 +454,13 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     try {
       setIsLoading(true);
 
+      const removed = items.find(
+        (item) => item.productId === productId && item.variantId === variantId
+      );
+      if (removed) {
+        trackRemoveFromCart(lineToGaItem(removed));
+      }
+
       const updatedItems = items.filter(
         item => !(item.productId === productId && item.variantId === variantId)
       );
@@ -472,6 +486,27 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       if (quantity <= 0) {
         await removeFromCart(productId, variantId);
         return;
+      }
+
+      const prevItem = items.find(
+        (item) => item.productId === productId && item.variantId === variantId
+      );
+      if (prevItem) {
+        if (quantity > prevItem.quantity) {
+          trackAddToCart(
+            lineToGaItem({
+              ...prevItem,
+              quantity: quantity - prevItem.quantity,
+            })
+          );
+        } else if (quantity < prevItem.quantity) {
+          trackRemoveFromCart(
+            lineToGaItem({
+              ...prevItem,
+              quantity: prevItem.quantity - quantity,
+            })
+          );
+        }
       }
 
       const updatedItems = items.map(item =>
