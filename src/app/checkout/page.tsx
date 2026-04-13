@@ -6,6 +6,10 @@ import Footer from "@/components/Footer";
 import CouponApplyBlock from "@/components/CouponApplyBlock";
 import { useCart } from "@/app/context/CartContext";
 import { useAuth } from "@/app/context/AuthContext";
+import {
+  YGF_CHECKOUT_CONTACT_KEY,
+  dispatchPixelContactUpdated,
+} from "@/lib/metaAdvancedMatching";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -192,6 +196,33 @@ export default function CheckoutPage() {
       loadUserAddress();
     }
   }, [items, user, router, loadUserAddress, jwt]);
+
+  // Meta Pixel advanced matching: sync checkout contact fields for fbq('init')
+  useEffect(() => {
+    const payload = {
+      fullName: shippingAddress.fullName,
+      phone: shippingAddress.phone,
+      city: shippingAddress.city,
+      state: shippingAddress.state,
+      pincode: shippingAddress.pincode,
+    };
+    const hasAny = Object.values(payload).some(
+      (v) => v != null && String(v).trim() !== ""
+    );
+    if (!hasAny) return;
+    try {
+      sessionStorage.setItem(YGF_CHECKOUT_CONTACT_KEY, JSON.stringify(payload));
+      dispatchPixelContactUpdated();
+    } catch {
+      // ignore storage errors
+    }
+  }, [
+    shippingAddress.fullName,
+    shippingAddress.phone,
+    shippingAddress.city,
+    shippingAddress.state,
+    shippingAddress.pincode,
+  ]);
 
   const validateAddress = (address: Address): string[] => {
     const errors: string[] = [];

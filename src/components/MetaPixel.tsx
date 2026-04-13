@@ -1,20 +1,83 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Script from "next/script";
+import { useAuth } from "@/app/context/AuthContext";
+import {
+  buildMetaAdvancedMatchingParams,
+  readCheckoutContact,
+  readSignupDraft,
+  YGF_PIXEL_CONTACT_EVENT,
+} from "@/lib/metaAdvancedMatching";
 
-const PIXEL_ID = "1652373069234970";
+const PIXEL_ID =
+  process.env.NEXT_PUBLIC_META_PIXEL_ID || "1652373069234970";
+
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
+function waitForFbq(onReady: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  if (window.fbq) {
+    onReady();
+    return () => {};
+  }
+  const t = window.setInterval(() => {
+    if (window.fbq) {
+      window.clearInterval(t);
+      onReady();
+    }
+  }, 50);
+  const max = window.setTimeout(() => window.clearInterval(t), 10000);
+  return () => {
+    window.clearInterval(t);
+    window.clearTimeout(max);
+  };
+}
+
+/** Runs fbq init with merged auth + checkout + signup draft; first hit also sends PageView. */
+function FbqAdvancedMatchingInit() {
+  const { user, isLoading } = useAuth();
+  const [contactEpoch, setContactEpoch] = useState(0);
+  const lastInitKey = useRef<string | null>(null);
+
+  useEffect(() => {
+    const bump = () => setContactEpoch((n) => n + 1);
+    window.addEventListener(YGF_PIXEL_CONTACT_EVENT, bump);
+    return () => window.removeEventListener(YGF_PIXEL_CONTACT_EVENT, bump);
+  }, []);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    const cancelWait = waitForFbq(() => {
+      const checkout = readCheckoutContact();
+      const signupDraft = readSignupDraft();
+      const params = buildMetaAdvancedMatchingParams(user, checkout, signupDraft);
+      const key = JSON.stringify(params);
+      if (key === lastInitKey.current) return;
+      lastInitKey.current = key;
+
+      window.fbq?.("init", PIXEL_ID, params);
+    });
+
+    return cancelWait;
+  }, [user, isLoading, contactEpoch]);
+
+  return null;
+}
 
 function PixelTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // This runs on every route change
-    if (typeof window !== "undefined" && (window as any).fbq) {
-      (window as any).fbq("track", "PageView");
-    }
+    if (typeof window === "undefined" || !window.fbq) return;
+    window.fbq("track", "PageView");
   }, [pathname, searchParams]);
 
   return null;
@@ -24,7 +87,7 @@ export default function MetaPixel() {
   return (
     <>
       <Script
-        id="fb-pixel"
+        id="fb-pixel-bootstrap"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
@@ -36,8 +99,6 @@ export default function MetaPixel() {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${PIXEL_ID}');
-            fbq('track', 'PageView');
           `,
         }}
       />
@@ -50,6 +111,7 @@ export default function MetaPixel() {
           alt=""
         />
       </noscript>
+      <FbqAdvancedMatchingInit />
       <Suspense fallback={null}>
         <PixelTracker />
       </Suspense>

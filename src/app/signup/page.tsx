@@ -1,8 +1,12 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
+import {
+  YGF_SIGNUP_DRAFT_KEY,
+  dispatchPixelContactUpdated,
+} from "@/lib/metaAdvancedMatching";
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -13,6 +17,28 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const signupDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (signupDraftTimer.current) clearTimeout(signupDraftTimer.current);
+    signupDraftTimer.current = setTimeout(() => {
+      const hasAny =
+        username.trim() !== "" || email.trim() !== "";
+      if (!hasAny) return;
+      try {
+        sessionStorage.setItem(
+          YGF_SIGNUP_DRAFT_KEY,
+          JSON.stringify({ username: username.trim(), email: email.trim() })
+        );
+        dispatchPixelContactUpdated();
+      } catch {
+        // ignore
+      }
+    }, 400);
+    return () => {
+      if (signupDraftTimer.current) clearTimeout(signupDraftTimer.current);
+    };
+  }, [username, email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +46,12 @@ export default function SignupPage() {
     setLoading(true);
     try {
       await signup(username, email, password);
+      try {
+        sessionStorage.removeItem(YGF_SIGNUP_DRAFT_KEY);
+        dispatchPixelContactUpdated();
+      } catch {
+        // ignore
+      }
       router.push("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Signup failed");

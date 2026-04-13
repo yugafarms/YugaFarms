@@ -80,8 +80,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <MetaPixel />
         <AuthProvider>
+          <MetaPixel />
           <CartProvider>
             {/* <TopBar /> */}
             <main className="pt-24">{children}</main>
