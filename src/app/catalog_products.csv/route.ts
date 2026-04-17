@@ -142,7 +142,7 @@ export async function GET() {
         const onSale = discount > 0 && saleAmount < listPrice;
 
         const availability = variant.Stock > 0 ? "in stock" : "out of stock";
-        const rowId = `${product.id}-v${variant.id ?? index + 1}`;
+        const rowId = String(product.id);
         const weightLabel = variant.Weight != null ? `${variant.Weight} g` : "";
 
         const titleBase = product.Title || "Product";
@@ -155,8 +155,7 @@ export async function GET() {
         const shippingWeight =
           variant.Weight != null && variant.Weight > 0 ? `${variant.Weight} g` : "";
 
-        lines.push(
-          csvRow([
+        const row = [
             rowId,
             title,
             desc,
@@ -189,8 +188,18 @@ export async function GET() {
             tag0,
             tag1,
             "",
-          ])
-        );
+          ];
+
+        // Hard guard: every data row must match header column count exactly.
+        if (row.length !== META_CATALOG_HEADERS.length) {
+          if (row.length > META_CATALOG_HEADERS.length) {
+            row.length = META_CATALOG_HEADERS.length;
+          } else {
+            while (row.length < META_CATALOG_HEADERS.length) row.push("");
+          }
+        }
+
+        lines.push(csvRow(row));
       });
     }
 
