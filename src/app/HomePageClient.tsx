@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useCart } from "@/app/context/CartContext";
 import Image from "next/image";
 import type { BannerMedia, Client, Product, ProductVariant } from "@/lib/strapiPublic";
+import { seoBannerImageAlt } from "@/lib/seo";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -174,7 +175,7 @@ function BannerCarousel({ bannerItems }: { bannerItems: BannerMedia[] }) {
         ) : (
           <Image
             src={`${BACKEND}${currentItem.url}`}
-            alt={currentItem.alternativeText || currentItem.name || "Banner"}
+            alt={seoBannerImageAlt(currentItem)}
             fill
             className="object-cover object-[center_20%] md:object-center"
             priority={currentIndex === 0}

@@ -19,17 +19,18 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://yugafarms.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://www.yugafarms.com"),
   title: {
-    default: "YugaFarms - Pure & Natural Ghee | Rooted in Purity",
+    default: "YugaFarms — Pure A2 Ghee & Honey Online India",
     template: "%s | YugaFarms",
   },
   description:
-    "Experience the purest ghee made using traditional Bilona methods with YugaFarms. Rooted in Indian heritage, always natural.",
+    "Buy A2 ghee online in India — bilona Sahiwal cow ghee, buffalo ghee & raw multifloral honey. Lab-tested, farm-fresh. Shop YugaFarms.",
   openGraph: {
-    title: "YugaFarms - Pure & Natural Ghee",
-    description: "Discover YugaFarms Ghee, produced using time-honored traditions for natural wellness.",
-    url: "https://yugafarms.com", // Replace with actual domain
+    title: "YugaFarms — Pure A2 Ghee & Honey Online",
+    description:
+      "Buy A2 bilona ghee and raw honey online in India. Traditional method, lab-tested purity. Fast delivery from YugaFarms.",
+    url: "https://www.yugafarms.com",
     siteName: "YugaFarms",
     images: [
       {
@@ -44,10 +45,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "YugaFarms - Pure & Natural Ghee",
-    description: "Traditional Indian ghee crafted with purity for your family.",
+    title: "YugaFarms — Buy A2 Ghee & Honey Online India",
+    description:
+      "Bilona A2 cow ghee and raw honey — lab-tested, farm-fresh. Shop YugaFarms online.",
     images: ["/logo.png"],
-    creator: "@yugafarms", // Replace with actual/X handle if applicable
+    creator: "@yugafarms",
   },
 };
 
