@@ -5,6 +5,9 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/app/context/AuthContext";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
+const MAPS_APP_URL = "https://maps.app.goo.gl/PaL5kMkERPGg97bJA?g_st=iw";
+const MAPS_EMBED_URL =
+  "https://www.google.com/maps?q=Janouli%20Palwal%20Haryana%20121102&output=embed";
 
 const SUBJECT_CHIPS: { value: string; label: string }[] = [
   { value: "general", label: "General" },
@@ -401,15 +404,26 @@ export default function ContactPage() {
                 Visit us
               </h2>
               <p className="text-center text-sm text-[#2D2D2D]/65 mb-6">
-                Janouli, Palwal — tap to open in Maps when you&apos;re ready to embed.
+                Janouli, Palwal, Haryana 121102
               </p>
               <div className="rounded-2xl border border-[#4b2e19]/10 overflow-hidden shadow-sm bg-[#4b2e19]/[0.03]">
-                <div className="aspect-[21/9] min-h-[160px] bg-gradient-to-br from-[#3d2614] to-[#2a4a2a] flex items-center justify-center">
-                  <div className="text-center text-white/90 px-4">
-                    <p className="text-sm font-medium opacity-90">Map embed</p>
-                    <p className="text-xs opacity-70 mt-1">Replace this block with Google Maps when you have the embed URL</p>
-                  </div>
-                </div>
+                <iframe
+                  title="YugaFarms location map"
+                  src={MAPS_EMBED_URL}
+                  className="w-full aspect-[21/9] min-h-[220px] border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+              <div className="mt-4 text-center">
+                <a
+                  href={MAPS_APP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center rounded-full bg-[#4b2e19] px-4 py-2 text-sm font-medium text-white hover:bg-[#2f4f2f] transition-colors"
+                >
+                  Open in Google Maps
+                </a>
               </div>
             </div>
           </div>

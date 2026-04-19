@@ -1,10 +1,23 @@
-import React from "react";
-// import ClientBlogPage from "./ClientBlogPage";
+import type { Metadata } from "next";
 import ClientBlogPage from "./ClientBlogPage";
+import { getBlogBySlug, stripHtmlToPlain } from "@/lib/strapiPublic";
 
-// In Next.js 15+, dynamic route params are Promises
-export default async function Page(props: { params: Promise<{ slug: string }> }) {
-  const params = await props.params;
-  
-  return <ClientBlogPage slug={params.slug} />;
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const blog = await getBlogBySlug(slug);
+  if (!blog) {
+    return { title: "Blog | YugaFarms" };
+  }
+  return {
+    title: `${blog.Title} | YugaFarms`,
+    description: stripHtmlToPlain(blog.Content, 160),
+  };
+}
+
+export default async function BlogSlugPage({ params }: Props) {
+  const { slug } = await params;
+  const blog = await getBlogBySlug(slug);
+  return <ClientBlogPage blog={blog} />;
 }

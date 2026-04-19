@@ -6,6 +6,7 @@ import { CartProvider } from "./context/CartContext";
 import CartDrawerWrapper from "@/components/CartDrawerWrapper";
 import MetaPixel from "@/components/MetaPixel";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import TopOfferStrip from "@/components/TopOfferStrip";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,6 +67,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <TopOfferStrip />
         <AuthProvider>
           <GoogleAnalytics />
           <MetaPixel />

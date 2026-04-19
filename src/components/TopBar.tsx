@@ -6,14 +6,6 @@ import React from 'react'
 import { useAuth } from '../app/context/AuthContext'
 import { useCart } from '../app/context/CartContext'
 
-const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
-
-type Offer = {
-    id: number;
-    Text: string;
-    Url: string | null;
-};
-
 /* ─── SVG Icon Components ─────────────────────────────────────────── */
 
 const IconNewlyLaunched = () => (
@@ -137,23 +129,6 @@ export default function TopBar() {
     const { totalItems, setIsCartOpen } = useCart()
     const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false)
     const [isShopOpen, setIsShopOpen] = React.useState(false)
-    const [offers, setOffers] = React.useState<Offer[]>([])
-
-    React.useEffect(() => {
-        const fetchOffers = async () => {
-            try {
-                const res = await fetch(`${BACKEND}/api/nav-offers`)
-                if (res.ok) {
-                    const data = await res.json()
-                    setOffers(data.data || [])
-                }
-            } catch (err) {
-                console.error("Failed to fetch nav offers", err)
-            }
-        }
-        fetchOffers()
-    }, [])
-
     // Lock body scroll when mobile menu is open
     React.useEffect(() => {
         if (isMobileMenuOpen) {
@@ -187,60 +162,6 @@ export default function TopBar() {
 
     return (
         <>
-            {/* ── Offers Marquee Strip ──────────────────────────────────── */}
-            <div className="fixed top-0 left-0 right-0 z-[60] bg-[#4b2e19] text-[#f5d26a] text-sm">
-                <div className="relative overflow-hidden h-10 flex items-center">
-                    <div className="marquee-track will-change-transform font-semibold">
-                        <div className="marquee-group">
-                            {offers.length > 0 ? (
-                                offers.map((offer, idx) => (
-                                    <span key={`offer-1-${idx}`} className="mx-6">
-                                        {offer.Url ? (
-                                            <Link href={offer.Url} className="hover:underline">
-                                                {offer.Text}
-                                            </Link>
-                                        ) : (
-                                            offer.Text
-                                        )}
-                                    </span>
-                                ))
-                            ) : (
-                                <>
-                                    <span className="mx-6">Lower Prices with GST 2.0</span>
-                                    <span className="mx-6">Navratri Special ✨ Flat 15% OFF</span>
-                                    <span className="mx-6">Free Hamper on Orders ₹1999+</span>
-                                    <span className="mx-6">Free Shipping on ₹699+ orders</span>
-                                    <span className="mx-6">Pure Ghee • Lab Tested</span>
-                                </>
-                            )}
-                        </div>
-                        <div className="marquee-group" aria-hidden="true">
-                            {offers.length > 0 ? (
-                                offers.map((offer, idx) => (
-                                    <span key={`offer-2-${idx}`} className="mx-6">
-                                        {offer.Url ? (
-                                            <Link href={offer.Url} className="hover:underline">
-                                                {offer.Text}
-                                            </Link>
-                                        ) : (
-                                            offer.Text
-                                        )}
-                                    </span>
-                                ))
-                            ) : (
-                                <>
-                                    <span className="mx-6">Lower Prices with GST 2.0</span>
-                                    <span className="mx-6">Navratri Special ✨ Flat 15% OFF</span>
-                                    <span className="mx-6">Free Hamper on Orders ₹1999+</span>
-                                    <span className="mx-6">Free Shipping on ₹699+ orders</span>
-                                    <span className="mx-6">Pure Ghee • Lab Tested</span>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             {/* ── Main Header ──────────────────────────────────────────── */}
             <header className="bg-white/90 backdrop-blur-md fixed w-full top-10 z-50 border-b border-gray-100 shadow-sm">
 
