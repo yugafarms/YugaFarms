@@ -1,6 +1,10 @@
 const DEFAULT_BACKEND = "http://localhost:1337";
 
+/** Prefer BACKEND_URL on the server (e.g. Vercel → Strapi) so SSR/crawlers always resolve the API. */
 export function getBackendUrl(): string {
+  if (typeof window === "undefined" && process.env.BACKEND_URL) {
+    return process.env.BACKEND_URL;
+  }
   return process.env.NEXT_PUBLIC_BACKEND || DEFAULT_BACKEND;
 }
 

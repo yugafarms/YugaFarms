@@ -47,6 +47,22 @@ export function seoBannerImageAlt(media: {
   return raw;
 }
 
+/** Blog index — exposes every post URL to crawlers that read JSON-LD. */
+export function buildBlogIndexItemListJsonLd(blogs: BlogSection[]) {
+  const base = getSiteUrl();
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    numberOfItems: blogs.length,
+    itemListElement: blogs.map((b, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: b.Title,
+      item: `${base}/blogs/${b.sluge}`,
+    })),
+  };
+}
+
 export function buildBlogPostingJsonLd(blog: BlogSection) {
   const url = getSiteUrl();
   const backend = getBackendUrl();

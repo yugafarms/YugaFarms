@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
-import BlogsPageClient from "./BlogsPageClient";
+import TopBar from "@/components/TopBar";
+import Footer from "@/components/Footer";
+import JsonLd from "@/components/seo/JsonLd";
+import { buildBlogIndexItemListJsonLd } from "@/lib/seo";
 import { getBlogSections } from "@/lib/strapiPublic";
+import BlogsListing from "./BlogsListing";
 
 export const metadata: Metadata = {
   title: "Blog — Ghee, Honey & Wellness Tips",
@@ -14,7 +18,17 @@ export const metadata: Metadata = {
   },
 };
 
+export const revalidate = 300;
+
 export default async function BlogsPage() {
   const blogs = await getBlogSections();
-  return <BlogsPageClient blogs={blogs} />;
+
+  return (
+    <>
+      {blogs.length > 0 ? <JsonLd data={buildBlogIndexItemListJsonLd(blogs)} /> : null}
+      <TopBar />
+      <BlogsListing blogs={blogs} />
+      <Footer />
+    </>
+  );
 }
