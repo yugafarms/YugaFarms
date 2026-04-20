@@ -2,9 +2,10 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
 import CouponApplyBlock from "@/components/CouponApplyBlock";
+import { trackCustomerEvent } from "@/lib/customerEvents";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -22,8 +23,21 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
     showCheckoutOTP,
     discount,
   } = useCart();
-  const { user } = useAuth();
+  const { user, jwt } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen || isLoading || items.length === 0) return;
+    void trackCustomerEvent("cart", {
+      jwt,
+      payload: {
+        source: "drawer",
+        itemCount: totalItems,
+        valueInr: totalPrice,
+        productIds: items.map((i) => i.productId),
+      },
+    });
+  }, [isOpen, isLoading, items, jwt, totalItems, totalPrice]);
 
   // Helper functions for unit conversion
   const formatVolume = (ml: number): string => {

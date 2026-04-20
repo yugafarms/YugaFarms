@@ -38,6 +38,7 @@ export default function CartPage() {
       jwt,
       path: "/cart",
       payload: {
+        source: "page",
         itemCount: totalItems,
         valueInr: totalPrice,
         productIds: items.map((i) => i.productId),
