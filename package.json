@@ -9,11 +9,11 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "marked": "^18.0.2",
     "next": "^16.0.7",
     "razorpay": "^2.9.6",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "react-markdown": "^10.1.0"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

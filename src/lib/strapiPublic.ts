@@ -1,11 +1,23 @@
 const DEFAULT_BACKEND = "http://localhost:1337";
 
-/** Prefer BACKEND_URL on the server (e.g. Vercel → Strapi) so SSR/crawlers always resolve the API. */
+/** Public Strapi host used for media in next.config — safe SSR fallback when env vars are missing on Vercel. */
+const PRODUCTION_STRAPI_PUBLIC = "https://server.yugafarms.com";
+
+/**
+ * Prefer BACKEND_URL on the server, then NEXT_PUBLIC_BACKEND.
+ * On Vercel without env, fall back to production Strapi so blog/product SSR is not empty (crawlers see real links).
+ */
 export function getBackendUrl(): string {
   if (typeof window === "undefined" && process.env.BACKEND_URL) {
     return process.env.BACKEND_URL;
   }
-  return process.env.NEXT_PUBLIC_BACKEND || DEFAULT_BACKEND;
+  if (process.env.NEXT_PUBLIC_BACKEND) {
+    return process.env.NEXT_PUBLIC_BACKEND;
+  }
+  if (typeof window === "undefined" && process.env.VERCEL) {
+    return PRODUCTION_STRAPI_PUBLIC;
+  }
+  return DEFAULT_BACKEND;
 }
 
 const REVALIDATE_SECONDS = 300;

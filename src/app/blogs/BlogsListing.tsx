@@ -56,6 +56,7 @@ export default function BlogsListing({ blogs }: { blogs: BlogSection[] }) {
               {blogs.map((blog) => (
                 <article key={blog.id}>
                   <Link
+                    prefetch
                     href={`/blogs/${blog.sluge}`}
                     className="group rounded-2xl bg-white overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col border border-[#4b2e19]/10 h-full"
                   >
@@ -111,6 +112,30 @@ export default function BlogsListing({ blogs }: { blogs: BlogSection[] }) {
               ))}
             </div>
           )}
+
+          {blogs.length > 0 ? (
+            <nav
+              aria-label="All blog article links"
+              className="mt-12 border-t border-[#4b2e19]/15 pt-8 pb-4"
+            >
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-[#4b2e19] mb-4">
+                All articles
+              </h2>
+              <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 text-[15px] text-[#2D2D2D]">
+                {blogs.map((blog) => (
+                  <li key={`list-${blog.id}`}>
+                    <Link
+                      prefetch
+                      href={`/blogs/${blog.sluge}`}
+                      className="text-[#2f4f2f] underline underline-offset-2 hover:text-[#4b2e19]"
+                    >
+                      {blog.Title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ) : null}
         </div>
       </section>
 

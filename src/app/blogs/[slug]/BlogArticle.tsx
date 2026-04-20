@@ -1,8 +1,34 @@
 import Image from "next/image";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
+import { marked } from "marked";
 import type { BlogSection } from "@/lib/strapiPublic";
 import { getBackendUrl } from "@/lib/strapiPublic";
+
+marked.setOptions({ gfm: true });
+
+/**
+ * Turn Strapi body into HTML on the server so simple HTTP fetchers see real
+ * article markup in the initial response (no react-markdown / client streaming).
+ */
+function postBodyHtml(content: string): string {
+  const raw = (content || "").trim();
+  if (!raw) return "";
+  if (raw.startsWith("<")) {
+    return raw;
+  }
+  return marked(raw, { async: false }) as string;
+}
+
+const bodyProseClass =
+  "post-body max-w-none text-[#2D2D2D]/80 text-lg leading-relaxed " +
+  "[&_h1]:text-3xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:text-[#4b2e19] " +
+  "[&_h2]:text-2xl [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-4 [&_h2]:text-[#4b2e19] " +
+  "[&_h3]:text-xl [&_h3]:font-bold [&_h3]:mt-6 [&_h3]:mb-3 [&_h3]:text-[#4b2e19] " +
+  "[&_p]:mb-6 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-6 [&_ul]:space-y-2 " +
+  "[&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-6 [&_ol]:space-y-2 " +
+  "[&_li]:text-[#2D2D2D]/80 [&_a]:text-[#2f4f2f] [&_a]:font-semibold [&_a]:underline hover:[&_a]:text-[#f5d26a] " +
+  "[&_blockquote]:border-l-4 [&_blockquote]:border-[#f5d26a] [&_blockquote]:pl-4 [&_blockquote]:py-1 [&_blockquote]:my-6 [&_blockquote]:italic [&_blockquote]:bg-[#fdf7f2] [&_blockquote]:p-4 [&_blockquote]:rounded-r-lg " +
+  "[&_strong]:font-bold [&_strong]:text-[#4b2e19]";
 
 export default function BlogArticle({ blog }: { blog: BlogSection }) {
   const backend = getBackendUrl();
@@ -11,6 +37,8 @@ export default function BlogArticle({ blog }: { blog: BlogSection }) {
       ? blog.CoverImage.url
       : `${backend}${blog.CoverImage.url}`
     : null;
+
+  const bodyHtml = postBodyHtml(blog.Content || "");
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#fdf7f2] via-[#f8f4e6] to-[#f0e6d2] pb-12 md:pb-16 relative">
@@ -51,54 +79,11 @@ export default function BlogArticle({ blog }: { blog: BlogSection }) {
               <div className="w-24 h-1 bg-gradient-to-r from-[#f5d26a] to-[#4b2e19] mx-auto rounded-full" />
             </header>
 
-            <div className="prose-blog">
-              <ReactMarkdown
-                components={{
-                  h1: ({ ...props }) => (
-                    <h1 className="text-3xl font-bold mt-8 mb-4 text-[#4b2e19]" {...props} />
-                  ),
-                  h2: ({ ...props }) => (
-                    <h2 className="text-2xl font-bold mt-8 mb-4 text-[#4b2e19]" {...props} />
-                  ),
-                  h3: ({ ...props }) => (
-                    <h3 className="text-xl font-bold mt-6 mb-3 text-[#4b2e19]" {...props} />
-                  ),
-                  p: ({ ...props }) => (
-                    <p className="mb-6 text-[#2D2D2D]/80 leading-relaxed text-lg" {...props} />
-                  ),
-                  ul: ({ ...props }) => (
-                    <ul
-                      className="list-disc pl-6 mb-6 space-y-2 text-[#2D2D2D]/80 text-lg"
-                      {...props}
-                    />
-                  ),
-                  ol: ({ ...props }) => (
-                    <ol
-                      className="list-decimal pl-6 mb-6 space-y-2 text-[#2D2D2D]/80 text-lg"
-                      {...props}
-                    />
-                  ),
-                  li: ({ ...props }) => <li className="text-[#2D2D2D]/80" {...props} />,
-                  a: ({ ...props }) => (
-                    <a
-                      className="text-[#2f4f2f] underline font-semibold hover:text-[#f5d26a]"
-                      {...props}
-                    />
-                  ),
-                  blockquote: ({ ...props }) => (
-                    <blockquote
-                      className="border-l-4 border-[#f5d26a] pl-4 py-1 my-6 italic bg-[#fdf7f2] p-4 rounded-r-lg"
-                      {...props}
-                    />
-                  ),
-                  strong: ({ ...props }) => (
-                    <strong className="font-bold text-[#4b2e19]" {...props} />
-                  ),
-                }}
-              >
-                {blog.Content}
-              </ReactMarkdown>
-            </div>
+            {bodyHtml ? (
+              <div className={bodyProseClass} dangerouslySetInnerHTML={{ __html: bodyHtml }} />
+            ) : (
+              <p className="text-[#2D2D2D]/70">No article body was provided for this post.</p>
+            )}
           </div>
         </article>
       </div>
