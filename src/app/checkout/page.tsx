@@ -11,6 +11,7 @@ import {
   dispatchPixelContactUpdated,
 } from "@/lib/metaAdvancedMatching";
 import { trackBeginCheckout } from "@/lib/gtag";
+import { trackCustomerEvent } from "@/lib/customerEvents";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -95,29 +96,44 @@ export default function CheckoutPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const checkoutTrackedRef = useRef(false);
 
-  // Meta: InitiateCheckout · GA4: begin_checkout
+  // Meta: InitiateCheckout · GA4: begin_checkout (once) · Strapi customer-event (once per tab, after JWT)
   useEffect(() => {
-    if (checkoutTrackedRef.current || items.length === 0 || typeof window === "undefined") return;
-
-    if ((window as any).fbq) {
-      (window as any).fbq('track', 'InitiateCheckout', {
-        value: totalPrice,
-        currency: 'INR',
-        num_items: items.reduce((sum, item) => sum + item.quantity, 0),
-        content_ids: items.map(item => item.productId.toString()),
-        content_type: 'product'
-      });
-    }
+    if (items.length === 0 || typeof window === "undefined") return;
 
     const value = Math.max(0, totalPrice - discount);
-    trackBeginCheckout(
-      items,
-      value,
-      "INR",
-      appliedCoupon?.Code
-    );
-    checkoutTrackedRef.current = true;
-  }, [items, totalPrice, discount, appliedCoupon]);
+
+    if (!checkoutTrackedRef.current) {
+      if ((window as any).fbq) {
+        (window as any).fbq('track', 'InitiateCheckout', {
+          value: totalPrice,
+          currency: 'INR',
+          num_items: items.reduce((sum, item) => sum + item.quantity, 0),
+          content_ids: items.map(item => item.productId.toString()),
+          content_type: 'product'
+        });
+      }
+
+      trackBeginCheckout(
+        items,
+        value,
+        "INR",
+        appliedCoupon?.Code
+      );
+      checkoutTrackedRef.current = true;
+    }
+
+    void trackCustomerEvent("checkout", {
+      jwt,
+      requireAuth: true,
+      path: "/checkout",
+      payload: {
+        valueInr: value,
+        itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
+        productIds: items.map((item) => item.productId),
+        couponCode: appliedCoupon?.Code ?? null,
+      },
+    });
+  }, [items, totalPrice, discount, appliedCoupon, jwt]);
 
   // Track if OTP modal has been shown to prevent repeated displays
   const otpModalShownRef = useRef(false);

@@ -5,6 +5,7 @@ import CouponApplyBlock from "@/components/CouponApplyBlock";
 import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
 import { trackViewCart } from "@/lib/gtag";
+import { trackCustomerEvent } from "@/lib/customerEvents";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
@@ -21,7 +22,7 @@ export default function CartPage() {
     removeFromCart,
     discount,
   } = useCart();
-  const { user } = useAuth();
+  const { user, jwt } = useAuth();
   const [isUpdating, setIsUpdating] = useState(false);
   const cartPageViewSentRef = useRef(false);
 
@@ -33,7 +34,16 @@ export default function CartPage() {
     if (cartPageViewSentRef.current) return;
     cartPageViewSentRef.current = true;
     trackViewCart(items);
-  }, [isLoading, items]);
+    void trackCustomerEvent("cart", {
+      jwt,
+      path: "/cart",
+      payload: {
+        itemCount: totalItems,
+        valueInr: totalPrice,
+        productIds: items.map((i) => i.productId),
+      },
+    });
+  }, [isLoading, items, jwt, totalItems, totalPrice]);
 
   const handleQuantityChange = async (productId: number, variantId: number, newQuantity: number) => {
     if (newQuantity < 0) return;
