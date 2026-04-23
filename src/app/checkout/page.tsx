@@ -11,7 +11,7 @@ import {
   dispatchPixelContactUpdated,
 } from "@/lib/metaAdvancedMatching";
 import { trackBeginCheckout } from "@/lib/gtag";
-import { trackCustomerEvent } from "@/lib/customerEvents";
+import { buildEventProducts, trackCustomerEvent } from "@/lib/customerEvents";
 
 const BACKEND = process.env.NEXT_PUBLIC_BACKEND || "http://localhost:1337";
 
@@ -129,7 +129,7 @@ export default function CheckoutPage() {
       payload: {
         valueInr: value,
         itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
-        productIds: items.map((item) => item.productId),
+        products: buildEventProducts(items),
         couponCode: appliedCoupon?.Code ?? null,
       },
     });
@@ -294,6 +294,18 @@ export default function CheckoutPage() {
       if (paymentMethod === 'COD') {
         await createOrder();
       } else {
+        void trackCustomerEvent("paymentbutton", {
+          jwt,
+          requireAuth: true,
+          path: "/checkout",
+          payload: {
+            paymentMethod: "RAZORPAY",
+            valueInr: finalTotal,
+            itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
+            products: buildEventProducts(items),
+            couponCode: appliedCoupon?.Code ?? null,
+          },
+        });
         await initiateRazorpayPayment();
       }
     } catch (error) {

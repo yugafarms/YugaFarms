@@ -5,7 +5,7 @@ import CouponApplyBlock from "@/components/CouponApplyBlock";
 import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
 import { trackViewCart } from "@/lib/gtag";
-import { trackCustomerEvent } from "@/lib/customerEvents";
+import { buildEventProducts, trackCustomerEvent } from "@/lib/customerEvents";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
@@ -41,7 +41,7 @@ export default function CartPage() {
         source: "page",
         itemCount: totalItems,
         valueInr: totalPrice,
-        productIds: items.map((i) => i.productId),
+        products: buildEventProducts(items),
       },
     });
   }, [isLoading, items, jwt, totalItems, totalPrice]);

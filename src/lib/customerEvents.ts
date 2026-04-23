@@ -2,12 +2,36 @@
  * Storefront → Strapi customer-events (one row per tab per event via sessionStorage).
  */
 
-export type CustomerEventName = "cart" | "checkout";
+export type CustomerEventName = "cart" | "checkout" | "paymentbutton";
 
 const SESSION_KEYS: Record<CustomerEventName, string> = {
   cart: "ygf_ce_cart",
   checkout: "ygf_ce_checkout",
+  paymentbutton: "ygf_ce_paymentbutton",
 };
+
+type EventProductInput = {
+  productId: number;
+  variantId: number;
+  productTitle: string;
+  quantity: number;
+  price: number;
+  weight: number;
+  productImage?: string;
+};
+
+export function buildEventProducts(items: EventProductInput[]) {
+  return items.map((item) => ({
+    productId: item.productId,
+    variantId: item.variantId,
+    title: item.productTitle,
+    quantity: item.quantity,
+    unitPriceInr: item.price,
+    lineTotalInr: item.price * item.quantity,
+    weight: item.weight,
+    productImage: item.productImage ?? null,
+  }));
+}
 
 /**
  * Sends a single analytics row per browser tab until refresh/close (sessionStorage).

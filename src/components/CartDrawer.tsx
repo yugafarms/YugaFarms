@@ -2,7 +2,7 @@
 import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
 import CouponApplyBlock from "@/components/CouponApplyBlock";
-import { trackCustomerEvent } from "@/lib/customerEvents";
+import { buildEventProducts, trackCustomerEvent } from "@/lib/customerEvents";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -34,7 +34,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
         source: "drawer",
         itemCount: totalItems,
         valueInr: totalPrice,
-        productIds: items.map((i) => i.productId),
+        products: buildEventProducts(items),
       },
     });
   }, [isOpen, isLoading, items, jwt, totalItems, totalPrice]);
