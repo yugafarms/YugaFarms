@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { marked } from "marked";
 import type { BlogSection } from "@/lib/strapiPublic";
@@ -53,13 +52,10 @@ export default function BlogArticle({ blog }: { blog: BlogSection }) {
         <article className="bg-white rounded-3xl overflow-hidden shadow-lg border border-[#4b2e19]/5">
           {coverSrc ? (
             <div className="relative w-full h-[30vh] md:h-[50vh] bg-gray-100">
-              <Image
+              <img
                 src={coverSrc}
                 alt={blog.CoverImage?.alternativeText || blog.Title}
-                fill
-                priority
-                className="object-cover"
-                unoptimized
+                className="absolute inset-0 w-full h-full object-cover"
               />
             </div>
           ) : null}

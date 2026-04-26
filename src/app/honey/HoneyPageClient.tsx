@@ -1,7 +1,6 @@
 'use client'
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { useCart } from "@/app/context/CartContext";
@@ -121,7 +120,7 @@ export default function HoneyPageClient({ products }: { products: Product[] }) {
                       <Link href={`/product/${product.id}`} className="block">
                         <div className="relative bg-gradient-to-br from-[#f5d26a]/20 to-[#f5d26a]/10 rounded-t-xl md:rounded-t-2xl border-b border-[#4b2e19]/10 flex items-center justify-center overflow-hidden cursor-pointer aspect-square w-full">
                           {product.Image && product.Image.length > 0 ? (
-                            <Image 
+                            <img 
                               src={`${BACKEND}${product.Image[0].url}`} 
                               alt={product.Image[0].alternativeText || product.Title}
                               width={400}

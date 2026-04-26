@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
-import Image from "next/image";
 
 export default function AboutPage() {
   const [counters, setCounters] = useState({ years: 0, families: 0, natural: 0, generations: 0 });
@@ -253,7 +252,7 @@ export default function AboutPage() {
                   <div key={idx} className="bg-white/60 backdrop-blur-sm rounded-3xl p-8 border border-[#4b2e19]/10 hover:shadow-xl transition-all duration-500 hover:scale-[1.02] group">
                     <div className="flex items-start gap-6">
                       <div className="w-24 h-24 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 group-hover:scale-110">
-                        <Image src={item.icon} alt={item.title} width={64} height={64} className="w-full h-full object-contain" />
+                        <img src={item.icon} alt={item.title} width={64} height={64} className="w-full h-full object-contain" />
                       </div>
                       <div className="space-y-4">
                         <div>
@@ -322,7 +321,7 @@ export default function AboutPage() {
                       <div className="flex-shrink-0">
                         <div className="relative">
                           <div className="w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110">
-                            <Image src={item.icon} alt={item.title} width={96} height={96} />
+                            <img src={item.icon} alt={item.title} width={96} height={96} />
                           </div>
                           <div className="absolute -top-2 -right-2 w-8 h-8 bg-[#4b2e19] text-white rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 group-hover:scale-110">
                             {item.step}

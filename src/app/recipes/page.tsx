@@ -1,6 +1,5 @@
 'use client'
 import React from "react";
-import Image from "next/image";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 
@@ -84,7 +83,7 @@ export default function RecipesPage() {
                   className="rounded-2xl border border-none flex flex-col items-center backdrop-blur-sm transition-shadow duration-300"
                 >
                   <div className="w-full flex-1 flex items-center justify-center p-4">
-                    <Image
+                    <img
                       src={recipe.image}
                       alt={recipe.title}
                       width={400}

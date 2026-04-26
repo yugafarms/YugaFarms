@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useParams } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
@@ -228,7 +227,7 @@ export default function OrderSuccessPage() {
                     <div key={index} className="flex items-center gap-4 p-4 bg-[#f8f4e6]/50 rounded-xl">
                       <div className="w-16 h-16 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-lg flex items-center justify-center overflow-hidden">
                         {item.productImage ? (
-                          <Image
+                          <img
                             src={item.productImage}
                             alt={item.productTitle}
                             width={64}

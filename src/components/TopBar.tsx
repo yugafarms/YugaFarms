@@ -1,5 +1,4 @@
 'use client'
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React from 'react'
@@ -170,13 +169,12 @@ export default function TopBar() {
 
                     {/* Logo — left */}
                     <Link href="/" className="flex-shrink-0 flex items-center">
-                        <Image
+                        <img
                             src="/logomark.svg"
                             alt="YugaFarms Logo"
                             width={120}
                             height={40}
                             className="object-contain h-10 w-auto"
-                            priority
                         />
                     </Link>
 
@@ -277,13 +275,12 @@ export default function TopBar() {
 
                     {/* Logo — centered absolutely */}
                     <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center">
-                        <Image
+                        <img
                             src="/logomark.svg"
                             alt="YugaFarms Logo"
                             width={120}
                             height={40}
                             className="object-contain h-10 w-auto"
-                            priority
                         />
                     </Link>
 

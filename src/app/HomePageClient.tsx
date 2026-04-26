@@ -5,7 +5,6 @@ import Link from "next/link";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { useCart } from "@/app/context/CartContext";
-import Image from "next/image";
 import type { BannerMedia, Client, Product, ProductVariant } from "@/lib/strapiPublic";
 import { seoBannerImageAlt } from "@/lib/seo";
 
@@ -173,13 +172,10 @@ function BannerCarousel({ bannerItems }: { bannerItems: BannerMedia[] }) {
             Your browser does not support the video tag.
           </video>
         ) : (
-          <Image
+          <img
             src={`${BACKEND}${currentItem.url}`}
             alt={seoBannerImageAlt(currentItem)}
-            fill
-            className="object-cover object-[center_20%] md:object-center"
-            priority={currentIndex === 0}
-            sizes="100vw"
+            className="absolute inset-0 w-full h-full object-cover object-[center_20%] md:object-center"
           />
         )}
       </div>
@@ -358,7 +354,7 @@ export default function HomePageClient({
                       <Link href={`/product/${product.id}`} className="block">
                         <div className="relative bg-gradient-to-br from-[#f5d26a]/20 to-[#f5d26a]/10 rounded-t-xl md:rounded-t-2xl border-b border-[#4b2e19]/10 flex items-center justify-center overflow-hidden cursor-pointer aspect-square w-full">
                           {product.Image && product.Image.length > 0 ? (
-                            <Image
+                            <img
                               src={`${BACKEND}${product.Image[0].url}`}
                               alt={product.Image[0].alternativeText || product.Title}
                               width={400}
@@ -528,7 +524,7 @@ export default function HomePageClient({
                   <div className="flex items-center gap-4 mt-auto">
                     <div className="w-12 h-12 md:w-16 md:h-16 rounded-full overflow-hidden flex-shrink-0 filter drop-shadow-sm border-2 border-gray-50 bg-gray-100">
                       {client.Image?.url ? (
-                        <Image
+                        <img
                           src={`${BACKEND}${client.Image.url}`}
                           alt={client.Image.alternativeText || client.Name || "Client"}
                           width={64}
@@ -536,7 +532,7 @@ export default function HomePageClient({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <Image
+                        <img
                           src="/images/client.png"
                           alt={client?.Name || "Client"}
                           width={64}
@@ -608,7 +604,7 @@ export default function HomePageClient({
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl">
-                    <Image src="/images/bilona.png" alt="Bilona" width={48} height={48} className="w-full h-full object-contain" />
+                    <img src="/images/bilona.png" alt="Bilona" width={48} height={48} className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-[#4b2e19] mb-2">Bilona-Churned Excellence</h3>
@@ -618,7 +614,7 @@ export default function HomePageClient({
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl">
-                    <Image src="/images/leaf.png" alt="Cold Pressed" width={48} height={48} className="w-full h-full object-contain" />
+                    <img src="/images/leaf.png" alt="Cold Pressed" width={48} height={48} className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-[#4b2e19] mb-2">Cold-Pressed Purity</h3>
@@ -628,7 +624,7 @@ export default function HomePageClient({
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl">
-                    <Image src="/images/farm.png" alt="Farm" width={48} height={48} className="w-full h-full object-contain" />
+                    <img src="/images/farm.png" alt="Farm" width={48} height={48} className="w-full h-full object-contain" />
                   </div>
                   <div>
                     <h3 className="text-2xl font-bold text-[#4b2e19] mb-2">Farm-to-Table Freshness</h3>
@@ -640,13 +636,13 @@ export default function HomePageClient({
               {/* Tradition badges */}
               <div className="flex flex-wrap gap-4 pt-6">
                 <div className="bg-[#f5d26a] text-[#4b2e19] px-6 py-3 rounded-full font-semibold flex items-center gap-2">
-                  <Image src="/images/bilona.png" alt="Bilona" width={24} height={24} className="h-[20px] object-contain" /> Bilona-churned
+                  <img src="/images/bilona.png" alt="Bilona" width={24} height={24} className="h-[20px] object-contain" /> Bilona-churned
                 </div>
                 <div className="bg-[#4b2e19] text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2">
-                  <Image src="/images/leaf.png" alt="Cold Pressed" width={24} height={24} className="h-[20px] object-contain" /> Cold-pressed
+                  <img src="/images/leaf.png" alt="Cold Pressed" width={24} height={24} className="h-[20px] object-contain" /> Cold-pressed
                 </div>
                 <div className="bg-white border-2 border-[#4b2e19] text-[#4b2e19] px-6 py-3 rounded-full font-semibold flex items-center">
-                  <Image src="/images/farm.png" alt="Farm" width={24} height={24} className="h-[20px] object-contain" /> No preservatives
+                  <img src="/images/farm.png" alt="Farm" width={24} height={24} className="h-[20px] object-contain" /> No preservatives
                 </div>
               </div>
             </div>
@@ -654,7 +650,7 @@ export default function HomePageClient({
             {/* Right side - Visual */}
             <div className="relative">
               <div className="relative">
-                <Image src="/images/tradition.png" alt="Tradition" width={600} height={600} className="w-[90%] h-full object-cover" />
+                <img src="/images/tradition.png" alt="Tradition" width={600} height={600} className="w-[90%] h-full object-cover" />
               </div>
             </div>
           </div>
@@ -684,7 +680,7 @@ export default function HomePageClient({
             ].map((cert, idx) => (
               <div key={idx} className="flex flex-col items-center group">
                 <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-gradient-to-br from-[#fdf7f2] to-white border border-[#eef2e9] shadow-[0_4px_20px_rgba(0,0,0,0.05)] flex flex-col items-center justify-center mb-3">
-                  <Image src={cert.img} alt={cert.name} width={48} height={48} className="w-full h-full object-contain" />
+                  <img src={cert.img} alt={cert.name} width={48} height={48} className="w-full h-full object-contain" />
                 </div>
                 <span className="text-xs md:text-sm font-semibold text-[#2D2D2D]/80 text-center">
                   {cert.name}
