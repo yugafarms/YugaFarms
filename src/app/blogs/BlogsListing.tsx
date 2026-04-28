@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { BlogSection } from "@/lib/strapiPublic";
 import { getBackendUrl } from "@/lib/strapiPublic";
@@ -61,15 +62,17 @@ export default function BlogsListing({ blogs }: { blogs: BlogSection[] }) {
                   >
                     <div className="relative h-64 w-full overflow-hidden bg-gray-100">
                       {blog.CoverImage?.url ? (
-                        <img
+                        <Image
                           src={
                             blog.CoverImage.url.startsWith("http")
                               ? blog.CoverImage.url
                               : `${backend}${blog.CoverImage.url}`
                           }
                           alt={blog.CoverImage.alternativeText || blog.Title}
-                          className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          unoptimized
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-4xl bg-[#f5d26a]/20">

@@ -3,6 +3,7 @@ import { useAuth } from "@/app/context/AuthContext";
 import { useCart } from "@/app/context/CartContext";
 import CouponApplyBlock from "@/components/CouponApplyBlock";
 import { buildEventProducts, trackCustomerEvent } from "@/lib/customerEvents";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -170,7 +171,7 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                     {/* Product Image */}
                     <div className="w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-md md:rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
                       {item.productImage ? (
-                        <img
+                        <Image
                           src={item.productImage}
                           alt={item.productTitle}
                           width={96}

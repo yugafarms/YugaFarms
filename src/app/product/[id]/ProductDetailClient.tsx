@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
@@ -239,11 +240,13 @@ export default function ProductDetailClient({
                 {/* Main Image */}
                 <div className={`relative w-full bg-gradient-to-br ${gradient} rounded-3xl flex items-center justify-center overflow-hidden aspect-square`}>
                   {product.Image && product.Image.length > 0 ? (
-                    <img
+                    <Image
                       src={`${BACKEND}${product.Image[selectedImageIndex].url}`}
                       alt={product.Image[selectedImageIndex].alternativeText || product.Title}
                       width={800}
                       height={800}
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                       className="w-full h-full object-cover aspect-square"
                     />
                   ) : (
@@ -276,7 +279,7 @@ export default function ProductDetailClient({
                           : 'border-transparent hover:border-[#4b2e19]/50'
                           }`}
                       >
-                        <img
+                        <Image
                           src={`${BACKEND}${image.url}`}
                           alt={image.alternativeText || `${product.Title} ${index + 1}`}
                           width={80}
@@ -339,25 +342,25 @@ export default function ProductDetailClient({
                       <div className="grid grid-cols-4 gap-2 text-center mt-2">
                         <div className="flex flex-col items-center group">
                           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#f5d26a]/50 bg-[#fdf7f2] flex items-center justify-center mb-2 group-hover:bg-[#f5d26a] transition-colors">
-                             <img src="/images/bilona.png" alt="Bilona Churned" width={24} height={24} className="opacity-80 group-hover:opacity-100" />
+                             <Image src="/images/bilona.png" alt="Bilona Churned" width={24} height={24} className="opacity-80 group-hover:opacity-100" />
                           </div>
                           <span className="text-[9px] md:text-[10px] font-bold text-[#4b2e19] uppercase leading-tight">Bilona<br/>Churned</span>
                         </div>
                         <div className="flex flex-col items-center group">
                           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#f5d26a]/50 bg-[#483600] flex items-center justify-center mb-2 transition-colors">
-                             <img src="/images/pure.png" alt="A2 Cow Milk" width={24} height={24} className="opacity-80 group-hover:opacity-100" />
+                             <Image src="/images/pure.png" alt="A2 Cow Milk" width={24} height={24} className="opacity-80 group-hover:opacity-100" />
                           </div>
                           <span className="text-[9px] md:text-[10px] font-bold text-[#4b2e19] uppercase leading-tight">A2 Cow<br/>Milk</span>
                         </div>
                         <div className="flex flex-col items-center group">
                           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#f5d26a]/50 bg-[#fdf7f2] flex items-center justify-center mb-2 group-hover:bg-[#f5d26a] transition-colors">
-                             <img src="/images/traditionalpreparation.png" alt="Woodfire Process" width={24} height={24} className="opacity-80 group-hover:opacity-100" />
+                             <Image src="/images/traditionalpreparation.png" alt="Woodfire Process" width={24} height={24} className="opacity-80 group-hover:opacity-100" />
                           </div>
                           <span className="text-[9px] md:text-[10px] font-bold text-[#4b2e19] uppercase leading-tight">Woodfire<br/>Process</span>
                         </div>
                         <div className="flex flex-col items-center group">
                           <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-[#f5d26a]/50 bg-[#483600] flex items-center justify-center mb-2 transition-colors">
-                             <img src="/images/madeinsmallbatches.png" alt="Small Batches" width={24} height={24} className="opacity-80 group-hover:opacity-100" />
+                             <Image src="/images/madeinsmallbatches.png" alt="Small Batches" width={24} height={24} className="opacity-80 group-hover:opacity-100" />
                           </div>
                           <span className="text-[9px] md:text-[10px] font-bold text-[#4b2e19] uppercase leading-tight">Small<br/>Batches</span>
                         </div>

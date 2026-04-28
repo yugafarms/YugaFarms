@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import TopBar from "@/components/TopBar";
 import { trackViewCart } from "@/lib/gtag";
 import { buildEventProducts, trackCustomerEvent } from "@/lib/customerEvents";
+import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 
@@ -143,7 +144,7 @@ export default function CartPage() {
                       {/* Product Image */}
                       <div className="md:w-32 md:h-32 w-full h-48 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-xl flex items-center justify-center overflow-hidden">
                         {item.productImage ? (
-                          <img
+                          <Image
                             src={item.productImage}
                             alt={item.productTitle}
                             width={128}

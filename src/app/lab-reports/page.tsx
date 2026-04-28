@@ -1,5 +1,6 @@
 'use client'
 import React from "react";
+import Image from "next/image";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 
@@ -58,7 +59,7 @@ export default function LabReportsPage() {
                   className="rounded-2xl border border-none flex flex-col items-center p-0 pb-6"
                 >
                   <div className="w-full flex-1 flex items-center justify-center p-4">
-                    <img
+                    <Image
                       src={item.image}
                       alt={item.name}
                       width={400}

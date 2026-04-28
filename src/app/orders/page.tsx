@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import TopBar from "@/components/TopBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/app/context/AuthContext";
@@ -270,7 +271,7 @@ export default function OrdersPage() {
                         <div key={index} className="flex items-center gap-2.5 py-2 first:pt-0 last:pb-0">
                           <div className="w-9 h-9 md:w-10 md:h-10 shrink-0 bg-gradient-to-br from-[#f5d26a] to-[#e6b800] rounded-md overflow-hidden flex items-center justify-center">
                             {item.productImage ? (
-                              <img
+                              <Image
                                 src={item.productImage}
                                 alt={item.productTitle}
                                 width={40}

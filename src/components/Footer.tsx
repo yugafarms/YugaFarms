@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
@@ -8,7 +9,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                     <div>
                         <Link href="/" className="flex items-center">
-                            <img src="/logo.svg" alt="YugaFarms Logo" width={80} height={80} className="object-contain" />
+                            <Image src="/logo.svg" alt="YugaFarms Logo" width={80} height={80} className="object-contain" />
                             {/* <span className="ml-2 font-[Pacifico] text-xl text-[#4b2e19]">YugaFarms</span> */}
                         </Link>
                         <p className="mt-3 text-sm text-[#2D2D2D]/70 max-w-xs">Pure, traditionally crafted ghee and oils made the slow way — from farm to your plate.</p>
